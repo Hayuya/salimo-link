@@ -1,0 +1,226 @@
+.container {
+  min-height: calc(100vh - 80px);
+  padding: var(--spacing-xl) var(--container-padding);
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.salonHeader {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.salonImage {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.salonInfo {
+  flex: 1;
+}
+
+.salonName {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.address {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.recruitmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.recruitmentTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.statusActive,
+.statusClosed {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.statusActive {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.statusClosed {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-600);
+}
+
+.deadlineInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.value {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.description {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.applySection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.appliedMessage {
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.closedMessage {
+  text-align: center;
+  padding: var(--spacing-md);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.error {
+  text-align: center;
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Modal styles */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.textarea {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  line-height: var(--line-height-normal);
+  width: 100%;
+}
+
+.textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.errorBox {
+  padding: var(--spacing-md);
+  background-color: var(--color-danger-light);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .salonHeader {
+    flex-direction: column;
+  }
+
+  .salonImage {
+    width: 100%;
+    height: 200px;
+  }
+
+  .salonName {
+    font-size: var(--font-size-2xl);
+  }
+
+  .recruitmentHeader {
+    flex-direction: column;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+  }
+
+  .modalActions button {
+    width: 100%;
+  }
+}

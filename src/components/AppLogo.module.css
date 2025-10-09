@@ -1,0 +1,25 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sm .logoText {
+  font-size: var(--font-size-xl);
+}
+
+.md .logoText {
+  font-size: var(--font-size-3xl);
+}
+
+.lg .logoText {
+  font-size: var(--font-size-4xl);
+}
