@@ -1,18 +1,15 @@
 import { Link } from 'react-router-dom';
-import { RecruitmentSlotWithSalon } from '@/types';
-import { formatDate, daysUntilDeadline } from '@/utils/date';
+import { RecruitmentSlotWithDetails } from '@/types';
 import { MENU_LABELS } from '@/utils/recruitment';
 import { Card } from './Card';
 import styles from './RecruitmentCard.module.css';
 
 interface RecruitmentCardProps {
-  recruitment: RecruitmentSlotWithSalon;
+  recruitment: RecruitmentSlotWithDetails;
 }
 
 export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
-  const daysLeft = daysUntilDeadline(recruitment.deadline_date);
-  const isUrgent = daysLeft <= 3 && daysLeft > 0;
-  const isClosed = recruitment.status === 'closed' || recruitment.status === 'confirmed';
+  const availableSlotsCount = recruitment.available_slots?.filter(slot => !slot.is_booked).length || 0;
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>
@@ -57,21 +54,15 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
         )}
 
         <div className={styles.footer}>
-          <div className={styles.deadline}>
-            <span className={styles.deadlineLabel}>募集締切:</span>
-            <span className={styles.deadlineDate}>
-              {formatDate(recruitment.deadline_date)}
-            </span>
+          <div className={styles.slotInfo}>
+            <span className={styles.slotLabel}>空き枠:</span>
+            <span className={styles.slotCount}>{availableSlotsCount}件</span>
           </div>
 
-          {isClosed ? (
-            <span className={styles.statusClosed}>募集終了</span>
-          ) : isUrgent ? (
-            <span className={styles.statusUrgent}>
-              あと{daysLeft}日
-            </span>
+          {availableSlotsCount > 0 ? (
+            <span className={styles.statusActive}>予約可能</span>
           ) : (
-            <span className={styles.statusActive}>募集中</span>
+            <span className={styles.statusClosed}>予約不可</span>
           )}
         </div>
       </Card>

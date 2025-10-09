@@ -77,19 +77,19 @@
   border-top: 1px solid var(--color-border-light);
 }
 
-.deadline {
+.slotInfo {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
 }
 
-.deadlineLabel {
+.slotLabel {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
   font-weight: var(--font-weight-medium);
 }
 
-.deadlineDate {
+.slotCount {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);

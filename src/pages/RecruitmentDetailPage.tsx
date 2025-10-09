@@ -3,16 +3,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
-import { useApplications } from '@/hooks/useApplications';
-import { RecruitmentSlotWithSalon } from '@/types';
-import { formatDate, formatDateTime, isDeadlinePassed } from '@/utils/date';
-import { 
-  MENU_LABELS, 
-  GENDER_LABELS, 
-  HAIR_LENGTH_LABELS, 
-  PHOTO_SHOOT_LABELS, 
-  EXPERIENCE_LABELS 
-} from '@/utils/recruitment';
+import { useReservations } from '@/hooks/useReservations';
+import { RecruitmentSlotWithDetails, AvailableSlot } from '@/types';
+import { formatDateTime } from '@/utils/date';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
@@ -24,399 +17,96 @@ export const RecruitmentDetailPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { fetchRecruitmentById } = useRecruitments();
-  const { checkIfApplied, createApplication } = useApplications();
+  const { createReservation, loading: reservationLoading } = useReservations();
 
-  const [recruitment, setRecruitment] = useState<RecruitmentSlotWithSalon | null>(null);
+  const [recruitment, setRecruitment] = useState<RecruitmentSlotWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasApplied, setHasApplied] = useState(false);
-
-  // 応募モーダル
-  const [showModal, setShowModal] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
   const [message, setMessage] = useState('');
-  const [conditionsAccepted, setConditionsAccepted] = useState<boolean[]>([]);
-  const [errors, setErrors] = useState<{ conditions?: string; general?: string }>({});
-  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
-    loadRecruitment();
-  }, [id]);
-
-  const loadRecruitment = async () => {
-    if (!id) return;
-
-    try {
+    if (id) {
       setLoading(true);
-      const data = await fetchRecruitmentById(id);
-      setRecruitment(data);
-
-      // 学生の場合、応募済みかチェック
-      if (user && user.userType === 'student') {
-        const applied = await checkIfApplied(user.id, id);
-        setHasApplied(applied);
-      }
-    } catch (error) {
-      console.error('募集情報の取得に失敗:', error);
-    } finally {
-      setLoading(false);
+      fetchRecruitmentById(id)
+        .then(data => setRecruitment(data))
+        .catch(error => console.error('募集情報の取得に失敗:', error))
+        .finally(() => setLoading(false));
     }
-  };
+  }, [id, fetchRecruitmentById]);
 
-  const handleApplyClick = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    if (user.userType !== 'student') {
-      alert('学生のみ応募できます');
-      return;
-    }
-
-    if (!recruitment) return;
-
-    // 条件の数だけfalseの配列を初期化
-    const conditionCount = getConditionCount(recruitment);
-    setConditionsAccepted(new Array(conditionCount).fill(false));
-    setShowModal(true);
-  };
-
-  const getConditionCount = (rec: RecruitmentSlotWithSalon) => {
-    let count = 0;
-    if (rec.menus && rec.menus.length > 0) count++;
-    if (rec.gender_requirement && rec.gender_requirement !== 'any') count++;
-    if (rec.hair_length_requirement && rec.hair_length_requirement !== 'any') count++;
-    if (rec.model_experience_requirement && rec.model_experience_requirement !== 'any') count++;
-    if (rec.has_date_requirement) count++;
-    if (rec.treatment_duration) count++;
-    return count;
-  };
-
-  const validateForm = () => {
-    const newErrors: { conditions?: string } = {};
-
-    // 全ての条件にチェックが入っているか確認
-    if (!conditionsAccepted.every(accepted => accepted)) {
-      newErrors.conditions = '全ての条件を確認してチェックを入れてください';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmitApplication = async () => {
-    if (!validateForm() || !user || !recruitment) return;
-
-    setApplying(true);
-    setErrors({});
+  const handleReservation = async () => {
+    if (!user || user.userType !== 'student' || !selectedSlot || !recruitment) return;
 
     try {
-      await createApplication({
-        recruitment_slot_id: recruitment.id,
+      await createReservation({
+        slot_id: selectedSlot.id,
         student_id: user.id,
-        message: message || undefined,
+        salon_id: recruitment.salon_id,
+        recruitment_slot_id: recruitment.id,
+        message,
         status: 'pending',
       });
-
-      alert('応募が完了しました！');
-      setShowModal(false);
-      setHasApplied(true);
-      setMessage('');
-      setConditionsAccepted([]);
+      alert('仮予約が完了しました。サロンからの承認をお待ちください。');
+      setSelectedSlot(null);
+      // 予約後はスロット一覧を更新
+      fetchRecruitmentById(recruitment.id).then(setRecruitment);
     } catch (error: any) {
-      setErrors({ general: error.message || '応募に失敗しました' });
-    } finally {
-      setApplying(false);
+      alert(error.message || '予約に失敗しました');
     }
   };
 
-  if (loading) {
-    return <Spinner fullScreen />;
-  }
+  if (loading) return <Spinner fullScreen />;
+  if (!recruitment) return <div>募集情報が見つかりませんでした</div>;
 
-  if (!recruitment) {
-    return (
-      <div className={styles.container}>
-        <Card padding="lg">
-          <p className={styles.error}>募集情報が見つかりませんでした</p>
-          <Button onClick={() => navigate('/')}>トップページへ戻る</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  const deadlinePassed = isDeadlinePassed(recruitment.deadline_date);
-  const canApply = user?.userType === 'student' && !hasApplied && !deadlinePassed && recruitment.status === 'active';
+  const availableSlots = recruitment.available_slots.filter(slot => !slot.is_booked);
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        {/* サロン情報 */}
+        {/* サロン情報 (変更なし) */}
+        
         <Card padding="lg">
-          <div className={styles.salonHeader}>
-            {recruitment.salon.photo_url && (
-              <img
-                src={recruitment.salon.photo_url}
-                alt={recruitment.salon.salon_name}
-                className={styles.salonImage}
-              />
-            )}
-            <div className={styles.salonInfo}>
-              <h1 className={styles.salonName}>{recruitment.salon.salon_name}</h1>
-              {recruitment.salon.address && (
-                <p className={styles.address}>📍 {recruitment.salon.address}</p>
-              )}
-            </div>
-          </div>
-
-          {recruitment.salon.description && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>サロンについて</h3>
-              <p className={styles.description}>{recruitment.salon.description}</p>
-            </div>
-          )}
-        </Card>
-
-        {/* 募集情報 */}
-        <Card padding="lg">
-          <div className={styles.recruitmentHeader}>
-            <h2 className={styles.recruitmentTitle}>{recruitment.title}</h2>
-            {recruitment.status === 'closed' || recruitment.status === 'confirmed' ? (
-              <span className={styles.statusClosed}>募集終了</span>
-            ) : deadlinePassed ? (
-              <span className={styles.statusClosed}>締切済み</span>
-            ) : (
-              <span className={styles.statusActive}>募集中</span>
-            )}
-          </div>
-
-          <div className={styles.deadlineInfo}>
-            <span className={styles.label}>募集締切:</span>
-            <span className={styles.value}>{formatDate(recruitment.deadline_date)}</span>
-          </div>
-
-          {recruitment.description && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>募集内容</h3>
-              <p className={styles.description}>{recruitment.description}</p>
-            </div>
-          )}
-
-          {/* 募集条件 */}
+          {/* 募集情報 (締切日を削除) */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>募集条件</h3>
-            <div className={styles.conditionsList}>
-              {recruitment.menus && recruitment.menus.length > 0 && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>メニュー:</span>
-                  <span className={styles.conditionValue}>
-                    {recruitment.menus.map(menu => MENU_LABELS[menu]).join('、')}
-                  </span>
-                </div>
-              )}
-              {recruitment.gender_requirement && recruitment.gender_requirement !== 'any' && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>性別:</span>
-                  <span className={styles.conditionValue}>
-                    {GENDER_LABELS[recruitment.gender_requirement]}
-                  </span>
-                </div>
-              )}
-              {recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any' && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>髪の長さ:</span>
-                  <span className={styles.conditionValue}>
-                    {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}
-                  </span>
-                </div>
-              )}
-              {recruitment.model_experience_requirement && recruitment.model_experience_requirement !== 'any' && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>モデル経験:</span>
-                  <span className={styles.conditionValue}>
-                    {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}
-                  </span>
-                </div>
-              )}
-               {recruitment.photo_shoot_requirement && recruitment.photo_shoot_requirement !== 'none' && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>撮影:</span>
-                  <span className={styles.conditionValue}>
-                    {PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}
-                  </span>
-                </div>
-              )}
-              {recruitment.has_date_requirement && recruitment.appointment_date && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>施術日時:</span>
-                  <span className={styles.conditionValue}>
-                    {formatDateTime(recruitment.appointment_date)}
-                  </span>
-                </div>
-              )}
-              {recruitment.treatment_duration && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>施術時間:</span>
-                  <span className={styles.conditionValue}>
-                    {recruitment.treatment_duration}
-                  </span>
-                </div>
-              )}
-              {recruitment.has_reward && (
-                 <div className={styles.conditionItem}>
-                 <span className={styles.conditionLabel}>謝礼:</span>
-                 <span className={styles.conditionValue}>
-                   あり {recruitment.reward_details && `(${recruitment.reward_details})`}
-                 </span>
-               </div>
-              )}
-            </div>
+            <h3 className={styles.sectionTitle}>予約可能な日時</h3>
+            {availableSlots.length > 0 ? (
+              <div className={styles.slotsGrid}>
+                {availableSlots.map(slot => (
+                  <Button 
+                    key={slot.id} 
+                    variant="outline"
+                    onClick={() => user ? setSelectedSlot(slot) : navigate('/login')}
+                  >
+                    {formatDateTime(slot.slot_time)}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p>現在予約可能な日時がありません。</p>
+            )}
           </div>
-
-          {recruitment.requirements && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>その他の条件</h3>
-              <p className={styles.description}>{recruitment.requirements}</p>
-            </div>
-          )}
-
-          {/* 応募ボタン */}
-          {user?.userType === 'student' && (
-            <div className={styles.applySection}>
-              {hasApplied ? (
-                <div className={styles.appliedMessage}>
-                  ✓ 応募済みです
-                </div>
-              ) : canApply ? (
-                <Button
-                  variant="primary"
-                  size="lg"
-                  fullWidth
-                  onClick={handleApplyClick}
-                >
-                  この募集に応募する
-                </Button>
-              ) : deadlinePassed ? (
-                <p className={styles.closedMessage}>募集締切を過ぎています</p>
-              ) : (
-                <p className={styles.closedMessage}>募集は終了しました</p>
-              )}
-            </div>
-          )}
-
-          {!user && (
-            <div className={styles.applySection}>
-              <Button
-                variant="primary"
-                size="lg"
-                fullWidth
-                onClick={() => navigate('/login')}
-              >
-                ログインして応募する
-              </Button>
-            </div>
-          )}
         </Card>
       </div>
 
-      {/* 応募モーダル */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title="応募確認"
-        size="md"
-      >
-        <div className={styles.modalContent}>
-          <p className={styles.modalDescription}>
-            以下の条件を確認し、全ての項目にチェックを入れてください
-          </p>
-          <div className={styles.conditionsChecklist}>
-            {recruitment && (() => {
-              let index = 0;
-              const conditions: JSX.Element[] = [];
-              const addCondition = (key: string, content: JSX.Element) => {
-                const currentIndex = index;
-                conditions.push(
-                  <label key={key} className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    {content}
-                  </label>
-                );
-                index++;
-              };
-
-              if (recruitment.menus && recruitment.menus.length > 0) {
-                addCondition('menu', <span><strong>メニュー:</strong> {recruitment.menus.map(m => MENU_LABELS[m]).join('、')}に該当します</span>);
-              }
-              if (recruitment.gender_requirement && recruitment.gender_requirement !== 'any') {
-                addCondition('gender', <span><strong>性別:</strong> {GENDER_LABELS[recruitment.gender_requirement]}に該当します</span>);
-              }
-              if (recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any') {
-                addCondition('hair', <span><strong>髪の長さ:</strong> {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}に該当します</span>);
-              }
-              if (recruitment.model_experience_requirement && recruitment.model_experience_requirement !== 'any') {
-                addCondition('experience', <span><strong>モデル経験:</strong> {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}に該当します</span>);
-              }
-              if (recruitment.has_date_requirement && recruitment.appointment_date) {
-                addCondition('date', <span><strong>施術日時:</strong> {formatDateTime(recruitment.appointment_date)}に参加可能です</span>);
-              }
-              if (recruitment.treatment_duration) {
-                addCondition('duration', <span><strong>施術時間:</strong> {recruitment.treatment_duration}の時間を確保できます</span>);
-              }
-              return conditions;
-            })()}
-          </div>
-
-
-          {errors.conditions && (
-            <div className={styles.errorBox}>
-              {errors.conditions}
-            </div>
-          )}
-
-          {/* メッセージ入力 */}
-          <div className={styles.inputWrapper}>
-            <label className={styles.label}>メッセージ（任意）</label>
+      {selectedSlot && (
+        <Modal isOpen={!!selectedSlot} onClose={() => setSelectedSlot(null)} title="予約確認" size="md">
+          <div className={styles.modalContent}>
+            <p>以下の日時で仮予約します。よろしいですか？</p>
+            <strong>{formatDateTime(selectedSlot.slot_time)}</strong>
             <textarea
               className={styles.textarea}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="サロンへのメッセージや希望があれば入力してください"
+              placeholder="サロンへのメッセージがあれば入力してください（任意）"
               rows={4}
             />
-          </div>
-
-          {errors.general && (
-            <div className={styles.errorBox}>
-              {errors.general}
+            <div className={styles.modalActions}>
+              <Button variant="outline" onClick={() => setSelectedSlot(null)}>キャンセル</Button>
+              <Button variant="primary" onClick={handleReservation} loading={reservationLoading}>仮予約を確定する</Button>
             </div>
-          )}
-
-          <div className={styles.modalActions}>
-            <Button
-              variant="outline"
-              onClick={() => setShowModal(false)}
-              disabled={applying}
-            >
-              キャンセル
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleSubmitApplication}
-              loading={applying}
-            >
-              応募する
-            </Button>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 };

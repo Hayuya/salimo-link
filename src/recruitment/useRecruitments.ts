@@ -1,57 +1,48 @@
+// src/recruitment/useRecruitments.ts
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   RecruitmentSlot,
-  RecruitmentSlotWithSalon,
+  RecruitmentSlotWithDetails,
   RecruitmentSlotInsert,
   RecruitmentSlotUpdate,
 } from '@/types';
 
-/**
- * 募集情報を管理するカスタムフック
- */
 export const useRecruitments = () => {
-  const [recruitments, setRecruitments] = useState<RecruitmentSlotWithSalon[]>([]);
+  const [recruitments, setRecruitments] = useState<RecruitmentSlotWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * 全ての募集情報を取得（アクティブなもののみ）
-   */
   const fetchRecruitments = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('recruitment_slots')
         .select(`
           *,
-          salon:salons(*)
+          salon:salons(*),
+          available_slots(*)
         `)
         .eq('status', 'active')
-        .order('deadline_date', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-
       setRecruitments(data || []);
-      setError(null);
     } catch (err: any) {
-      console.error('募集情報の取得エラー:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * 特定の募集情報を取得
-   */
-  const fetchRecruitmentById = async (id: string): Promise<RecruitmentSlotWithSalon | null> => {
+  const fetchRecruitmentById = async (id: string): Promise<RecruitmentSlotWithDetails | null> => {
     try {
       const { data, error } = await supabase
         .from('recruitment_slots')
         .select(`
           *,
-          salon:salons(*)
+          salon:salons(*),
+          available_slots(*)
         `)
         .eq('id', id)
         .single();
@@ -59,14 +50,10 @@ export const useRecruitments = () => {
       if (error) throw error;
       return data;
     } catch (err: any) {
-      console.error('募集情報の取得エラー:', err);
       throw err;
     }
   };
 
-  /**
-   * サロンの募集情報を取得
-   */
   const fetchRecruitmentsBySalonId = async (salonId: string): Promise<RecruitmentSlot[]> => {
     try {
       const { data, error } = await supabase
@@ -78,37 +65,42 @@ export const useRecruitments = () => {
       if (error) throw error;
       return data || [];
     } catch (err: any) {
-      console.error('サロンの募集情報取得エラー:', err);
       throw err;
     }
   };
 
-  /**
-   * 新しい募集を作成
-   */
   const createRecruitment = async (data: RecruitmentSlotInsert): Promise<RecruitmentSlot> => {
     try {
-      const { data: newRecruitment, error } = await supabase
+      const { available_slots, ...recruitmentData } = data;
+
+      // 1. 募集スロットを作成
+      const { data: newRecruitment, error: recruitmentError } = await supabase
         .from('recruitment_slots')
-        .insert(data)
+        .insert(recruitmentData)
         .select()
         .single();
+      
+      if (recruitmentError) throw recruitmentError;
 
-      if (error) throw error;
+      // 2. 利用可能な日時スロットを作成
+      const slotInsertData = available_slots.map(slot => ({
+        recruitment_slot_id: newRecruitment.id,
+        slot_time: slot,
+      }));
+
+      const { error: slotsError } = await supabase
+        .from('available_slots')
+        .insert(slotInsertData);
+
+      if (slotsError) throw slotsError;
+
       return newRecruitment;
     } catch (err: any) {
-      console.error('募集作成エラー:', err);
       throw err;
     }
   };
 
-  /**
-   * 募集情報を更新
-   */
-  const updateRecruitment = async (
-    id: string,
-    data: RecruitmentSlotUpdate
-  ): Promise<RecruitmentSlot> => {
+  const updateRecruitment = async (id: string, data: RecruitmentSlotUpdate): Promise<RecruitmentSlot> => {
     try {
       const { data: updatedRecruitment, error } = await supabase
         .from('recruitment_slots')
@@ -120,14 +112,10 @@ export const useRecruitments = () => {
       if (error) throw error;
       return updatedRecruitment;
     } catch (err: any) {
-      console.error('募集更新エラー:', err);
       throw err;
     }
   };
 
-  /**
-   * 募集を削除
-   */
   const deleteRecruitment = async (id: string): Promise<void> => {
     try {
       const { error } = await supabase
@@ -137,7 +125,6 @@ export const useRecruitments = () => {
 
       if (error) throw error;
     } catch (err: any) {
-      console.error('募集削除エラー:', err);
       throw err;
     }
   };
