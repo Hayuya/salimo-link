@@ -4,11 +4,10 @@ import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
 import { useApplications } from '@/hooks/useApplications';
 import { RecruitmentSlotWithSalon } from '@/types';
-import { formatDate, isDeadlinePassed } from '@/utils/date';
-import { isValidInstagramUrl } from '@/utils/validators';
+import { formatDate, formatDateTime, isDeadlinePassed } from '@/utils/date';
+import { MENU_LABELS, GENDER_LABELS, HAIR_LENGTH_LABELS } from '@/utils/recruitment';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Spinner } from '@/components/Spinner';
 import styles from './RecruitmentDetailPage.module.css';
@@ -26,9 +25,9 @@ export const RecruitmentDetailPage = () => {
 
   // 応募モーダル
   const [showModal, setShowModal] = useState(false);
-  const [instagramUrl, setInstagramUrl] = useState('');
   const [message, setMessage] = useState('');
-  const [errors, setErrors] = useState<{ instagramUrl?: string; general?: string }>({});
+  const [conditionsAccepted, setConditionsAccepted] = useState<boolean[]>([]);
+  const [errors, setErrors] = useState<{ conditions?: string; general?: string }>({});
   const [applying, setApplying] = useState(false);
 
   useEffect(() => {
@@ -66,21 +65,30 @@ export const RecruitmentDetailPage = () => {
       return;
     }
 
-    // プロフィールからInstagram URLを初期値として設定
-    if (user.profile.instagram_url) {
-      setInstagramUrl(user.profile.instagram_url);
-    }
+    if (!recruitment) return;
 
+    // 条件の数だけfalseの配列を初期化
+    const conditionCount = getConditionCount(recruitment);
+    setConditionsAccepted(new Array(conditionCount).fill(false));
     setShowModal(true);
   };
 
-  const validateForm = () => {
-    const newErrors: { instagramUrl?: string } = {};
+  const getConditionCount = (rec: RecruitmentSlotWithSalon) => {
+    let count = 0;
+    if (rec.menus && rec.menus.length > 0) count++;
+    if (rec.gender_requirement && rec.gender_requirement !== 'any') count++;
+    if (rec.hair_length_requirement && rec.hair_length_requirement !== 'any') count++;
+    if (rec.has_date_requirement) count++;
+    if (rec.treatment_duration) count++;
+    return count;
+  };
 
-    if (!instagramUrl) {
-      newErrors.instagramUrl = 'Instagram URLを入力してください';
-    } else if (!isValidInstagramUrl(instagramUrl)) {
-      newErrors.instagramUrl = '有効なInstagram URLを入力してください（例: https://instagram.com/username）';
+  const validateForm = () => {
+    const newErrors: { conditions?: string } = {};
+
+    // 全ての条件にチェックが入っているか確認
+    if (!conditionsAccepted.every(accepted => accepted)) {
+      newErrors.conditions = '全ての条件を確認してチェックを入れてください';
     }
 
     setErrors(newErrors);
@@ -97,7 +105,6 @@ export const RecruitmentDetailPage = () => {
       await createApplication({
         recruitment_slot_id: recruitment.id,
         student_id: user.id,
-        instagram_url: instagramUrl,
         message: message || undefined,
         status: 'pending',
       });
@@ -105,6 +112,8 @@ export const RecruitmentDetailPage = () => {
       alert('応募が完了しました！');
       setShowModal(false);
       setHasApplied(true);
+      setMessage('');
+      setConditionsAccepted([]);
     } catch (error: any) {
       setErrors({ general: error.message || '応募に失敗しました' });
     } finally {
@@ -184,9 +193,56 @@ export const RecruitmentDetailPage = () => {
             </div>
           )}
 
+          {/* 募集条件 */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>募集条件</h3>
+            <div className={styles.conditionsList}>
+              {recruitment.menus && recruitment.menus.length > 0 && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>メニュー:</span>
+                  <span className={styles.conditionValue}>
+                    {recruitment.menus.map(menu => MENU_LABELS[menu]).join('、')}
+                  </span>
+                </div>
+              )}
+              {recruitment.gender_requirement && recruitment.gender_requirement !== 'any' && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>性別:</span>
+                  <span className={styles.conditionValue}>
+                    {GENDER_LABELS[recruitment.gender_requirement]}
+                  </span>
+                </div>
+              )}
+              {recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any' && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>髪の長さ:</span>
+                  <span className={styles.conditionValue}>
+                    {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}
+                  </span>
+                </div>
+              )}
+              {recruitment.has_date_requirement && recruitment.appointment_date && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>施術日時:</span>
+                  <span className={styles.conditionValue}>
+                    {formatDateTime(recruitment.appointment_date)}
+                  </span>
+                </div>
+              )}
+              {recruitment.treatment_duration && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>施術時間:</span>
+                  <span className={styles.conditionValue}>
+                    {recruitment.treatment_duration}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {recruitment.requirements && (
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>応募条件</h3>
+              <h3 className={styles.sectionTitle}>その他の条件</h3>
               <p className={styles.description}>{recruitment.requirements}</p>
             </div>
           )}
@@ -234,21 +290,130 @@ export const RecruitmentDetailPage = () => {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="応募情報を入力"
+        title="応募確認"
         size="md"
       >
         <div className={styles.modalContent}>
-          <Input
-            label="Instagram プロフィールURL"
-            type="url"
-            value={instagramUrl}
-            onChange={(e) => setInstagramUrl(e.target.value)}
-            error={errors.instagramUrl}
-            placeholder="https://instagram.com/username"
-            required
-            fullWidth
-          />
+          <p className={styles.modalDescription}>
+            以下の条件を確認し、全ての項目にチェックを入れてください
+          </p>
 
+          {/* 条件確認チェックリスト */}
+          <div className={styles.conditionsChecklist}>
+            {recruitment && (() => {
+              let index = 0;
+              const conditions = [];
+
+              if (recruitment.menus && recruitment.menus.length > 0) {
+                conditions.push(
+                  <label key="menu" className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[index] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[index] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    <span>
+                      <strong>メニュー:</strong> {recruitment.menus.map(m => MENU_LABELS[m]).join('、')}に該当します
+                    </span>
+                  </label>
+                );
+                index++;
+              }
+
+              if (recruitment.gender_requirement && recruitment.gender_requirement !== 'any') {
+                conditions.push(
+                  <label key="gender" className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[index] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[index] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    <span>
+                      <strong>性別:</strong> {GENDER_LABELS[recruitment.gender_requirement]}に該当します
+                    </span>
+                  </label>
+                );
+                index++;
+              }
+
+              if (recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any') {
+                conditions.push(
+                  <label key="hair" className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[index] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[index] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    <span>
+                      <strong>髪の長さ:</strong> {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}に該当します
+                    </span>
+                  </label>
+                );
+                index++;
+              }
+
+              if (recruitment.has_date_requirement && recruitment.appointment_date) {
+                conditions.push(
+                  <label key="date" className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[index] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[index] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    <span>
+                      <strong>施術日時:</strong> {formatDateTime(recruitment.appointment_date)}に参加可能です
+                    </span>
+                  </label>
+                );
+                index++;
+              }
+
+              if (recruitment.treatment_duration) {
+                conditions.push(
+                  <label key="duration" className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[index] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[index] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    <span>
+                      <strong>施術時間:</strong> {recruitment.treatment_duration}の時間を確保できます
+                    </span>
+                  </label>
+                );
+              }
+
+              return conditions;
+            })()}
+          </div>
+
+          {errors.conditions && (
+            <div className={styles.errorBox}>
+              {errors.conditions}
+            </div>
+          )}
+
+          {/* メッセージ入力 */}
           <div className={styles.inputWrapper}>
             <label className={styles.label}>メッセージ（任意）</label>
             <textarea

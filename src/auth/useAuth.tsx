@@ -128,31 +128,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     profileData: StudentInsert | SalonInsert
   ) => {
     try {
-      // ユーザー登録
+      // プロフィールデータをメタデータとして含めてユーザー登録
+      // Database Triggerがこのメタデータを使用してプロフィールを自動作成
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            user_type: userType,
+            ...profileData,
+          },
+        },
       });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error('ユーザー作成に失敗しました');
 
-      // プロフィール作成
-      const tableName = userType === 'student' ? 'students' : 'salons';
-      const { error: profileError } = await supabase.from(tableName).insert({
-        ...profileData,
-        id: authData.user.id,
-        email: authData.user.email!,
-      });
-
-      if (profileError) {
-        // プロフィール作成に失敗した場合、認証ユーザーを削除
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        throw profileError;
+      // メール確認が必要な場合は、確認を促すメッセージを表示
+      if (authData.user && !authData.session) {
+        alert('確認メールを送信しました。メールを確認してアカウントを有効化してください。');
       }
 
-      // プロフィール読み込み
-      await loadUserProfile(authData.user.id, authData.user.email!);
+      // セッションがあればプロフィールを読み込み（メール確認不要の場合）
+      if (authData.session) {
+        await loadUserProfile(authData.user.id, authData.user.email!);
+      }
     } catch (error: any) {
       console.error('新規登録エラー:', error);
       throw new Error(error.message || '新規登録に失敗しました');

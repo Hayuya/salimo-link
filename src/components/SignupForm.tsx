@@ -96,7 +96,10 @@ export const SignupForm = () => {
           };
 
       await signUp(email, password, userType, profileData);
-      navigate('/');
+      
+      // 登録成功メッセージを表示してログインページへ
+      alert('登録が完了しました！メールを確認してアカウントを有効化してください。');
+      navigate('/login');
     } catch (error: any) {
       setErrors({ general: error.message || '新規登録に失敗しました' });
     } finally {

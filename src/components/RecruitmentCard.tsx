@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { RecruitmentSlotWithSalon } from '@/types';
 import { formatDate, daysUntilDeadline } from '@/utils/date';
+import { MENU_LABELS } from '@/utils/recruitment';
 import { Card } from './Card';
 import styles from './RecruitmentCard.module.css';
 
@@ -33,6 +34,19 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
         </div>
 
         <h4 className={styles.title}>{recruitment.title}</h4>
+
+        {recruitment.menus && recruitment.menus.length > 0 && (
+          <div className={styles.menuTags}>
+            {recruitment.menus.slice(0, 3).map(menu => (
+              <span key={menu} className={styles.menuTag}>
+                {MENU_LABELS[menu]}
+              </span>
+            ))}
+            {recruitment.menus.length > 3 && (
+              <span className={styles.menuTag}>+{recruitment.menus.length - 3}</span>
+            )}
+          </div>
+        )}
 
         {recruitment.description && (
           <p className={styles.description}>

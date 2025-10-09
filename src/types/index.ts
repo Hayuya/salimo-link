@@ -76,6 +76,12 @@ export interface SalonUpdate {
   photo_url?: string;
 }
 
+export type GenderRequirement = 'male' | 'female' | 'any';
+
+export type HairLengthRequirement = 'short' | 'bob' | 'medium' | 'long' | 'any';
+
+export type MenuType = 'cut' | 'color' | 'perm' | 'treatment' | 'straight' | 'other';
+
 // ==========================================
 // Recruitment Slot
 // ==========================================
@@ -85,7 +91,13 @@ export interface RecruitmentSlot {
   salon_id: string;
   title: string;
   description?: string;
-  requirements?: string;
+  requirements?: string; // 旧形式（互換性のため残す）
+  menus: MenuType[];
+  gender_requirement: GenderRequirement;
+  hair_length_requirement: HairLengthRequirement;
+  has_date_requirement: boolean;
+  appointment_date?: string;
+  treatment_duration?: string;
   deadline_date: string;
   status: RecruitmentStatus;
   max_applicants: number;
@@ -101,7 +113,12 @@ export interface RecruitmentSlotInsert {
   salon_id: string;
   title: string;
   description?: string;
-  requirements?: string;
+  menus: MenuType[];
+  gender_requirement: GenderRequirement;
+  hair_length_requirement: HairLengthRequirement;
+  has_date_requirement: boolean;
+  appointment_date?: string;
+  treatment_duration?: string;
   deadline_date: string;
   status: RecruitmentStatus;
   max_applicants?: number;
@@ -110,7 +127,12 @@ export interface RecruitmentSlotInsert {
 export interface RecruitmentSlotUpdate {
   title?: string;
   description?: string;
-  requirements?: string;
+  menus?: MenuType[];
+  gender_requirement?: GenderRequirement;
+  hair_length_requirement?: HairLengthRequirement;
+  has_date_requirement?: boolean;
+  appointment_date?: string;
+  treatment_duration?: string;
   deadline_date?: string;
   status?: RecruitmentStatus;
   max_applicants?: number;
@@ -124,7 +146,7 @@ export interface Application {
   id: string;
   recruitment_slot_id: string;
   student_id: string;
-  instagram_url: string;
+  instagram_url?: string;
   message?: string;
   status: ApplicationStatus;
   created_at: string;
@@ -139,7 +161,7 @@ export interface ApplicationWithDetails extends Application {
 export interface ApplicationInsert {
   recruitment_slot_id: string;
   student_id: string;
-  instagram_url: string;
+  instagram_url?: string;
   message?: string;
   status: ApplicationStatus;
 }

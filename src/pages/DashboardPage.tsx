@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useApplications } from '@/hooks/useApplications';
 import { useRecruitments } from '@/recruitment';
-import { ApplicationWithDetails, RecruitmentSlot, Student, Salon } from '@/types';
+import { ApplicationWithDetails, RecruitmentSlot, Student, Salon, MenuType, GenderRequirement, HairLengthRequirement } from '@/types';
 import { formatDate, formatDateTime } from '@/utils/date';
+import { MENU_OPTIONS, MENU_LABELS, GENDER_OPTIONS, GENDER_LABELS, HAIR_LENGTH_OPTIONS, HAIR_LENGTH_LABELS } from '@/utils/recruitment';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
@@ -31,7 +32,12 @@ export const DashboardPage = () => {
   const [recruitmentData, setRecruitmentData] = useState({
     title: '',
     description: '',
-    requirements: '',
+    menus: [] as MenuType[],
+    gender_requirement: 'any' as GenderRequirement,
+    hair_length_requirement: 'any' as HairLengthRequirement,
+    has_date_requirement: false,
+    appointment_date: '',
+    treatment_duration: '',
     deadline_date: '',
   });
   const [createLoading, setCreateLoading] = useState(false);
@@ -84,7 +90,15 @@ export const DashboardPage = () => {
       setCreateLoading(true);
       await createRecruitment({
         salon_id: user.id,
-        ...recruitmentData,
+        title: recruitmentData.title,
+        description: recruitmentData.description,
+        menus: recruitmentData.menus,
+        gender_requirement: recruitmentData.gender_requirement,
+        hair_length_requirement: recruitmentData.hair_length_requirement,
+        has_date_requirement: recruitmentData.has_date_requirement,
+        appointment_date: recruitmentData.has_date_requirement ? recruitmentData.appointment_date : undefined,
+        treatment_duration: recruitmentData.treatment_duration || undefined,
+        deadline_date: recruitmentData.deadline_date,
         status: 'active',
       });
       alert('募集を作成しました');
@@ -92,7 +106,12 @@ export const DashboardPage = () => {
       setRecruitmentData({
         title: '',
         description: '',
-        requirements: '',
+        menus: [],
+        gender_requirement: 'any',
+        hair_length_requirement: 'any',
+        has_date_requirement: false,
+        appointment_date: '',
+        treatment_duration: '',
         deadline_date: '',
       });
       await loadDashboardData();
@@ -101,6 +120,15 @@ export const DashboardPage = () => {
     } finally {
       setCreateLoading(false);
     }
+  };
+
+  const toggleMenu = (menu: MenuType) => {
+    setRecruitmentData(prev => ({
+      ...prev,
+      menus: prev.menus.includes(menu)
+        ? prev.menus.filter(m => m !== menu)
+        : [...prev.menus, menu]
+    }));
   };
 
   const getStatusLabel = (status: string) => {
@@ -145,7 +173,6 @@ export const DashboardPage = () => {
               <p><strong>名前:</strong> {(user.profile as Student).name}</p>
               <p><strong>学校名:</strong> {(user.profile as Student).school_name || '未設定'}</p>
               <p><strong>メールアドレス:</strong> {user.email}</p>
-              <p><strong>Instagram:</strong> {(user.profile as Student).instagram_url || '未設定'}</p>
             </div>
           ) : (
             <div className={styles.profileInfo}>
@@ -250,14 +277,6 @@ export const DashboardPage = () => {
                 onChange={(e) => setProfileData({ ...profileData, school_name: e.target.value })}
                 fullWidth
               />
-              <Input
-                label="Instagram URL"
-                type="url"
-                value={profileData.instagram_url || ''}
-                onChange={(e) => setProfileData({ ...profileData, instagram_url: e.target.value })}
-                placeholder="https://instagram.com/username"
-                fullWidth
-              />
             </>
           ) : (
             <>
@@ -306,7 +325,7 @@ export const DashboardPage = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         title="新規募集作成"
-        size="md"
+        size="lg"
       >
         <div className={styles.modalContent}>
           <Input
@@ -316,24 +335,110 @@ export const DashboardPage = () => {
             required
             fullWidth
           />
+          
           <div className={styles.inputWrapper}>
             <label className={styles.label}>募集内容</label>
             <textarea
               className={styles.textarea}
               value={recruitmentData.description}
               onChange={(e) => setRecruitmentData({ ...recruitmentData, description: e.target.value })}
+              placeholder="詳しい募集内容を入力してください"
               rows={4}
             />
           </div>
+
+          {/* メニュー選択 */}
           <div className={styles.inputWrapper}>
-            <label className={styles.label}>応募条件</label>
-            <textarea
-              className={styles.textarea}
-              value={recruitmentData.requirements}
-              onChange={(e) => setRecruitmentData({ ...recruitmentData, requirements: e.target.value })}
-              rows={3}
-            />
+            <label className={styles.label}>メニュー（複数選択可）<span className={styles.required}>*</span></label>
+            <div className={styles.checkboxGrid}>
+              {MENU_OPTIONS.map(menu => (
+                <label key={menu} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={recruitmentData.menus.includes(menu)}
+                    onChange={() => toggleMenu(menu)}
+                  />
+                  <span>{MENU_LABELS[menu]}</span>
+                </label>
+              ))}
+            </div>
           </div>
+
+          {/* 性別 */}
+          <div className={styles.inputWrapper}>
+            <label className={styles.label}>性別</label>
+            <div className={styles.radioGroup}>
+              {GENDER_OPTIONS.map(gender => (
+                <label key={gender} className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={gender}
+                    checked={recruitmentData.gender_requirement === gender}
+                    onChange={(e) => setRecruitmentData({ ...recruitmentData, gender_requirement: e.target.value as GenderRequirement })}
+                  />
+                  <span>{GENDER_LABELS[gender]}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 髪の長さ */}
+          <div className={styles.inputWrapper}>
+            <label className={styles.label}>髪の長さ</label>
+            <div className={styles.radioGroup}>
+              {HAIR_LENGTH_OPTIONS.map(length => (
+                <label key={length} className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="hairLength"
+                    value={length}
+                    checked={recruitmentData.hair_length_requirement === length}
+                    onChange={(e) => setRecruitmentData({ ...recruitmentData, hair_length_requirement: e.target.value as HairLengthRequirement })}
+                  />
+                  <span>{HAIR_LENGTH_LABELS[length]}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 日時指定 */}
+          <div className={styles.inputWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={recruitmentData.has_date_requirement}
+                onChange={(e) => setRecruitmentData({ ...recruitmentData, has_date_requirement: e.target.checked })}
+              />
+              <span>日時の指定あり</span>
+            </label>
+          </div>
+
+          {/* 日時指定がある場合 */}
+          {recruitmentData.has_date_requirement && (
+            <>
+              <Input
+                label="施術日時"
+                type="datetime-local"
+                value={recruitmentData.appointment_date}
+                onChange={(e) => setRecruitmentData({ ...recruitmentData, appointment_date: e.target.value })}
+                required
+                fullWidth
+              />
+            </>
+          )}
+
+          {/* 施術時間 */}
+          <Input
+            label="施術時間（任意）"
+            type="text"
+            value={recruitmentData.treatment_duration}
+            onChange={(e) => setRecruitmentData({ ...recruitmentData, treatment_duration: e.target.value })}
+            placeholder="例: 2〜3時間"
+            fullWidth
+          />
+
+          {/* 募集締切日 */}
           <Input
             label="募集締切日"
             type="date"
@@ -342,11 +447,18 @@ export const DashboardPage = () => {
             required
             fullWidth
           />
+          <p className={styles.note}>※予告なく締め切る場合もございますので予めご了承ください</p>
+
           <div className={styles.modalActions}>
             <Button variant="outline" onClick={() => setShowCreateModal(false)}>
               キャンセル
             </Button>
-            <Button variant="primary" onClick={handleCreateRecruitment} loading={createLoading}>
+            <Button 
+              variant="primary" 
+              onClick={handleCreateRecruitment} 
+              loading={createLoading}
+              disabled={recruitmentData.menus.length === 0 || !recruitmentData.title || !recruitmentData.deadline_date}
+            >
               作成
             </Button>
           </div>

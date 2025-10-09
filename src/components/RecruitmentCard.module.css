@@ -46,6 +46,22 @@
   margin: 0 0 var(--spacing-sm) 0;
 }
 
+.menuTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.menuTag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
 .description {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
