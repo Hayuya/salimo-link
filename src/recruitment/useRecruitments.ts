@@ -6,6 +6,7 @@ import {
   RecruitmentWithDetails,
   RecruitmentInsert,
   RecruitmentUpdate,
+  AvailableDate,
 } from '@/types';
 
 export const useRecruitments = () => {
@@ -26,7 +27,13 @@ export const useRecruitments = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setRecruitments(data || []);
+      const filteredRecruitments = (data || []).filter((recruitment) => {
+        if (recruitment.status !== 'active') return false;
+        return Array.isArray(recruitment.available_dates)
+          ? (recruitment.available_dates as AvailableDate[]).some((date: AvailableDate) => !date.is_booked)
+          : true;
+      });
+      setRecruitments(filteredRecruitments);
     } catch (err: any) {
       setError(err.message);
     } finally {
