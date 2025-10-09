@@ -365,6 +365,78 @@ export const DashboardPage = () => {
   if (loading) return <Spinner fullScreen />;
   if (!user) return null;
   
+  const pendingReservations = reservations.filter(res => res.status === 'pending');
+  const nonPendingReservations = reservations.filter(res => res.status !== 'pending');
+
+  const renderSalonReservation = (res: ReservationWithDetails) => (
+    <div
+      key={res.id}
+      className={[
+        styles.applicationItem,
+        res.status === 'pending' ? styles.pendingReservation : '',
+      ].filter(Boolean).join(' ')}
+    >
+      <div className={styles.applicationHeader}>
+        <div className={styles.reservationDetails}>
+          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+            {res.recruitment.title}
+          </Link>
+          <div className={styles.studentInfo}>
+            <p className={styles.studentInfoRow}>
+              <strong>予約者:</strong> {res.student.name}
+            </p>
+            {res.student.school_name && (
+              <p className={styles.studentInfoRow}>
+                <strong>学校:</strong> {res.student.school_name}
+              </p>
+            )}
+            <p className={styles.studentInfoRow}>
+              <strong>メール:</strong>{' '}
+              <a className={styles.contactLink} href={`mailto:${res.student.email}`}>
+                {res.student.email}
+              </a>
+            </p>
+            {res.student.instagram_url && (
+              <p className={styles.studentInfoRow}>
+                <strong>Instagram:</strong>{' '}
+                <a
+                  className={styles.contactLink}
+                  href={res.student.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {res.student.instagram_url}
+                </a>
+              </p>
+            )}
+          </div>
+          <p className={styles.applicationSalon}>
+            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+          </p>
+          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
+          {res.message && (
+            <p className={styles.applicationSalon}>
+              <strong>メッセージ:</strong> {res.message}
+            </p>
+          )}
+        </div>
+        <span className={getReservationStatusLabel(res.status).className}>
+          {getReservationStatusLabel(res.status).text}
+        </span>
+      </div>
+      {res.status === 'pending' && (
+        <div className={styles.recruitmentActions}>
+          <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
+            承認
+          </Button>
+          <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
+            キャンセル
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
   const renderRecruitmentForm = (
     data: typeof newRecruitmentData | typeof editingRecruitment | null,
     setter: any,
@@ -630,34 +702,85 @@ export const DashboardPage = () => {
         </Card>
 
         {user.userType === 'student' && (
-          <Card padding="lg">
-            <h2 className={styles.sectionTitle}>予約履歴</h2>
-            {reservations.length === 0 ? (
-              <p className={styles.emptyMessage}>予約履歴はありません</p>
-            ) : (
-              <div className={styles.applicationList}>
-                {reservations.map((res) => (
-                  <div key={res.id} className={styles.applicationItem}>
-                    <div className={styles.applicationHeader}>
-                      <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-                        {res.recruitment.title}
-                      </Link>
-                      <span className={getReservationStatusLabel(res.status).className}>
-                        {getReservationStatusLabel(res.status).text}
-                      </span>
+          <>
+            {pendingReservations.length > 0 && (
+              <Card padding="lg" className={styles.pendingCard}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>承認待ちの予約</h2>
+                </div>
+                <p className={styles.pendingDescription}>
+                  サロンからの承認をお待ちください。連絡が届いたら早めに返信しましょう。
+                </p>
+                <div className={styles.applicationList}>
+                  {pendingReservations.map(res => (
+                    <div key={res.id} className={`${styles.applicationItem} ${styles.pendingReservation}`}>
+                      <div className={styles.applicationHeader}>
+                        <div className={styles.reservationDetails}>
+                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+                            {res.recruitment.title}
+                          </Link>
+                          <p className={styles.applicationSalon}>
+                            <strong>サロン:</strong> {res.recruitment.salon.salon_name}
+                          </p>
+                          <p className={styles.applicationSalon}>
+                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+                          </p>
+                          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
+                        </div>
+                        <span className={getReservationStatusLabel(res.status).className}>
+                          {getReservationStatusLabel(res.status).text}
+                        </span>
+                      </div>
                     </div>
-                    <p className={styles.applicationSalon}>
-                      <strong>サロン:</strong> {res.recruitment.salon.salon_name}
-                    </p>
-                    <p className={styles.applicationSalon}>
-                      <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-                    </p>
-                    <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </Card>
             )}
-          </Card>
+
+            <Card padding="lg">
+              <h2 className={styles.sectionTitle}>予約履歴</h2>
+              {nonPendingReservations.length === 0 ? (
+                <p className={styles.emptyMessage}>
+                  {pendingReservations.length > 0 ? '承認待ち以外の予約はまだありません' : '予約履歴はありません'}
+                </p>
+              ) : (
+                <div className={styles.applicationList}>
+                  {nonPendingReservations.map(res => (
+                    <div
+                      key={res.id}
+                      className={[
+                        styles.applicationItem,
+                        res.status === 'confirmed' ? styles.confirmedReservation : '',
+                      ].filter(Boolean).join(' ')}
+                    >
+                      <div className={styles.applicationHeader}>
+                        <div className={styles.reservationDetails}>
+                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+                            {res.recruitment.title}
+                          </Link>
+                          <p className={styles.applicationSalon}>
+                            <strong>サロン:</strong> {res.recruitment.salon.salon_name}
+                          </p>
+                          <p className={styles.applicationSalon}>
+                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+                          </p>
+                          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
+                          {res.status === 'confirmed' && (
+                            <p className={styles.confirmedNote}>
+                              予約が確定しました。集合時間や持ち物などの連絡を確認しましょう。
+                            </p>
+                          )}
+                        </div>
+                        <span className={getReservationStatusLabel(res.status).className}>
+                          {getReservationStatusLabel(res.status).text}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </>
         )}
 
         {user.userType === 'salon' && (
@@ -667,42 +790,23 @@ export const DashboardPage = () => {
               {reservations.length === 0 ? (
                 <p className={styles.emptyMessage}>現在、予約はありません</p>
               ) : (
-                <div className={styles.applicationList}>
-                  {reservations.map(res => (
-                    <div key={res.id} className={styles.applicationItem}>
-                      <div className={styles.applicationHeader}>
-                        <div style={{ flex: 1 }}>
-                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-                            {res.recruitment.title}
-                          </Link>
-                          <p className={styles.applicationSalon}>
-                            <strong>予約者:</strong> {res.student.name}
-                          </p>
-                          <p className={styles.applicationSalon}>
-                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-                          </p>
-                          {res.message && (
-                            <p className={styles.applicationSalon}>
-                              <strong>メッセージ:</strong> {res.message}
-                            </p>
-                          )}
-                        </div>
-                        <span className={getReservationStatusLabel(res.status).className}>
-                          {getReservationStatusLabel(res.status).text}
-                        </span>
+                <div className={styles.reservationSections}>
+                  {pendingReservations.length > 0 && (
+                    <div className={styles.reservationSection}>
+                      <h3 className={styles.subSectionTitle}>承認待ち</h3>
+                      <div className={styles.applicationList}>
+                        {pendingReservations.map(renderSalonReservation)}
                       </div>
-                      {res.status === 'pending' && (
-                        <div className={styles.recruitmentActions}>
-                          <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
-                            承認
-                          </Button>
-                          <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
-                            キャンセル
-                          </Button>
-                        </div>
-                      )}
                     </div>
-                  ))}
+                  )}
+                  {nonPendingReservations.length > 0 && (
+                    <div className={styles.reservationSection}>
+                      <h3 className={styles.subSectionTitle}>その他の予約</h3>
+                      <div className={styles.applicationList}>
+                        {nonPendingReservations.map(renderSalonReservation)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </Card>

@@ -90,6 +90,17 @@ export const useReservations = () => {
         }
         throw new Error(errorMessage);
       }
+
+      if (data) {
+        const { error: closeError } = await supabase
+          .from('recruitments')
+          .update({ status: 'closed' })
+          .eq('id', recruitmentId);
+
+        if (closeError) {
+          console.error('Failed to close recruitment after reservation:', closeError);
+        }
+      }
       
       return data; // 予約IDを返す
     } catch (err: any) {
@@ -129,6 +140,28 @@ export const useReservations = () => {
           console.error('cancel_reservation error:', cancelError);
           // キャンセル処理のエラーは警告のみとして扱う
           console.warn('予約の日時を空き枠に戻す処理に失敗しました');
+        }
+
+        if (updatedReservation?.recruitment_id) {
+          const recruitmentId = updatedReservation.recruitment_id;
+          const { data: activeReservations, error: activeError } = await supabase
+            .from('reservations')
+            .select('id')
+            .eq('recruitment_id', recruitmentId)
+            .in('status', ['pending', 'confirmed']);
+
+          if (activeError) {
+            console.error('Failed to check active reservations:', activeError);
+          } else if ((activeReservations?.length || 0) === 0) {
+            const { error: reopenError } = await supabase
+              .from('recruitments')
+              .update({ status: 'active' })
+              .eq('id', recruitmentId);
+
+            if (reopenError) {
+              console.error('Failed to reopen recruitment:', reopenError);
+            }
+          }
         }
       }
       

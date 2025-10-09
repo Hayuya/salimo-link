@@ -88,6 +88,22 @@
   box-shadow: var(--shadow-sm);
 }
 
+.reservationDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.pendingReservation {
+  border-color: var(--color-info);
+  background-color: var(--color-info-light);
+}
+
+.confirmedReservation {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light);
+}
+
 .applicationHeader {
   display: flex;
   justify-content: space-between;
@@ -118,6 +134,13 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
   margin: 0;
+}
+
+.confirmedNote {
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+  margin: var(--spacing-xs) 0 0 0;
 }
 
 /* Recruitment List */
@@ -175,6 +198,25 @@
   border-top: 1px solid var(--color-border-light);
 }
 
+.reservationSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.reservationSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.subSectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
 
 /* Status badges */
 .statusPending,
@@ -218,6 +260,33 @@
 .statusClosed {
   background-color: var(--color-gray-200);
   color: var(--color-gray-600);
+}
+
+.pendingCard {
+  border-left: 4px solid var(--color-info);
+  background-color: var(--color-info-light);
+}
+
+.pendingDescription {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-secondary);
+}
+
+.studentInfo {
+  display: grid;
+  gap: var(--spacing-xs);
+  margin: var(--spacing-sm) 0;
+}
+
+.studentInfoRow {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.contactLink {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 /* Modal styles */
