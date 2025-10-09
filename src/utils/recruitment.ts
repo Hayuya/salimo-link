@@ -1,4 +1,5 @@
-import { MenuType, GenderRequirement, HairLengthRequirement } from '@/types';
+// src/utils/recruitment.ts
+import { MenuType, GenderRequirement, HairLengthRequirement, PhotoShootRequirement, ModelExperienceRequirement } from '@/types';
 
 /**
  * メニューの日本語ラベル
@@ -9,6 +10,10 @@ export const MENU_LABELS: Record<MenuType, string> = {
   perm: 'パーマ',
   treatment: 'トリートメント',
   straight: 'ストレート',
+  hair_set: 'ヘアセット',
+  head_spa: 'ヘッドスパ',
+  hair_straightening: '縮毛矯正',
+  extensions: 'エクステ',
   other: 'その他',
 };
 
@@ -33,9 +38,38 @@ export const HAIR_LENGTH_LABELS: Record<HairLengthRequirement, string> = {
 };
 
 /**
+ * 撮影要件の日本語ラベル
+ */
+export const PHOTO_SHOOT_LABELS: Record<PhotoShootRequirement, string> = {
+  required: '必須',
+  optional: '任意',
+  none: 'なし',
+};
+
+/**
+ * モデル経験の日本語ラベル
+ */
+export const EXPERIENCE_LABELS: Record<ModelExperienceRequirement, string> = {
+  any: '問わない',
+  experienced: '経験者のみ',
+  beginner: '未経験者歓迎',
+};
+
+/**
  * メニューの選択肢
  */
-export const MENU_OPTIONS: MenuType[] = ['cut', 'color', 'perm', 'treatment', 'straight', 'other'];
+export const MENU_OPTIONS: MenuType[] = [
+  'cut', 
+  'color', 
+  'perm', 
+  'treatment', 
+  'straight', 
+  'hair_set', 
+  'head_spa', 
+  'hair_straightening', 
+  'extensions', 
+  'other'
+];
 
 /**
  * 性別の選択肢
@@ -46,3 +80,13 @@ export const GENDER_OPTIONS: GenderRequirement[] = ['male', 'female', 'any'];
  * 髪の長さの選択肢
  */
 export const HAIR_LENGTH_OPTIONS: HairLengthRequirement[] = ['short', 'bob', 'medium', 'long', 'any'];
+
+/**
+ * 撮影要件の選択肢
+ */
+export const PHOTO_SHOOT_OPTIONS: PhotoShootRequirement[] = ['required', 'optional', 'none'];
+
+/**
+ * モデル経験の選択肢
+ */
+export const EXPERIENCE_OPTIONS: ModelExperienceRequirement[] = ['any', 'experienced', 'beginner'];

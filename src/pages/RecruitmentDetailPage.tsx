@@ -1,3 +1,4 @@
+// src/pages/RecruitmentDetailPage.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
@@ -5,7 +6,13 @@ import { useRecruitments } from '@/recruitment';
 import { useApplications } from '@/hooks/useApplications';
 import { RecruitmentSlotWithSalon } from '@/types';
 import { formatDate, formatDateTime, isDeadlinePassed } from '@/utils/date';
-import { MENU_LABELS, GENDER_LABELS, HAIR_LENGTH_LABELS } from '@/utils/recruitment';
+import { 
+  MENU_LABELS, 
+  GENDER_LABELS, 
+  HAIR_LENGTH_LABELS, 
+  PHOTO_SHOOT_LABELS, 
+  EXPERIENCE_LABELS 
+} from '@/utils/recruitment';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
@@ -78,6 +85,7 @@ export const RecruitmentDetailPage = () => {
     if (rec.menus && rec.menus.length > 0) count++;
     if (rec.gender_requirement && rec.gender_requirement !== 'any') count++;
     if (rec.hair_length_requirement && rec.hair_length_requirement !== 'any') count++;
+    if (rec.model_experience_requirement && rec.model_experience_requirement !== 'any') count++;
     if (rec.has_date_requirement) count++;
     if (rec.treatment_duration) count++;
     return count;
@@ -221,6 +229,22 @@ export const RecruitmentDetailPage = () => {
                   </span>
                 </div>
               )}
+              {recruitment.model_experience_requirement && recruitment.model_experience_requirement !== 'any' && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>モデル経験:</span>
+                  <span className={styles.conditionValue}>
+                    {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}
+                  </span>
+                </div>
+              )}
+               {recruitment.photo_shoot_requirement && recruitment.photo_shoot_requirement !== 'none' && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>撮影:</span>
+                  <span className={styles.conditionValue}>
+                    {PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}
+                  </span>
+                </div>
+              )}
               {recruitment.has_date_requirement && recruitment.appointment_date && (
                 <div className={styles.conditionItem}>
                   <span className={styles.conditionLabel}>施術日時:</span>
@@ -236,6 +260,14 @@ export const RecruitmentDetailPage = () => {
                     {recruitment.treatment_duration}
                   </span>
                 </div>
+              )}
+              {recruitment.has_reward && (
+                 <div className={styles.conditionItem}>
+                 <span className={styles.conditionLabel}>謝礼:</span>
+                 <span className={styles.conditionValue}>
+                   あり {recruitment.reward_details && `(${recruitment.reward_details})`}
+                 </span>
+               </div>
               )}
             </div>
           </div>
@@ -297,121 +329,51 @@ export const RecruitmentDetailPage = () => {
           <p className={styles.modalDescription}>
             以下の条件を確認し、全ての項目にチェックを入れてください
           </p>
-
-          {/* 条件確認チェックリスト */}
           <div className={styles.conditionsChecklist}>
             {recruitment && (() => {
               let index = 0;
-              const conditions = [];
+              const conditions: JSX.Element[] = [];
+              const addCondition = (key: string, content: JSX.Element) => {
+                const currentIndex = index;
+                conditions.push(
+                  <label key={key} className={styles.conditionCheckLabel}>
+                    <input
+                      type="checkbox"
+                      checked={conditionsAccepted[currentIndex] || false}
+                      onChange={(e) => {
+                        const newAccepted = [...conditionsAccepted];
+                        newAccepted[currentIndex] = e.target.checked;
+                        setConditionsAccepted(newAccepted);
+                      }}
+                    />
+                    {content}
+                  </label>
+                );
+                index++;
+              };
 
               if (recruitment.menus && recruitment.menus.length > 0) {
-                const currentIndex = index;
-                conditions.push(
-                  <label key="menu" className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    <span>
-                      <strong>メニュー:</strong> {recruitment.menus.map(m => MENU_LABELS[m]).join('、')}に該当します
-                    </span>
-                  </label>
-                );
-                index++;
+                addCondition('menu', <span><strong>メニュー:</strong> {recruitment.menus.map(m => MENU_LABELS[m]).join('、')}に該当します</span>);
               }
-
               if (recruitment.gender_requirement && recruitment.gender_requirement !== 'any') {
-                const currentIndex = index;
-                conditions.push(
-                  <label key="gender" className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    <span>
-                      <strong>性別:</strong> {GENDER_LABELS[recruitment.gender_requirement]}に該当します
-                    </span>
-                  </label>
-                );
-                index++;
+                addCondition('gender', <span><strong>性別:</strong> {GENDER_LABELS[recruitment.gender_requirement]}に該当します</span>);
               }
-
               if (recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any') {
-                const currentIndex = index;
-                conditions.push(
-                  <label key="hair" className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    <span>
-                      <strong>髪の長さ:</strong> {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}に該当します
-                    </span>
-                  </label>
-                );
-                index++;
+                addCondition('hair', <span><strong>髪の長さ:</strong> {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}に該当します</span>);
               }
-
+              if (recruitment.model_experience_requirement && recruitment.model_experience_requirement !== 'any') {
+                addCondition('experience', <span><strong>モデル経験:</strong> {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}に該当します</span>);
+              }
               if (recruitment.has_date_requirement && recruitment.appointment_date) {
-                const currentIndex = index;
-                conditions.push(
-                  <label key="date" className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    <span>
-                      <strong>施術日時:</strong> {formatDateTime(recruitment.appointment_date)}に参加可能です
-                    </span>
-                  </label>
-                );
-                index++;
+                addCondition('date', <span><strong>施術日時:</strong> {formatDateTime(recruitment.appointment_date)}に参加可能です</span>);
               }
-
               if (recruitment.treatment_duration) {
-                const currentIndex = index;
-                conditions.push(
-                  <label key="duration" className={styles.conditionCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={conditionsAccepted[currentIndex] || false}
-                      onChange={(e) => {
-                        const newAccepted = [...conditionsAccepted];
-                        newAccepted[currentIndex] = e.target.checked;
-                        setConditionsAccepted(newAccepted);
-                      }}
-                    />
-                    <span>
-                      <strong>施術時間:</strong> {recruitment.treatment_duration}の時間を確保できます
-                    </span>
-                  </label>
-                );
-                index++;
+                addCondition('duration', <span><strong>施術時間:</strong> {recruitment.treatment_duration}の時間を確保できます</span>);
               }
-
               return conditions;
             })()}
           </div>
+
 
           {errors.conditions && (
             <div className={styles.errorBox}>

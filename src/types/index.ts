@@ -1,3 +1,5 @@
+// src/types/index.ts
+
 // ==========================================
 // Database Types
 // ==========================================
@@ -76,11 +78,30 @@ export interface SalonUpdate {
   photo_url?: string;
 }
 
+// ==========================================
+// Recruitment Types
+// ==========================================
+
 export type GenderRequirement = 'male' | 'female' | 'any';
 
 export type HairLengthRequirement = 'short' | 'bob' | 'medium' | 'long' | 'any';
 
-export type MenuType = 'cut' | 'color' | 'perm' | 'treatment' | 'straight' | 'other';
+export type MenuType = 
+  | 'cut' 
+  | 'color' 
+  | 'perm' 
+  | 'treatment' 
+  | 'straight' 
+  | 'hair_set' 
+  | 'head_spa' 
+  | 'hair_straightening' 
+  | 'extensions' 
+  | 'other';
+
+export type PhotoShootRequirement = 'required' | 'optional' | 'none';
+
+export type ModelExperienceRequirement = 'any' | 'experienced' | 'beginner';
+
 
 // ==========================================
 // Recruitment Slot
@@ -103,6 +124,11 @@ export interface RecruitmentSlot {
   max_applicants: number;
   created_at: string;
   updated_at: string;
+  // 追加フィールド
+  photo_shoot_requirement: PhotoShootRequirement;
+  model_experience_requirement: ModelExperienceRequirement;
+  has_reward: boolean;
+  reward_details?: string;
 }
 
 export interface RecruitmentSlotWithSalon extends RecruitmentSlot {
@@ -122,6 +148,11 @@ export interface RecruitmentSlotInsert {
   deadline_date: string;
   status: RecruitmentStatus;
   max_applicants?: number;
+  // 追加フィールド
+  photo_shoot_requirement: PhotoShootRequirement;
+  model_experience_requirement: ModelExperienceRequirement;
+  has_reward: boolean;
+  reward_details?: string;
 }
 
 export interface RecruitmentSlotUpdate {
@@ -136,6 +167,11 @@ export interface RecruitmentSlotUpdate {
   deadline_date?: string;
   status?: RecruitmentStatus;
   max_applicants?: number;
+  // 追加フィールド
+  photo_shoot_requirement?: PhotoShootRequirement;
+  model_experience_requirement?: ModelExperienceRequirement;
+  has_reward?: boolean;
+  reward_details?: string;
 }
 
 // ==========================================

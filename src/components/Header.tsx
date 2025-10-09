@@ -1,4 +1,5 @@
 // src/components/Header.tsx
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { Button } from './Button';
@@ -8,6 +9,8 @@ import { UserIcon } from './UserIcon';
 export const Header = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = async () => {
     try {
@@ -29,6 +32,19 @@ export const Header = () => {
     return 'ゲスト';
   };
 
+  // ドロップダウンの外側をクリックしたときに閉じる処理
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -42,16 +58,21 @@ export const Header = () => {
               <Link to="/dashboard" className={styles.navLink}>
                 マイページ
               </Link>
-              <div className={styles.dropdown}>
-                 <div className={styles.profileLink}>
+              <div className={styles.dropdown} ref={dropdownRef}>
+                 <button 
+                    className={styles.profileLink} 
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                 >
                     <UserIcon />
                     <span>{getProfileName()}</span>
-                 </div>
-                 <div className={styles.dropdownContent}>
-                    <button onClick={handleSignOut} className={styles.dropdownItem}>
-                      ログアウト
-                    </button>
-                 </div>
+                 </button>
+                 {isDropdownOpen && (
+                    <div className={styles.dropdownContent}>
+                        <button onClick={handleSignOut} className={styles.dropdownItem}>
+                        ログアウト
+                        </button>
+                    </div>
+                 )}
               </div>
             </>
           ) : (
