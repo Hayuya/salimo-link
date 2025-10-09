@@ -2,14 +2,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
-  RecruitmentSlot,
-  RecruitmentSlotWithDetails,
-  RecruitmentSlotInsert,
-  RecruitmentSlotUpdate,
+  Recruitment,
+  RecruitmentWithDetails,
+  RecruitmentInsert,
+  RecruitmentUpdate,
 } from '@/types';
 
 export const useRecruitments = () => {
-  const [recruitments, setRecruitments] = useState<RecruitmentSlotWithDetails[]>([]);
+  const [recruitments, setRecruitments] = useState<RecruitmentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,11 +17,10 @@ export const useRecruitments = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('recruitment_slots')
+        .from('recruitments')
         .select(`
           *,
-          salon:salons(*),
-          available_slots(*)
+          salon:salons(*)
         `)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -35,14 +34,13 @@ export const useRecruitments = () => {
     }
   };
 
-  const fetchRecruitmentById = async (id: string): Promise<RecruitmentSlotWithDetails | null> => {
+  const fetchRecruitmentById = async (id: string): Promise<RecruitmentWithDetails | null> => {
     try {
       const { data, error } = await supabase
-        .from('recruitment_slots')
+        .from('recruitments')
         .select(`
           *,
-          salon:salons(*),
-          available_slots(*)
+          salon:salons(*)
         `)
         .eq('id', id)
         .single();
@@ -54,10 +52,10 @@ export const useRecruitments = () => {
     }
   };
 
-  const fetchRecruitmentsBySalonId = async (salonId: string): Promise<RecruitmentSlot[]> => {
+  const fetchRecruitmentsBySalonId = async (salonId: string): Promise<Recruitment[]> => {
     try {
       const { data, error } = await supabase
-        .from('recruitment_slots')
+        .from('recruitments')
         .select('*')
         .eq('salon_id', salonId)
         .order('created_at', { ascending: false });
@@ -69,41 +67,25 @@ export const useRecruitments = () => {
     }
   };
 
-  const createRecruitment = async (data: RecruitmentSlotInsert): Promise<RecruitmentSlot> => {
+  const createRecruitment = async (data: RecruitmentInsert): Promise<Recruitment> => {
     try {
-      const { available_slots, ...recruitmentData } = data;
-
-      // 1. 募集スロットを作成
-      const { data: newRecruitment, error: recruitmentError } = await supabase
-        .from('recruitment_slots')
-        .insert(recruitmentData)
+      const { data: newRecruitment, error } = await supabase
+        .from('recruitments')
+        .insert(data)
         .select()
         .single();
       
-      if (recruitmentError) throw recruitmentError;
-
-      // 2. 利用可能な日時スロットを作成
-      const slotInsertData = available_slots.map(slot => ({
-        recruitment_slot_id: newRecruitment.id,
-        slot_time: slot,
-      }));
-
-      const { error: slotsError } = await supabase
-        .from('available_slots')
-        .insert(slotInsertData);
-
-      if (slotsError) throw slotsError;
-
+      if (error) throw error;
       return newRecruitment;
     } catch (err: any) {
       throw err;
     }
   };
 
-  const updateRecruitment = async (id: string, data: RecruitmentSlotUpdate): Promise<RecruitmentSlot> => {
+  const updateRecruitment = async (id: string, data: RecruitmentUpdate): Promise<Recruitment> => {
     try {
       const { data: updatedRecruitment, error } = await supabase
-        .from('recruitment_slots')
+        .from('recruitments')
         .update(data)
         .eq('id', id)
         .select()
@@ -119,7 +101,7 @@ export const useRecruitments = () => {
   const deleteRecruitment = async (id: string): Promise<void> => {
     try {
       const { error } = await supabase
-        .from('recruitment_slots')
+        .from('recruitments')
         .delete()
         .eq('id', id);
 

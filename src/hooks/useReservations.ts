@@ -1,7 +1,7 @@
 // src/hooks/useReservations.ts
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Reservation, ReservationWithDetails, ReservationInsert, ReservationUpdate } from '@/types';
+import { Reservation, ReservationWithDetails, ReservationUpdate } from '@/types';
 
 export const useReservations = () => {
   const [loading, setLoading] = useState(false);
@@ -15,8 +15,7 @@ export const useReservations = () => {
         .select(`
           *,
           student:students(*),
-          recruitment_slot:recruitment_slots(*, salon:salons(*)),
-          available_slot:available_slots(*)
+          recruitment:recruitments(*, salon:salons(*))
         `)
         .eq('student_id', studentId)
         .order('created_at', { ascending: false });
@@ -39,8 +38,7 @@ export const useReservations = () => {
         .select(`
           *,
           student:students(*),
-          recruitment_slot:recruitment_slots(*, salon:salons(*)),
-          available_slot:available_slots(*)
+          recruitment:recruitments(*, salon:salons(*))
         `)
         .eq('salon_id', salonId)
         .order('created_at', { ascending: false });
@@ -55,20 +53,26 @@ export const useReservations = () => {
     }
   };
 
-  const createReservation = async (reservationData: ReservationInsert): Promise<Reservation> => {
+  const createReservation = async (
+    recruitmentId: string,
+    studentId: string,
+    salonId: string,
+    reservationDatetime: string,
+    message?: string
+  ): Promise<string> => {
     setLoading(true);
     try {
-      // トランザクションで予約作成とスロットの更新を同時に行う
-      const { data, error } = await supabase.rpc('create_reservation_and_book_slot', {
-        p_slot_id: reservationData.slot_id,
-        p_student_id: reservationData.student_id,
-        p_salon_id: reservationData.salon_id,
-        p_recruitment_slot_id: reservationData.recruitment_slot_id,
-        p_message: reservationData.message,
+      // データベースのmake_reservation関数を使用
+      const { data, error } = await supabase.rpc('make_reservation', {
+        p_recruitment_id: recruitmentId,
+        p_student_id: studentId,
+        p_salon_id: salonId,
+        p_reservation_datetime: reservationDatetime,
+        p_message: message || null,
       });
 
       if (error) throw error;
-      return data;
+      return data; // 予約IDを返す
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -77,9 +81,13 @@ export const useReservations = () => {
     }
   };
 
-  const updateReservationStatus = async (id: string, status: ReservationUpdate['status']): Promise<Reservation> => {
+  const updateReservationStatus = async (
+    id: string,
+    status: ReservationUpdate['status']
+  ): Promise<Reservation> => {
     setLoading(true);
     try {
+      // ステータスを更新
       const { data: updatedReservation, error } = await supabase
         .from('reservations')
         .update({ status, updated_at: new Date().toISOString() })
@@ -89,13 +97,13 @@ export const useReservations = () => {
       
       if (error) throw error;
 
-      // キャンセルされた場合はスロットを再度利用可能にする
+      // キャンセルされた場合はavailable_datesを更新
       if (status === 'cancelled_by_salon' || status === 'cancelled_by_student') {
-        const { error: slotError } = await supabase
-          .from('available_slots')
-          .update({ is_booked: false })
-          .eq('id', updatedReservation.slot_id);
-        if (slotError) throw slotError;
+        const { error: cancelError } = await supabase.rpc('cancel_reservation', {
+          p_reservation_id: id
+        });
+        
+        if (cancelError) throw cancelError;
       }
       
       return updatedReservation;

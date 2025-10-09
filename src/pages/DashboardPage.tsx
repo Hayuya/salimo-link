@@ -4,7 +4,7 @@ import { useAuth } from '@/auth';
 import { useReservations } from '@/hooks/useReservations';
 import { useRecruitments } from '@/recruitment';
 import {
-  RecruitmentSlot,
+  Recruitment,
   Student,
   Salon,
   MenuType,
@@ -12,9 +12,10 @@ import {
   HairLengthRequirement,
   PhotoShootRequirement,
   ModelExperienceRequirement,
-  RecruitmentSlotUpdate,
+  RecruitmentUpdate,
   ReservationWithDetails,
   ReservationStatus,
+  AvailableDate,
 } from '@/types';
 import { formatDateTime } from '@/utils/date';
 import {
@@ -48,7 +49,7 @@ const initialRecruitmentState = {
   model_experience_requirement: 'any' as ModelExperienceRequirement,
   has_reward: false,
   reward_details: '',
-  available_slots: [] as string[],
+  available_dates: [] as AvailableDate[], // ★ 変更
 };
 
 export const DashboardPage = () => {
@@ -62,7 +63,7 @@ export const DashboardPage = () => {
   } = useRecruitments();
 
   const [reservations, setReservations] = useState<ReservationWithDetails[]>([]);
-  const [recruitments, setRecruitments] = useState<RecruitmentSlot[]>([]);
+  const [recruitments, setRecruitments] = useState<Recruitment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -71,15 +72,15 @@ export const DashboardPage = () => {
 
   const [profileData, setProfileData] = useState<Partial<Student & Salon>>({});
   const [newRecruitmentData, setNewRecruitmentData] = useState(initialRecruitmentState);
-  const [editingRecruitment, setEditingRecruitment] = useState<(RecruitmentSlotUpdate & { id: string }) | null>(null);
+  const [editingRecruitment, setEditingRecruitment] = useState<(RecruitmentUpdate & { id: string }) | null>(null);
 
   const [profileLoading, setProfileLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
 
+  // ★ 変更: 日時入力用の状態
   const [newSlotDate, setNewSlotDate] = useState('');
   const [newSlotTime, setNewSlotTime] = useState('');
-
 
   useEffect(() => {
     loadDashboardData();
@@ -94,8 +95,8 @@ export const DashboardPage = () => {
         setReservations(res);
       } else {
         const [recs, res] = await Promise.all([
-            fetchRecruitmentsBySalonId(user.id),
-            fetchReservationsBySalon(user.id)
+          fetchRecruitmentsBySalonId(user.id),
+          fetchReservationsBySalon(user.id)
         ]);
         setRecruitments(recs);
         setReservations(res);
@@ -120,8 +121,63 @@ export const DashboardPage = () => {
     }
   };
 
+  // ★ 変更: 日時をavailable_datesに追加
+  const addSlot = () => {
+    if (!newSlotDate || !newSlotTime) {
+      alert('日付と時刻を選択してください');
+      return;
+    }
+    
+    const datetime = new Date(`${newSlotDate}T${newSlotTime}`).toISOString();
+    
+    // 重複チェック
+    if (newRecruitmentData.available_dates.some(d => d.datetime === datetime)) {
+      alert('同じ日時がすでに追加されています');
+      return;
+    }
+    
+    const newDate: AvailableDate = {
+      datetime,
+      is_booked: false
+    };
+    
+    setNewRecruitmentData({
+      ...newRecruitmentData,
+      available_dates: [...newRecruitmentData.available_dates, newDate].sort(
+        (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+      )
+    });
+    
+    // 入力フィールドをクリア
+    setNewSlotDate('');
+    setNewSlotTime('');
+  };
+
+  const removeSlot = (datetime: string) => {
+    setNewRecruitmentData({
+      ...newRecruitmentData,
+      available_dates: newRecruitmentData.available_dates.filter(d => d.datetime !== datetime)
+    });
+  };
+
   const handleCreateRecruitment = async () => {
     if (!user) return;
+    
+    if (newRecruitmentData.menus.length === 0) {
+      alert('メニューを1つ以上選択してください');
+      return;
+    }
+    
+    if (!newRecruitmentData.title) {
+      alert('タイトルを入力してください');
+      return;
+    }
+    
+    if (newRecruitmentData.available_dates.length === 0) {
+      alert('施術可能な日時を1つ以上追加してください');
+      return;
+    }
+    
     setCreateLoading(true);
     try {
       await createRecruitment({
@@ -181,27 +237,27 @@ export const DashboardPage = () => {
     }
   };
 
-  const handleOpenEditModal = (recruitment: RecruitmentSlot) => {
+  const handleOpenEditModal = (recruitment: Recruitment) => {
     setEditingRecruitment({ ...recruitment });
     setShowEditModal(true);
   };
   
   const handleUpdateReservation = async (id: string, status: ReservationStatus) => {
     const action = {
-        confirmed: '承認',
-        cancelled_by_salon: 'キャンセル',
+      confirmed: '承認',
+      cancelled_by_salon: 'キャンセル',
     }[status as 'confirmed' | 'cancelled_by_salon'];
 
     if (action && window.confirm(`この予約を${action}しますか？`)) {
-        try {
-            await updateReservationStatus(id, status);
-            alert(`予約を${action}しました。`);
-            await loadDashboardData();
-        } catch(error: any) {
-            alert(error.message || `予約の${action}に失敗しました。`);
-        }
+      try {
+        await updateReservationStatus(id, status);
+        alert(`予約を${action}しました。`);
+        await loadDashboardData();
+      } catch(error: any) {
+        alert(error.message || `予約の${action}に失敗しました。`);
+      }
     }
-  }
+  };
 
   const toggleMenu = (menu: MenuType, isEdit = false) => {
     const target = isEdit ? editingRecruitment : newRecruitmentData;
@@ -214,22 +270,6 @@ export const DashboardPage = () => {
     setter({ ...target, menus: newMenus } as any);
   };
 
-  const addSlot = () => {
-    if (!newSlotDate || !newSlotTime) return;
-    const dateTime = new Date(`${newSlotDate}T${newSlotTime}`).toISOString();
-    if (newRecruitmentData.available_slots.includes(dateTime)) {
-      alert('同じ日時がすでに追加されています。');
-      return;
-    }
-    const updatedSlots = [...newRecruitmentData.available_slots, dateTime].sort();
-    setNewRecruitmentData({ ...newRecruitmentData, available_slots: updatedSlots });
-  };
-
-  const removeSlot = (slot: string) => {
-    const updatedSlots = newRecruitmentData.available_slots.filter(s => s !== slot);
-    setNewRecruitmentData({ ...newRecruitmentData, available_slots: updatedSlots });
-  };
-  
   const getReservationStatusLabel = (status: ReservationStatus) => {
     switch (status) {
       case 'pending': return { text: '承認待ち', className: styles.statusPending };
@@ -251,16 +291,144 @@ export const DashboardPage = () => {
     if (!data) return null;
     return (
       <div className={styles.modalContent}>
-        <Input label="募集タイトル" value={data.title || ''} onChange={(e) => setter({ ...data, title: e.target.value })} required fullWidth/>
-        <div className={styles.inputWrapper}><label className={styles.label}>募集内容</label><textarea className={styles.textarea} value={data.description || ''} onChange={(e) => setter({ ...data, description: e.target.value })} placeholder="詳しい募集内容を入力してください" rows={4}/></div>
-        <div className={styles.inputWrapper}><label className={styles.label}>メニュー（複数選択可）<span className={styles.required}>*</span></label><div className={styles.checkboxGrid}>{MENU_OPTIONS.map(menu => ( <label key={menu} className={styles.checkboxLabel}> <input type="checkbox" checked={data.menus?.includes(menu)} onChange={() => toggleMenu(menu, isEdit)}/> <span>{MENU_LABELS[menu]}</span> </label> ))}</div></div>
-        <div className={styles.inputWrapper}><label className={styles.label}>性別</label><div className={styles.radioGroup}>{GENDER_OPTIONS.map(gender => ( <label key={gender} className={styles.radioLabel}> <input type="radio" name={`gender_${isEdit}`} value={gender} checked={data.gender_requirement === gender} onChange={(e) => setter({...data, gender_requirement: e.target.value as GenderRequirement})}/> <span>{GENDER_LABELS[gender]}</span> </label> ))}</div></div>
-        <div className={styles.inputWrapper}><label className={styles.label}>髪の長さ</label><div className={styles.radioGroup}>{HAIR_LENGTH_OPTIONS.map(length => ( <label key={length} className={styles.radioLabel}> <input type="radio" name={`hairLength_${isEdit}`} value={length} checked={data.hair_length_requirement === length} onChange={(e) => setter({...data, hair_length_requirement: e.target.value as HairLengthRequirement})}/> <span>{HAIR_LENGTH_LABELS[length]}</span> </label> ))}</div></div>
-        <div className={styles.inputWrapper}><label className={styles.label}>モデル経験</label><div className={styles.radioGroup}>{EXPERIENCE_OPTIONS.map(exp => ( <label key={exp} className={styles.radioLabel}> <input type="radio" name={`experience_${isEdit}`} value={exp} checked={data.model_experience_requirement === exp} onChange={(e) => setter({...data, model_experience_requirement: e.target.value as ModelExperienceRequirement})}/> <span>{EXPERIENCE_LABELS[exp]}</span> </label>))}</div></div>
-        <div className={styles.inputWrapper}><label className={styles.label}>撮影</label><div className={styles.radioGroup}>{PHOTO_SHOOT_OPTIONS.map(photo => ( <label key={photo} className={styles.radioLabel}> <input type="radio" name={`photoShoot_${isEdit}`} value={photo} checked={data.photo_shoot_requirement === photo} onChange={(e) => setter({...data, photo_shoot_requirement: e.target.value as PhotoShootRequirement})}/> <span>{PHOTO_SHOOT_LABELS[photo]}</span> </label> ))}</div></div>
-        <div className={styles.inputWrapper}><label className={styles.checkboxLabel}><input type="checkbox" checked={data.has_reward} onChange={(e) => setter({ ...data, has_reward: e.target.checked })}/><span>謝礼あり</span></label></div>
-        {data.has_reward && ( <Input label="謝礼詳細（任意）" value={data.reward_details || ''} onChange={(e) => setter({ ...data, reward_details: e.target.value })} placeholder="例: 交通費支給、トリートメントサービスなど" fullWidth/> )}
-        <Input label="施術時間（任意）" type="text" value={data.treatment_duration || ''} onChange={(e) => setter({ ...data, treatment_duration: e.target.value })} placeholder="例: 2〜3時間" fullWidth/>
+        <Input 
+          label="募集タイトル" 
+          value={data.title || ''} 
+          onChange={(e) => setter({ ...data, title: e.target.value })} 
+          required 
+          fullWidth
+        />
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>募集内容</label>
+          <textarea 
+            className={styles.textarea} 
+            value={data.description || ''} 
+            onChange={(e) => setter({ ...data, description: e.target.value })} 
+            placeholder="詳しい募集内容を入力してください" 
+            rows={4}
+          />
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>
+            メニュー（複数選択可）<span className={styles.required}>*</span>
+          </label>
+          <div className={styles.checkboxGrid}>
+            {MENU_OPTIONS.map(menu => (
+              <label key={menu} className={styles.checkboxLabel}>
+                <input 
+                  type="checkbox" 
+                  checked={data.menus?.includes(menu)} 
+                  onChange={() => toggleMenu(menu, isEdit)}
+                />
+                <span>{MENU_LABELS[menu]}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>性別</label>
+          <div className={styles.radioGroup}>
+            {GENDER_OPTIONS.map(gender => (
+              <label key={gender} className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name={`gender_${isEdit}`} 
+                  value={gender} 
+                  checked={data.gender_requirement === gender} 
+                  onChange={(e) => setter({...data, gender_requirement: e.target.value as GenderRequirement})}
+                />
+                <span>{GENDER_LABELS[gender]}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>髪の長さ</label>
+          <div className={styles.radioGroup}>
+            {HAIR_LENGTH_OPTIONS.map(length => (
+              <label key={length} className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name={`hairLength_${isEdit}`} 
+                  value={length} 
+                  checked={data.hair_length_requirement === length} 
+                  onChange={(e) => setter({...data, hair_length_requirement: e.target.value as HairLengthRequirement})}
+                />
+                <span>{HAIR_LENGTH_LABELS[length]}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>モデル経験</label>
+          <div className={styles.radioGroup}>
+            {EXPERIENCE_OPTIONS.map(exp => (
+              <label key={exp} className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name={`experience_${isEdit}`} 
+                  value={exp} 
+                  checked={data.model_experience_requirement === exp} 
+                  onChange={(e) => setter({...data, model_experience_requirement: e.target.value as ModelExperienceRequirement})}
+                />
+                <span>{EXPERIENCE_LABELS[exp]}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>撮影</label>
+          <div className={styles.radioGroup}>
+            {PHOTO_SHOOT_OPTIONS.map(photo => (
+              <label key={photo} className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name={`photoShoot_${isEdit}`} 
+                  value={photo} 
+                  checked={data.photo_shoot_requirement === photo} 
+                  onChange={(e) => setter({...data, photo_shoot_requirement: e.target.value as PhotoShootRequirement})}
+                />
+                <span>{PHOTO_SHOOT_LABELS[photo]}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.inputWrapper}>
+          <label className={styles.checkboxLabel}>
+            <input 
+              type="checkbox" 
+              checked={data.has_reward} 
+              onChange={(e) => setter({ ...data, has_reward: e.target.checked })}
+            />
+            <span>謝礼あり</span>
+          </label>
+        </div>
+        
+        {data.has_reward && (
+          <Input 
+            label="謝礼詳細（任意）" 
+            value={data.reward_details || ''} 
+            onChange={(e) => setter({ ...data, reward_details: e.target.value })} 
+            placeholder="例: 交通費支給、トリートメントサービスなど" 
+            fullWidth
+          />
+        )}
+        
+        <Input 
+          label="施術時間（任意）" 
+          type="text" 
+          value={data.treatment_duration || ''} 
+          onChange={(e) => setter({ ...data, treatment_duration: e.target.value })} 
+          placeholder="例: 2〜3時間" 
+          fullWidth
+        />
       </div>
     );
   };
@@ -268,26 +436,63 @@ export const DashboardPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.header}><h1 className={styles.title}>マイページ</h1><div className={styles.headerActions}><Link to="/"><Button variant="secondary">募集一覧へ</Button></Link><Button variant="outline" onClick={() => { setProfileData(user.profile); setShowProfileModal(true); }}>プロフィール編集</Button></div></div>
+        <div className={styles.header}>
+          <h1 className={styles.title}>マイページ</h1>
+          <div className={styles.headerActions}>
+            <Link to="/"><Button variant="secondary">募集一覧へ</Button></Link>
+            <Button 
+              variant="outline" 
+              onClick={() => { 
+                setProfileData(user.profile); 
+                setShowProfileModal(true); 
+              }}
+            >
+              プロフィール編集
+            </Button>
+          </div>
+        </div>
 
         <Card padding="lg">
           <h2 className={styles.sectionTitle}>プロフィール</h2>
-          {user.userType === 'student' ? (<div className={styles.profileInfo}><p><strong>名前:</strong> {(user.profile as Student).name}</p><p><strong>学校名:</strong> {(user.profile as Student).school_name || '未設定'}</p><p><strong>メールアドレス:</strong> {user.email}</p></div>) 
-          : (<div className={styles.profileInfo}><p><strong>サロン名:</strong> {(user.profile as Salon).salon_name}</p><p><strong>住所:</strong> {(user.profile as Salon).address || '未設定'}</p><p><strong>メールアドレス:</strong> {user.email}</p><p><strong>電話番号:</strong> {(user.profile as Salon).phone_number || '未設定'}</p></div>)}
+          {user.userType === 'student' ? (
+            <div className={styles.profileInfo}>
+              <p><strong>名前:</strong> {(user.profile as Student).name}</p>
+              <p><strong>学校名:</strong> {(user.profile as Student).school_name || '未設定'}</p>
+              <p><strong>メールアドレス:</strong> {user.email}</p>
+            </div>
+          ) : (
+            <div className={styles.profileInfo}>
+              <p><strong>サロン名:</strong> {(user.profile as Salon).salon_name}</p>
+              <p><strong>住所:</strong> {(user.profile as Salon).address || '未設定'}</p>
+              <p><strong>メールアドレス:</strong> {user.email}</p>
+              <p><strong>電話番号:</strong> {(user.profile as Salon).phone_number || '未設定'}</p>
+            </div>
+          )}
         </Card>
 
         {user.userType === 'student' && (
           <Card padding="lg">
             <h2 className={styles.sectionTitle}>予約履歴</h2>
-            {reservations.length === 0 ? ( <p className={styles.emptyMessage}>予約履歴はありません</p> ) : (
+            {reservations.length === 0 ? (
+              <p className={styles.emptyMessage}>予約履歴はありません</p>
+            ) : (
               <div className={styles.applicationList}>
                 {reservations.map((res) => (
                   <div key={res.id} className={styles.applicationItem}>
                     <div className={styles.applicationHeader}>
-                      <Link to={`/recruitment/${res.recruitment_slot_id}`} className={styles.applicationTitle}>{res.recruitment_slot.title}</Link>
-                      <span className={getReservationStatusLabel(res.status).className}>{getReservationStatusLabel(res.status).text}</span>
+                      <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+                        {res.recruitment.title}
+                      </Link>
+                      <span className={getReservationStatusLabel(res.status).className}>
+                        {getReservationStatusLabel(res.status).text}
+                      </span>
                     </div>
-                    <p className={styles.applicationSalon}><strong>予約日時:</strong> {formatDateTime(res.available_slot.slot_time)}</p>
+                    <p className={styles.applicationSalon}>
+                      <strong>サロン:</strong> {res.recruitment.salon.salon_name}
+                    </p>
+                    <p className={styles.applicationSalon}>
+                      <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+                    </p>
                     <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
                   </div>
                 ))}
@@ -299,45 +504,82 @@ export const DashboardPage = () => {
         {user.userType === 'salon' && (
           <>
             <Card padding="lg">
-                <h2 className={styles.sectionTitle}>予約管理</h2>
-                {reservations.length === 0 ? (<p className={styles.emptyMessage}>現在、予約はありません</p>) : (
-                    <div className={styles.reservationList}>
-                        {reservations.map(res => (
-                            <div key={res.id} className={styles.reservationItem}>
-                                <div className={styles.reservationInfo}>
-                                    <p><strong>募集:</strong> <Link to={`/recruitment/${res.recruitment_slot_id}`}>{res.recruitment_slot.title}</Link></p>
-                                    <p><strong>予約者:</strong> {res.student.name}</p>
-                                    <p><strong>予約日時:</strong> {formatDateTime(res.available_slot.slot_time)}</p>
-                                    <p><strong>ステータス:</strong> <span className={getReservationStatusLabel(res.status).className}>{getReservationStatusLabel(res.status).text}</span></p>
-                                </div>
-                                {res.status === 'pending' && (
-                                    <div className={styles.reservationActions}>
-                                        <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>承認</Button>
-                                        <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>キャンセル</Button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+              <h2 className={styles.sectionTitle}>予約管理</h2>
+              {reservations.length === 0 ? (
+                <p className={styles.emptyMessage}>現在、予約はありません</p>
+              ) : (
+                <div className={styles.applicationList}>
+                  {reservations.map(res => (
+                    <div key={res.id} className={styles.applicationItem}>
+                      <div className={styles.applicationHeader}>
+                        <div style={{ flex: 1 }}>
+                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+                            {res.recruitment.title}
+                          </Link>
+                          <p className={styles.applicationSalon}>
+                            <strong>予約者:</strong> {res.student.name}
+                          </p>
+                          <p className={styles.applicationSalon}>
+                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+                          </p>
+                        </div>
+                        <span className={getReservationStatusLabel(res.status).className}>
+                          {getReservationStatusLabel(res.status).text}
+                        </span>
+                      </div>
+                      {res.status === 'pending' && (
+                        <div className={styles.recruitmentActions}>
+                          <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
+                            承認
+                          </Button>
+                          <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
+                            キャンセル
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                )}
+                  ))}
+                </div>
+              )}
             </Card>
+            
             <Card padding="lg">
-              <div className={styles.sectionHeader}><h2 className={styles.sectionTitle}>募集管理</h2><Button variant="primary" onClick={() => setShowCreateModal(true)}>新規募集作成</Button></div>
-              {recruitments.length === 0 ? ( <p className={styles.emptyMessage}>まだ募集を作成していません</p> ) : (
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>募集管理</h2>
+                <Button variant="primary" onClick={() => setShowCreateModal(true)}>新規募集作成</Button>
+              </div>
+              {recruitments.length === 0 ? (
+                <p className={styles.emptyMessage}>まだ募集を作成していません</p>
+              ) : (
                 <div className={styles.recruitmentList}>
                   {recruitments.map((rec) => (
                     <div key={rec.id} className={styles.recruitmentItem}>
                       <div className={styles.recruitmentHeader}>
-                        <Link to={`/recruitment/${rec.id}`} className={styles.recruitmentTitle}>{rec.title}</Link>
-                        <span className={rec.status === 'active' ? styles.statusActive : styles.statusClosed}>{rec.status === 'active' ? '公開中' : '非公開'}</span>
+                        <Link to={`/recruitment/${rec.id}`} className={styles.recruitmentTitle}>
+                          {rec.title}
+                        </Link>
+                        <span className={rec.status === 'active' ? styles.statusActive : styles.statusClosed}>
+                          {rec.status === 'active' ? '公開中' : '非公開'}
+                        </span>
                       </div>
+                      <p className={styles.applicationDate}>
+                        空き枠: {rec.available_dates.filter(d => !d.is_booked).length}件
+                      </p>
                       <div className={styles.recruitmentActions}>
-                          <Button variant="outline" size="sm" onClick={() => handleOpenEditModal(rec)}>編集</Button>
-                          {rec.status === 'active' 
-                            ? <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'closed')}>非公開にする</Button>
-                            : <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'active')}>公開する</Button>
-                          }
-                          <Button variant="danger" size="sm" onClick={() => handleDeleteRecruitment(rec.id)}>削除</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleOpenEditModal(rec)}>
+                          編集
+                        </Button>
+                        {rec.status === 'active' 
+                          ? <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'closed')}>
+                              非公開にする
+                            </Button>
+                          : <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'active')}>
+                              公開する
+                            </Button>
+                        }
+                        <Button variant="danger" size="sm" onClick={() => handleDeleteRecruitment(rec.id)}>
+                          削除
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -348,55 +590,141 @@ export const DashboardPage = () => {
         )}
       </div>
 
+      {/* プロフィール編集モーダル */}
       <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} title="プロフィール編集" size="md">
         <div className={styles.modalContent}>
-            {user.userType === 'student' ? (
-                <>
-                <Input label="名前" value={profileData.name || ''} onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} fullWidth/>
-                <Input label="学校名" value={profileData.school_name || ''} onChange={(e) => setProfileData({ ...profileData, school_name: e.target.value })} fullWidth/>
-                </>
-            ) : (
-                <>
-                <Input label="サロン名" value={profileData.salon_name || ''} onChange={(e) => setProfileData({ ...profileData, salon_name: e.target.value })} fullWidth/>
-                <Input label="住所" value={profileData.address || ''} onChange={(e) => setProfileData({ ...profileData, address: e.target.value })} fullWidth/>
-                <Input label="電話番号" value={profileData.phone_number || ''} onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })} fullWidth/>
-                <div className={styles.inputWrapper}>
-                    <label className={styles.label}>サロン紹介</label>
-                    <textarea className={styles.textarea} value={profileData.description || ''} onChange={(e) => setProfileData({ ...profileData, description: e.target.value })} rows={4}/>
-                </div>
-                </>
-            )}
-            <div className={styles.modalActions}>
-                <Button variant="outline" onClick={() => setShowProfileModal(false)}>キャンセル</Button>
-                <Button variant="primary" onClick={handleUpdateProfile} loading={profileLoading}>保存</Button>
-            </div>
+          {user.userType === 'student' ? (
+            <>
+              <Input 
+                label="名前" 
+                value={profileData.name || ''} 
+                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} 
+                fullWidth
+              />
+              <Input 
+                label="学校名" 
+                value={profileData.school_name || ''} 
+                onChange={(e) => setProfileData({ ...profileData, school_name: e.target.value })} 
+                fullWidth
+              />
+            </>
+          ) : (
+            <>
+              <Input 
+                label="サロン名" 
+                value={profileData.salon_name || ''} 
+                onChange={(e) => setProfileData({ ...profileData, salon_name: e.target.value })} 
+                fullWidth
+              />
+              <Input 
+                label="住所" 
+                value={profileData.address || ''} 
+                onChange={(e) => setProfileData({ ...profileData, address: e.target.value })} 
+                fullWidth
+              />
+              <Input 
+                label="電話番号" 
+                value={profileData.phone_number || ''} 
+                onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })} 
+                fullWidth
+              />
+              <div className={styles.inputWrapper}>
+                <label className={styles.label}>サロン紹介</label>
+                <textarea 
+                  className={styles.textarea} 
+                  value={profileData.description || ''} 
+                  onChange={(e) => setProfileData({ ...profileData, description: e.target.value })} 
+                  rows={4}
+                />
+              </div>
+            </>
+          )}
+          <div className={styles.modalActions}>
+            <Button variant="outline" onClick={() => setShowProfileModal(false)}>キャンセル</Button>
+            <Button variant="primary" onClick={handleUpdateProfile} loading={profileLoading}>保存</Button>
+          </div>
         </div>
       </Modal>
 
+      {/* 募集作成モーダル */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="新規募集作成" size="lg">
         {renderRecruitmentForm(newRecruitmentData, setNewRecruitmentData, false)}
+        
+        {/* ★ 変更: 日時追加UI */}
         <div className={styles.inputWrapper}>
-            <label className={styles.label}>施術可能な日時を追加 <span className={styles.required}>*</span></label>
-            <div className={styles.dateTimeInput}>
-                <Input type="date" value={newSlotDate} onChange={e => setNewSlotDate(e.target.value)} />
-                <Input type="time" step="3600" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} />
-                <Button onClick={addSlot} size="sm">追加</Button>
+          <label className={styles.label}>
+            施術可能な日時を追加 <span className={styles.required}>*</span>
+          </label>
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
+            <Input 
+              type="date" 
+              value={newSlotDate} 
+              onChange={e => setNewSlotDate(e.target.value)}
+            />
+            <Input 
+              type="time" 
+              value={newSlotTime} 
+              onChange={e => setNewSlotTime(e.target.value)}
+            />
+            <Button onClick={addSlot} size="sm">追加</Button>
+          </div>
+          
+          {newRecruitmentData.available_dates.length > 0 && (
+            <div style={{ 
+              marginTop: 'var(--spacing-md)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 'var(--spacing-xs)' 
+            }}>
+              {newRecruitmentData.available_dates.map(date => (
+                <div 
+                  key={date.datetime} 
+                  style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: 'var(--spacing-sm)',
+                    backgroundColor: 'var(--color-bg-secondary)',
+                    borderRadius: 'var(--radius-md)'
+                  }}
+                >
+                  <span>{formatDateTime(date.datetime)}</span>
+                  <button 
+                    onClick={() => removeSlot(date.datetime)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontSize: 'var(--font-size-xl)',
+                      cursor: 'pointer',
+                      color: 'var(--color-danger)'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
-            <div className={styles.slotList}>
-                {newRecruitmentData.available_slots.map(slot => (
-                    <div key={slot} className={styles.slotItem}>
-                        <span>{formatDateTime(slot)}</span>
-                        <button onClick={() => removeSlot(slot)}>&times;</button>
-                    </div>
-                ))}
-            </div>
+          )}
         </div>
+        
         <div className={styles.modalActions}>
           <Button variant="outline" onClick={() => setShowCreateModal(false)}>キャンセル</Button>
-          <Button variant="primary" onClick={handleCreateRecruitment} loading={createLoading} disabled={newRecruitmentData.menus.length === 0 || !newRecruitmentData.title || newRecruitmentData.available_slots.length === 0}>作成</Button>
+          <Button 
+            variant="primary" 
+            onClick={handleCreateRecruitment} 
+            loading={createLoading}
+            disabled={
+              newRecruitmentData.menus.length === 0 || 
+              !newRecruitmentData.title || 
+              newRecruitmentData.available_dates.length === 0
+            }
+          >
+            作成
+          </Button>
         </div>
       </Modal>
 
+      {/* 募集編集モーダル */}
       {editingRecruitment && (
         <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="募集内容を編集" size="lg">
           {renderRecruitmentForm(editingRecruitment, setEditingRecruitment, true)}

@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
-import { RecruitmentSlotWithDetails } from '@/types';
+import { RecruitmentWithDetails } from '@/types';
 import { MENU_LABELS } from '@/utils/recruitment';
 import { Card } from './Card';
 import styles from './RecruitmentCard.module.css';
 
 interface RecruitmentCardProps {
-  recruitment: RecruitmentSlotWithDetails;
+  recruitment: RecruitmentWithDetails;
 }
 
 export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
-  const availableSlotsCount = recruitment.available_slots?.filter(slot => !slot.is_booked).length || 0;
+  // ★ 変更: available_dates配列から予約可能な日時をカウント
+  const availableSlotsCount = recruitment.available_dates.filter(
+    date => !date.is_booked
+  ).length;
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>

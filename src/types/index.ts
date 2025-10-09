@@ -4,59 +4,101 @@
 
 export type UserType = 'student' | 'salon';
 
-export type RecruitmentStatus = 'active' | 'closed' | 'confirmed';
+export type RecruitmentStatus = 'active' | 'closed';
 
-// application -> reservation に変更
 export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled_by_salon' | 'cancelled_by_student';
 
-export type SenderType = 'student' | 'salon';
-
 // ==========================================
-// Student / Salon (変更なし)
+// Student / Salon
 // ==========================================
 export interface Student {
-  id: string; email: string; name: string; school_name?: string; instagram_url?: string; avatar_url?: string; is_verified: boolean; created_at: string; updated_at: string;
+  id: string;
+  email: string;
+  name: string;
+  school_name?: string;
+  instagram_url?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
 }
+
 export interface StudentInsert {
-  id: string; email: string; name: string; school_name?: string; instagram_url?: string; avatar_url?: string;
+  id: string;
+  email: string;
+  name: string;
+  school_name?: string;
+  instagram_url?: string;
+  avatar_url?: string;
 }
+
 export interface StudentUpdate {
-  name?: string; school_name?: string; instagram_url?: string; avatar_url?: string;
+  name?: string;
+  school_name?: string;
+  instagram_url?: string;
+  avatar_url?: string;
 }
+
 export interface Salon {
-  id: string; email: string; salon_name: string; description?: string; address?: string; phone_number?: string; photo_url?: string; created_at: string; updated_at: string;
+  id: string;
+  email: string;
+  salon_name: string;
+  description?: string;
+  address?: string;
+  phone_number?: string;
+  photo_url?: string;
+  created_at: string;
+  updated_at: string;
 }
+
 export interface SalonInsert {
-  id: string; email: string; salon_name: string; description?: string; address?: string; phone_number?: string; photo_url?: string;
+  id: string;
+  email: string;
+  salon_name: string;
+  description?: string;
+  address?: string;
+  phone_number?: string;
+  photo_url?: string;
 }
+
 export interface SalonUpdate {
-  salon_name?: string; description?: string; address?: string; phone_number?: string; photo_url?: string;
+  salon_name?: string;
+  description?: string;
+  address?: string;
+  phone_number?: string;
+  photo_url?: string;
 }
 
 // ==========================================
-// Recruitment Types (変更なし)
+// Recruitment Types
 // ==========================================
 export type GenderRequirement = 'male' | 'female' | 'any';
 export type HairLengthRequirement = 'short' | 'bob' | 'medium' | 'long' | 'any';
-export type MenuType = | 'cut' | 'color' | 'perm' | 'treatment' | 'straight' | 'hair_set' | 'head_spa' | 'hair_straightening' | 'extensions' | 'other';
+export type MenuType = 
+  | 'cut' 
+  | 'color' 
+  | 'perm' 
+  | 'treatment' 
+  | 'straight' 
+  | 'hair_set' 
+  | 'head_spa' 
+  | 'hair_straightening' 
+  | 'extensions' 
+  | 'other';
 export type PhotoShootRequirement = 'required' | 'optional' | 'none';
 export type ModelExperienceRequirement = 'any' | 'experienced' | 'beginner';
 
-
 // ==========================================
-// Available Slot (新規)
+// Available Date Type (JSONB内の構造)
 // ==========================================
-export interface AvailableSlot {
-  id: string;
-  recruitment_slot_id: string;
-  slot_time: string;
+export interface AvailableDate {
+  datetime: string;
   is_booked: boolean;
 }
 
 // ==========================================
-// Recruitment Slot (大幅に変更)
+// Recruitment (テーブル名変更: recruitment_slots → recruitments)
 // ==========================================
-export interface RecruitmentSlot {
+export interface Recruitment {
   id: string;
   salon_id: string;
   title: string;
@@ -66,20 +108,23 @@ export interface RecruitmentSlot {
   hair_length_requirement: HairLengthRequirement;
   treatment_duration?: string;
   status: RecruitmentStatus;
-  created_at: string;
-  updated_at: string;
   photo_shoot_requirement: PhotoShootRequirement;
   model_experience_requirement: ModelExperienceRequirement;
   has_reward: boolean;
   reward_details?: string;
+  
+  // ★ 変更: JSONB配列で管理
+  available_dates: AvailableDate[];
+  
+  created_at: string;
+  updated_at: string;
 }
 
-export interface RecruitmentSlotWithDetails extends RecruitmentSlot {
+export interface RecruitmentWithDetails extends Recruitment {
   salon: Salon;
-  available_slots: AvailableSlot[];
 }
 
-export interface RecruitmentSlotInsert {
+export interface RecruitmentInsert {
   salon_id: string;
   title: string;
   description?: string;
@@ -92,11 +137,12 @@ export interface RecruitmentSlotInsert {
   model_experience_requirement: ModelExperienceRequirement;
   has_reward: boolean;
   reward_details?: string;
-  // 施術日時を複数受け取る
-  available_slots: string[];
+  
+  // ★ 変更: JSONB配列で管理
+  available_dates: AvailableDate[];
 }
 
-export interface RecruitmentSlotUpdate {
+export interface RecruitmentUpdate {
   title?: string;
   description?: string;
   menus?: MenuType[];
@@ -108,17 +154,21 @@ export interface RecruitmentSlotUpdate {
   model_experience_requirement?: ModelExperienceRequirement;
   has_reward?: boolean;
   reward_details?: string;
+  available_dates?: AvailableDate[];
 }
 
 // ==========================================
-// Reservation (Applicationから変更)
+// Reservation (Application → Reservation, 構造変更)
 // ==========================================
 export interface Reservation {
   id: string;
-  slot_id: string;
+  recruitment_id: string;
   student_id: string;
   salon_id: string;
-  recruitment_slot_id: string;
+  
+  // ★ 変更: slot_id削除、reservation_datetimeを追加
+  reservation_datetime: string;
+  
   status: ReservationStatus;
   message?: string;
   created_at: string;
@@ -127,15 +177,14 @@ export interface Reservation {
 
 export interface ReservationWithDetails extends Reservation {
   student: Student;
-  recruitment_slot: RecruitmentSlotWithDetails;
-  available_slot: AvailableSlot;
+  recruitment: RecruitmentWithDetails;
 }
 
 export interface ReservationInsert {
-  slot_id: string;
+  recruitment_id: string;
   student_id: string;
   salon_id: string;
-  recruitment_slot_id: string;
+  reservation_datetime: string;
   message?: string;
   status: ReservationStatus;
 }
@@ -144,23 +193,26 @@ export interface ReservationUpdate {
   status?: ReservationStatus;
 }
 
-
 // ==========================================
-// Chat Message (変更なし)
-// ==========================================
-export interface ChatMessage {
-  id: string; application_id: string; sender_id: string; sender_type: SenderType; message: string; is_read: boolean; created_at: string;
-}
-export interface ChatMessageInsert {
-  application_id: string; sender_id: string; sender_type: SenderType; message: string;
-}
-
-// ==========================================
-// Auth Context Types (変更なし)
+// Auth Context Types
 // ==========================================
 export interface AuthUser {
-  id: string; email: string; userType: UserType; profile: Student | Salon;
+  id: string;
+  email: string;
+  userType: UserType;
+  profile: Student | Salon;
 }
+
 export interface AuthContextType {
-  user: AuthUser | null; loading: boolean; signIn: (email: string, password: string) => Promise<void>; signUp: (email: string, password: string, userType: UserType, profileData: StudentInsert | SalonInsert) => Promise<void>; signOut: () => Promise<void>; updateProfile: (data: StudentUpdate | SalonUpdate) => Promise<void>;
+  user: AuthUser | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    userType: UserType,
+    profileData: StudentInsert | SalonInsert
+  ) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateProfile: (data: StudentUpdate | SalonUpdate) => Promise<void>;
 }
