@@ -75,7 +75,6 @@ export const DashboardPage = () => {
   const [newRecruitmentData, setNewRecruitmentData] = useState(initialRecruitmentState);
   const [editingRecruitment, setEditingRecruitment] = useState<RecruitmentSlot & { id: string } | null>(null);
 
-
   // ローディング状態
   const [profileLoading, setProfileLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
@@ -103,7 +102,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // プロフィール更新処理
   const handleUpdateProfile = async () => {
     setProfileLoading(true);
     try {
@@ -117,7 +115,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // 新規募集作成処理
   const handleCreateRecruitment = async () => {
     if (!user) return;
     setCreateLoading(true);
@@ -150,12 +147,11 @@ export const DashboardPage = () => {
     }
   };
 
-  // 募集更新処理
   const handleUpdateRecruitment = async () => {
     if (!editingRecruitment) return;
     setEditLoading(true);
     try {
-      const { id, created_at, updated_at, salon, ...updateData } = editingRecruitment;
+      const { id, created_at, updated_at, ...updateData } = editingRecruitment;
       await updateRecruitment(id, updateData as RecruitmentSlotUpdate);
       alert('募集を更新しました');
       setShowEditModal(false);
@@ -168,7 +164,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // 募集締め切り処理
   const handleCloseRecruitment = async (id: string) => {
     if (window.confirm('この募集を締め切りますか？')) {
       try {
@@ -181,7 +176,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // 募集削除処理
   const handleDeleteRecruitment = async (id: string) => {
     if (window.confirm('この募集を完全に削除しますか？この操作は元に戻せません。')) {
       try {
@@ -194,7 +188,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // 編集モーダルを開く
   const handleOpenEditModal = (recruitment: RecruitmentSlot) => {
     setEditingRecruitment({
         ...recruitment,
@@ -204,7 +197,6 @@ export const DashboardPage = () => {
     setShowEditModal(true);
   };
   
-  // フォームのメニューをトグルする
   const toggleMenu = (menu: MenuType, isEdit = false) => {
     if (isEdit) {
       setEditingRecruitment(prev => {
@@ -237,6 +229,67 @@ export const DashboardPage = () => {
   if (loading) return <Spinner fullScreen />;
   if (!user) return null;
 
+  const renderRecruitmentForm = (
+    data: typeof newRecruitmentData | typeof editingRecruitment, 
+    setter: typeof setNewRecruitmentData | typeof setEditingRecruitment,
+    isEdit: boolean
+  ) => (
+    <div className={styles.modalContent}>
+      <Input label="募集タイトル" value={data?.title || ''} onChange={(e) => setter({ ...data, title: e.target.value } as any)} required fullWidth/>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>募集内容</label>
+        <textarea className={styles.textarea} value={data?.description || ''} onChange={(e) => setter({ ...data, description: e.target.value } as any)} placeholder="詳しい募集内容を入力してください" rows={4}/>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>メニュー（複数選択可）<span className={styles.required}>*</span></label>
+        <div className={styles.checkboxGrid}>
+          {MENU_OPTIONS.map(menu => ( <label key={menu} className={styles.checkboxLabel}> <input type="checkbox" checked={data?.menus.includes(menu)} onChange={() => toggleMenu(menu, isEdit)}/> <span>{MENU_LABELS[menu]}</span> </label> ))}
+        </div>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>性別</label>
+        <div className={styles.radioGroup}>
+          {GENDER_OPTIONS.map(gender => ( <label key={gender} className={styles.radioLabel}> <input type="radio" name={`gender_${isEdit}`} value={gender} checked={data?.gender_requirement === gender} onChange={(e) => setter({...data, gender_requirement: e.target.value as GenderRequirement} as any)}/> <span>{GENDER_LABELS[gender]}</span> </label> ))}
+        </div>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>髪の長さ</label>
+        <div className={styles.radioGroup}>
+          {HAIR_LENGTH_OPTIONS.map(length => ( <label key={length} className={styles.radioLabel}> <input type="radio" name={`hairLength_${isEdit}`} value={length} checked={data?.hair_length_requirement === length} onChange={(e) => setter({...data, hair_length_requirement: e.target.value as HairLengthRequirement} as any)}/> <span>{HAIR_LENGTH_LABELS[length]}</span> </label> ))}
+        </div>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>モデル経験</label>
+        <div className={styles.radioGroup}>
+          {EXPERIENCE_OPTIONS.map(exp => ( <label key={exp} className={styles.radioLabel}> <input type="radio" name={`experience_${isEdit}`} value={exp} checked={data?.model_experience_requirement === exp} onChange={(e) => setter({...data, model_experience_requirement: e.target.value as ModelExperienceRequirement} as any)}/> <span>{EXPERIENCE_LABELS[exp]}</span> </label> ))}
+        </div>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>撮影</label>
+        <div className={styles.radioGroup}>
+          {PHOTO_SHOOT_OPTIONS.map(photo => ( <label key={photo} className={styles.radioLabel}> <input type="radio" name={`photoShoot_${isEdit}`} value={photo} checked={data?.photo_shoot_requirement === photo} onChange={(e) => setter({...data, photo_shoot_requirement: e.target.value as PhotoShootRequirement} as any)}/> <span>{PHOTO_SHOOT_LABELS[photo]}</span> </label> ))}
+        </div>
+      </div>
+      <div className={styles.inputWrapper}>
+        <label className={styles.checkboxLabel}>
+          <input type="checkbox" checked={data?.has_reward} onChange={(e) => setter({ ...data, has_reward: e.target.checked } as any)}/>
+          <span>謝礼あり</span>
+        </label>
+      </div>
+      {data?.has_reward && ( <Input label="謝礼詳細（任意）" value={data.reward_details || ''} onChange={(e) => setter({ ...data, reward_details: e.target.value } as any)} placeholder="例: 交通費支給、トリートメントサービスなど" fullWidth/> )}
+      <div className={styles.inputWrapper}>
+        <label className={styles.checkboxLabel}>
+          <input type="checkbox" checked={data?.has_date_requirement} onChange={(e) => setter({ ...data, has_date_requirement: e.target.checked } as any)}/>
+          <span>日時の指定あり</span>
+        </label>
+      </div>
+      {data?.has_date_requirement && ( <Input label="施術日時" type="datetime-local" value={data.appointment_date || ''} onChange={(e) => setter({ ...data, appointment_date: e.target.value } as any)} required fullWidth/> )}
+      <Input label="施術時間（任意）" type="text" value={data?.treatment_duration || ''} onChange={(e) => setter({ ...data, treatment_duration: e.target.value } as any)} placeholder="例: 2〜3時間" fullWidth/>
+      <Input label="募集締切日" type="date" value={data?.deadline_date || ''} onChange={(e) => setter({ ...data, deadline_date: e.target.value } as any)} required fullWidth/>
+      <p className={styles.note}>※予告なく締め切る場合もございますので予めご了承ください</p>
+    </div>
+  );
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -249,7 +302,6 @@ export const DashboardPage = () => {
             </Button>
           </div>
         </div>
-
         <Card padding="lg">
           <h2 className={styles.sectionTitle}>プロフィール</h2>
           {user.userType === 'student' ? (
@@ -267,7 +319,6 @@ export const DashboardPage = () => {
             </div>
           )}
         </Card>
-
         {user.userType === 'student' && (
           <Card padding="lg">
             <h2 className={styles.sectionTitle}>応募履歴</h2>
@@ -278,12 +329,8 @@ export const DashboardPage = () => {
                 {applications.map((app) => (
                   <div key={app.id} className={styles.applicationItem}>
                     <div className={styles.applicationHeader}>
-                      <Link to={`/recruitment/${app.recruitment_slot_id}`} className={styles.applicationTitle}>
-                        {app.recruitment_slot.title}
-                      </Link>
-                      <span className={getStatusLabel(app.status).className}>
-                        {getStatusLabel(app.status).text}
-                      </span>
+                      <Link to={`/recruitment/${app.recruitment_slot_id}`} className={styles.applicationTitle}>{app.recruitment_slot.title}</Link>
+                      <span className={getStatusLabel(app.status).className}>{getStatusLabel(app.status).text}</span>
                     </div>
                     <p className={styles.applicationSalon}>{app.recruitment_slot.salon.salon_name}</p>
                     <p className={styles.applicationDate}>応募日: {formatDateTime(app.created_at)}</p>
@@ -293,7 +340,6 @@ export const DashboardPage = () => {
             )}
           </Card>
         )}
-
         {user.userType === 'salon' && (
           <Card padding="lg">
             <div className={styles.sectionHeader}>
@@ -327,7 +373,6 @@ export const DashboardPage = () => {
           </Card>
         )}
       </div>
-
       <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} title="プロフィール編集" size="md">
         <div className={styles.modalContent}>
           {user.userType === 'student' ? (
@@ -352,76 +397,20 @@ export const DashboardPage = () => {
           </div>
         </div>
       </Modal>
-
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="新規募集作成" size="lg">
-        <div className={styles.modalContent}>
-          <Input label="募集タイトル" value={newRecruitmentData.title} onChange={(e) => setNewRecruitmentData({ ...newRecruitmentData, title: e.target.value })} required fullWidth/>
-          <div className={styles.inputWrapper}>
-            <label className={styles.label}>募集内容</label>
-            <textarea className={styles.textarea} value={newRecruitmentData.description} onChange={(e) => setNewRecruitmentData({ ...newRecruitmentData, description: e.target.value })} placeholder="詳しい募集内容を入力してください" rows={4}/>
-          </div>
-          <div className={styles.inputWrapper}>
-            <label className={styles.label}>メニュー（複数選択可）<span className={styles.required}>*</span></label>
-            <div className={styles.checkboxGrid}>
-              {MENU_OPTIONS.map(menu => ( <label key={menu} className={styles.checkboxLabel}> <input type="checkbox" checked={newRecruitmentData.menus.includes(menu)} onChange={() => toggleMenu(menu, false)}/> <span>{MENU_LABELS[menu]}</span> </label> ))}
-            </div>
-          </div>
-          {/* ... Other fields for newRecruitmentData ... */}
-          <div className={styles.modalActions}>
-            <Button variant="outline" onClick={() => setShowCreateModal(false)}>キャンセル</Button>
-            <Button variant="primary" onClick={handleCreateRecruitment} loading={createLoading} disabled={newRecruitmentData.menus.length === 0 || !newRecruitmentData.title || !newRecruitmentData.deadline_date}>作成</Button>
-          </div>
+        {renderRecruitmentForm(newRecruitmentData, setNewRecruitmentData, false)}
+        <div className={styles.modalActions}>
+          <Button variant="outline" onClick={() => setShowCreateModal(false)}>キャンセル</Button>
+          <Button variant="primary" onClick={handleCreateRecruitment} loading={createLoading} disabled={newRecruitmentData.menus.length === 0 || !newRecruitmentData.title || !newRecruitmentData.deadline_date}>作成</Button>
         </div>
       </Modal>
-
       {editingRecruitment && (
         <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="募集内容を編集" size="lg">
-            <div className={styles.modalContent}>
-            <Input
-                label="募集タイトル"
-                value={editingRecruitment.title || ''}
-                onChange={(e) => setEditingRecruitment({ ...editingRecruitment, title: e.target.value })}
-                required fullWidth
-            />
-            <div className={styles.inputWrapper}>
-                <label className={styles.label}>募集内容</label>
-                <textarea className={styles.textarea} value={editingRecruitment.description || ''} onChange={(e) => setEditingRecruitment({ ...editingRecruitment, description: e.target.value })} placeholder="詳しい募集内容を入力してください" rows={4}/>
-            </div>
-            <div className={styles.inputWrapper}>
-                <label className={styles.label}>メニュー（複数選択可）<span className={styles.required}>*</span></label>
-                <div className={styles.checkboxGrid}>
-                {MENU_OPTIONS.map(menu => (
-                    <label key={menu} className={styles.checkboxLabel}>
-                    <input type="checkbox" checked={editingRecruitment.menus?.includes(menu)} onChange={() => toggleMenu(menu, true)}/>
-                    <span>{MENU_LABELS[menu]}</span>
-                    </label>
-                ))}
-                </div>
-            </div>
-            <div className={styles.inputWrapper}>
-              <label className={styles.label}>性別</label>
-              <div className={styles.radioGroup}>
-                {GENDER_OPTIONS.map(gender => ( <label key={gender} className={styles.radioLabel}> <input type="radio" name="gender_edit" value={gender} checked={editingRecruitment.gender_requirement === gender} onChange={(e) => setEditingRecruitment({...editingRecruitment, gender_requirement: e.target.value as GenderRequirement})}/> <span>{GENDER_LABELS[gender]}</span> </label> ))}
-              </div>
-            </div>
-            <div className={styles.inputWrapper}>
-              <label className={styles.label}>髪の長さ</label>
-              <div className={styles.radioGroup}>
-                {HAIR_LENGTH_OPTIONS.map(length => ( <label key={length} className={styles.radioLabel}> <input type="radio" name="hairLength_edit" value={length} checked={editingRecruitment.hair_length_requirement === length} onChange={(e) => setEditingRecruitment({...editingRecruitment, hair_length_requirement: e.target.value as HairLengthRequirement})}/> <span>{HAIR_LENGTH_LABELS[length]}</span> </label> ))}
-              </div>
-            </div>
-            <Input
-                label="募集締切日"
-                type="date"
-                value={editingRecruitment.deadline_date || ''}
-                onChange={(e) => setEditingRecruitment({ ...editingRecruitment, deadline_date: e.target.value })}
-                required fullWidth
-            />
-            <div className={styles.modalActions}>
-                <Button variant="outline" onClick={() => setShowEditModal(false)}>キャンセル</Button>
-                <Button variant="primary" onClick={handleUpdateRecruitment} loading={editLoading}>更新</Button>
-            </div>
-            </div>
+          {renderRecruitmentForm(editingRecruitment, setEditingRecruitment as any, true)}
+          <div className={styles.modalActions}>
+            <Button variant="outline" onClick={() => setShowEditModal(false)}>キャンセル</Button>
+            <Button variant="primary" onClick={handleUpdateRecruitment} loading={editLoading}>更新</Button>
+          </div>
         </Modal>
       )}
     </div>
