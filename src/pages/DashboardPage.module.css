@@ -132,6 +132,9 @@
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .recruitmentItem:hover {
@@ -144,7 +147,6 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xs);
 }
 
 .recruitmentTitle {
@@ -164,6 +166,15 @@
   color: var(--color-text-tertiary);
   margin: 0;
 }
+
+.recruitmentActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
 
 /* Status badges */
 .statusPending,
@@ -355,6 +366,10 @@
   .applicationHeader,
   .recruitmentHeader {
     flex-direction: column;
+  }
+  
+  .recruitmentActions {
+    flex-wrap: wrap;
   }
 
   .modalActions {

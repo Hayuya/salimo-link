@@ -6,6 +6,7 @@
  * ISO形式の日付文字列を "YYYY年MM月DD日" 形式に変換
  */
 export const formatDate = (dateString: string): string => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -14,9 +15,10 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
- * ISO形式の日付文字列を "YYYY-MM-DD" 形式に変換
+ * ISO形式の日付文字列を "YYYY-MM-DD" 形式に変換 (input[type=date]用)
  */
-export const formatDateInput = (dateString: string): string => {
+export const formatDateForInput = (dateString?: string): string => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -25,9 +27,23 @@ export const formatDateInput = (dateString: string): string => {
 };
 
 /**
+ * ISO形式の日時文字列を "YYYY-MM-DDTHH:MM" 形式に変換 (input[type=datetime-local]用)
+ */
+export const formatDateTimeForInput = (dateString?: string): string => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    // タイムゾーンのオフセットを考慮してフォーマット
+    const timezoneOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+};
+
+
+/**
  * ISO形式の日時文字列を "YYYY年MM月DD日 HH:MM" 形式に変換
  */
 export const formatDateTime = (dateString: string): string => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -68,6 +84,7 @@ export const formatRelativeTime = (dateString: string): string => {
 export const isDeadlinePassed = (deadlineDate: string): boolean => {
   const now = new Date();
   const deadline = new Date(deadlineDate);
+  deadline.setHours(23, 59, 59, 999); // 日付の終わりまでを考慮
   return now > deadline;
 };
 
@@ -77,6 +94,9 @@ export const isDeadlinePassed = (deadlineDate: string): boolean => {
 export const daysUntilDeadline = (deadlineDate: string): number => {
   const now = new Date();
   const deadline = new Date(deadlineDate);
+  // 時間をリセットして日付のみで比較
+  now.setHours(0, 0, 0, 0);
+  deadline.setHours(0, 0, 0, 0);
   const diffMs = deadline.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return diffDays;
