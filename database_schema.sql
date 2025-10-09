@@ -210,9 +210,10 @@ BEGIN
     RAISE EXCEPTION 'Invalid reservation datetime';
   END IF;
   
-  -- Update recruitment's available_dates
+  -- Update recruitment's available_dates and close the recruitment
   UPDATE recruitments
-  SET available_dates = v_updated_dates
+  SET available_dates = v_updated_dates,
+      status = 'closed'
   WHERE id = p_recruitment_id;
   
   -- Create reservation
@@ -249,6 +250,8 @@ DECLARE
   v_available_dates JSONB;
   v_updated_dates JSONB := '[]'::jsonb;
   v_date_obj JSONB;
+  v_active_reservations INTEGER;
+  v_has_open_slot BOOLEAN := FALSE;
 BEGIN
   -- Get reservation details
   SELECT recruitment_id, reservation_datetime
@@ -277,10 +280,28 @@ BEGIN
       v_updated_dates := v_updated_dates || v_date_obj;
     END IF;
   END LOOP;
+
+  -- Check for remaining pending/confirmed reservations
+  SELECT COUNT(*) INTO v_active_reservations
+  FROM reservations
+  WHERE recruitment_id = v_recruitment_id
+    AND status IN ('pending', 'confirmed');
+
+  -- Determine if there is at least one open slot
+  SELECT EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(v_updated_dates) elem
+    WHERE (elem->>'is_booked')::boolean = FALSE
+  ) INTO v_has_open_slot;
   
-  -- Update recruitment's available_dates
+  -- Update recruitment's available_dates and status
   UPDATE recruitments
-  SET available_dates = v_updated_dates
+  SET available_dates = v_updated_dates,
+      status = CASE
+        WHEN v_active_reservations = 0 AND v_has_open_slot THEN 'active'
+        WHEN v_active_reservations = 0 AND NOT v_has_open_slot THEN 'closed'
+        ELSE 'closed'
+      END
   WHERE id = v_recruitment_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
