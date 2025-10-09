@@ -160,9 +160,14 @@ export const DashboardPage = () => {
         {/* ヘッダー */}
         <div className={styles.header}>
           <h1 className={styles.title}>マイページ</h1>
-          <Button variant="outline" onClick={handleOpenProfileModal}>
-            プロフィール編集
-          </Button>
+          <div className={styles.headerActions}>
+            <Link to="/">
+              <Button variant="secondary">募集一覧へ</Button>
+            </Link>
+            <Button variant="outline" onClick={handleOpenProfileModal}>
+              プロフィール編集
+            </Button>
+          </div>
         </div>
 
         {/* プロフィール情報 */}

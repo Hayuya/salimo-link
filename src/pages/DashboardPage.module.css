@@ -18,6 +18,11 @@
   margin-bottom: var(--spacing-md);
 }
 
+.headerActions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
 .title {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
@@ -329,6 +334,12 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-md);
+  }
+  
+  .headerActions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 
   .sectionHeader {

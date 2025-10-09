@@ -1,7 +1,9 @@
+// src/components/Header.tsx
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { Button } from './Button';
 import styles from './Header.module.css';
+import { UserIcon } from './UserIcon';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
@@ -14,6 +16,17 @@ export const Header = () => {
     } catch (error) {
       console.error('ログアウトエラー:', error);
     }
+  };
+
+  const getProfileName = () => {
+    if (!user) return '';
+    if (user.userType === 'student' && 'name' in user.profile) {
+      return user.profile.name;
+    }
+    if (user.userType === 'salon' && 'salon_name' in user.profile) {
+      return user.profile.salon_name;
+    }
+    return 'ゲスト';
   };
 
   return (
@@ -29,12 +42,23 @@ export const Header = () => {
               <Link to="/dashboard" className={styles.navLink}>
                 マイページ
               </Link>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                ログアウト
-              </Button>
+              <div className={styles.dropdown}>
+                 <div className={styles.profileLink}>
+                    <UserIcon />
+                    <span>{getProfileName()}</span>
+                 </div>
+                 <div className={styles.dropdownContent}>
+                    <button onClick={handleSignOut} className={styles.dropdownItem}>
+                      ログアウト
+                    </button>
+                 </div>
+              </div>
             </>
           ) : (
             <>
+              <Link to="/about" className={styles.navLink}>
+                cutmoとは？
+              </Link>
               <Link to="/login" className={styles.navLink}>
                 ログイン
               </Link>

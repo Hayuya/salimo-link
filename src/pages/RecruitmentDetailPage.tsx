@@ -305,14 +305,15 @@ export const RecruitmentDetailPage = () => {
               const conditions = [];
 
               if (recruitment.menus && recruitment.menus.length > 0) {
+                const currentIndex = index;
                 conditions.push(
                   <label key="menu" className={styles.conditionCheckLabel}>
                     <input
                       type="checkbox"
-                      checked={conditionsAccepted[index] || false}
+                      checked={conditionsAccepted[currentIndex] || false}
                       onChange={(e) => {
                         const newAccepted = [...conditionsAccepted];
-                        newAccepted[index] = e.target.checked;
+                        newAccepted[currentIndex] = e.target.checked;
                         setConditionsAccepted(newAccepted);
                       }}
                     />
@@ -325,14 +326,15 @@ export const RecruitmentDetailPage = () => {
               }
 
               if (recruitment.gender_requirement && recruitment.gender_requirement !== 'any') {
+                const currentIndex = index;
                 conditions.push(
                   <label key="gender" className={styles.conditionCheckLabel}>
                     <input
                       type="checkbox"
-                      checked={conditionsAccepted[index] || false}
+                      checked={conditionsAccepted[currentIndex] || false}
                       onChange={(e) => {
                         const newAccepted = [...conditionsAccepted];
-                        newAccepted[index] = e.target.checked;
+                        newAccepted[currentIndex] = e.target.checked;
                         setConditionsAccepted(newAccepted);
                       }}
                     />
@@ -345,14 +347,15 @@ export const RecruitmentDetailPage = () => {
               }
 
               if (recruitment.hair_length_requirement && recruitment.hair_length_requirement !== 'any') {
+                const currentIndex = index;
                 conditions.push(
                   <label key="hair" className={styles.conditionCheckLabel}>
                     <input
                       type="checkbox"
-                      checked={conditionsAccepted[index] || false}
+                      checked={conditionsAccepted[currentIndex] || false}
                       onChange={(e) => {
                         const newAccepted = [...conditionsAccepted];
-                        newAccepted[index] = e.target.checked;
+                        newAccepted[currentIndex] = e.target.checked;
                         setConditionsAccepted(newAccepted);
                       }}
                     />
@@ -365,14 +368,15 @@ export const RecruitmentDetailPage = () => {
               }
 
               if (recruitment.has_date_requirement && recruitment.appointment_date) {
+                const currentIndex = index;
                 conditions.push(
                   <label key="date" className={styles.conditionCheckLabel}>
                     <input
                       type="checkbox"
-                      checked={conditionsAccepted[index] || false}
+                      checked={conditionsAccepted[currentIndex] || false}
                       onChange={(e) => {
                         const newAccepted = [...conditionsAccepted];
-                        newAccepted[index] = e.target.checked;
+                        newAccepted[currentIndex] = e.target.checked;
                         setConditionsAccepted(newAccepted);
                       }}
                     />
@@ -385,14 +389,15 @@ export const RecruitmentDetailPage = () => {
               }
 
               if (recruitment.treatment_duration) {
+                const currentIndex = index;
                 conditions.push(
                   <label key="duration" className={styles.conditionCheckLabel}>
                     <input
                       type="checkbox"
-                      checked={conditionsAccepted[index] || false}
+                      checked={conditionsAccepted[currentIndex] || false}
                       onChange={(e) => {
                         const newAccepted = [...conditionsAccepted];
-                        newAccepted[index] = e.target.checked;
+                        newAccepted[currentIndex] = e.target.checked;
                         setConditionsAccepted(newAccepted);
                       }}
                     />
@@ -401,6 +406,7 @@ export const RecruitmentDetailPage = () => {
                     </span>
                   </label>
                 );
+                index++;
               }
 
               return conditions;
