@@ -21,18 +21,29 @@ export const useRecruitments = () => {
         .from('recruitments')
         .select(`
           *,
-          salon:salons(*)
+          salon:salons(*),
+          reservations:reservations(status)
         `)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const filteredRecruitments = (data || []).filter((recruitment) => {
-        if (recruitment.status !== 'active') return false;
-        return Array.isArray(recruitment.available_dates)
-          ? (recruitment.available_dates as AvailableDate[]).some((date: AvailableDate) => !date.is_booked)
-          : true;
-      });
+      const filteredRecruitments = (data || [])
+        .filter(recruitment => {
+          if (recruitment.status !== 'active') return false;
+          const hasPendingOrConfirmed = Array.isArray(recruitment.reservations)
+            ? recruitment.reservations.some(
+                (res: { status: string }) =>
+                  res.status === 'pending' || res.status === 'confirmed'
+              )
+            : false;
+          if (hasPendingOrConfirmed) return false;
+          if (!Array.isArray(recruitment.available_dates)) return true;
+          return (recruitment.available_dates as AvailableDate[]).some(
+            (date: AvailableDate) => !date.is_booked
+          );
+        })
+        .map(({ reservations, ...rest }) => rest as RecruitmentWithDetails);
       setRecruitments(filteredRecruitments);
     } catch (err: any) {
       setError(err.message);
