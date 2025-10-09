@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useReservations } from '@/hooks/useReservations';
@@ -49,7 +49,7 @@ const initialRecruitmentState = {
   model_experience_requirement: 'any' as ModelExperienceRequirement,
   has_reward: false,
   reward_details: '',
-  available_dates: [] as AvailableDate[], // ★ 変更
+  available_dates: [] as AvailableDate[],
 };
 
 export const DashboardPage = () => {
@@ -78,15 +78,15 @@ export const DashboardPage = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
 
-  // ★ 変更: 日時入力用の状態
+  // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
   const [newSlotTime, setNewSlotTime] = useState('');
 
-  useEffect(() => {
-    loadDashboardData();
-  }, [user]);
+  // 編集用の日時入力
+  const [editSlotDate, setEditSlotDate] = useState('');
+  const [editSlotTime, setEditSlotTime] = useState('');
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -103,10 +103,15 @@ export const DashboardPage = () => {
       }
     } catch (error) {
       console.error('データ読み込みエラー:', error);
+      alert('データの読み込みに失敗しました');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, fetchReservationsByStudent, fetchReservationsBySalon, fetchRecruitmentsBySalonId]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   const handleUpdateProfile = async () => {
     setProfileLoading(true);
@@ -121,14 +126,21 @@ export const DashboardPage = () => {
     }
   };
 
-  // ★ 変更: 日時をavailable_datesに追加
+  // JSTとして扱う日時作成関数
+  const createJSTDateTime = (date: string, time: string): string => {
+    // ISO 8601形式でJST（+09:00）を明示
+    return `${date}T${time}:00+09:00`;
+  };
+
+  // 新規作成時の日時追加
   const addSlot = () => {
     if (!newSlotDate || !newSlotTime) {
       alert('日付と時刻を選択してください');
       return;
     }
     
-    const datetime = new Date(`${newSlotDate}T${newSlotTime}`).toISOString();
+    const jstDatetime = createJSTDateTime(newSlotDate, newSlotTime);
+    const datetime = new Date(jstDatetime).toISOString();
     
     // 重複チェック
     if (newRecruitmentData.available_dates.some(d => d.datetime === datetime)) {
@@ -157,6 +169,50 @@ export const DashboardPage = () => {
     setNewRecruitmentData({
       ...newRecruitmentData,
       available_dates: newRecruitmentData.available_dates.filter(d => d.datetime !== datetime)
+    });
+  };
+
+  // 編集時の日時追加
+  const addEditSlot = () => {
+    if (!editSlotDate || !editSlotTime || !editingRecruitment) {
+      alert('日付と時刻を選択してください');
+      return;
+    }
+    
+    const jstDatetime = createJSTDateTime(editSlotDate, editSlotTime);
+    const datetime = new Date(jstDatetime).toISOString();
+    
+    // 重複チェック
+    if (editingRecruitment.available_dates?.some(d => d.datetime === datetime)) {
+      alert('同じ日時がすでに追加されています');
+      return;
+    }
+    
+    const newDate: AvailableDate = {
+      datetime,
+      is_booked: false
+    };
+    
+    const updatedDates = [...(editingRecruitment.available_dates || []), newDate].sort(
+      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+    );
+    
+    setEditingRecruitment({
+      ...editingRecruitment,
+      available_dates: updatedDates
+    });
+    
+    // 入力フィールドをクリア
+    setEditSlotDate('');
+    setEditSlotTime('');
+  };
+
+  const removeEditSlot = (datetime: string) => {
+    if (!editingRecruitment) return;
+    
+    setEditingRecruitment({
+      ...editingRecruitment,
+      available_dates: editingRecruitment.available_dates?.filter(d => d.datetime !== datetime)
     });
   };
 
@@ -197,6 +253,32 @@ export const DashboardPage = () => {
 
   const handleUpdateRecruitment = async () => {
     if (!editingRecruitment) return;
+    
+    // バリデーション
+    if (!editingRecruitment.title) {
+      alert('タイトルを入力してください');
+      return;
+    }
+    
+    if (!editingRecruitment.menus || editingRecruitment.menus.length === 0) {
+      alert('メニューを1つ以上選択してください');
+      return;
+    }
+    
+    // 予約済みの日時が削除されていないかチェック
+    const originalRecruitment = recruitments.find(r => r.id === editingRecruitment.id);
+    if (originalRecruitment) {
+      const bookedDates = originalRecruitment.available_dates.filter(d => d.is_booked);
+      const hasAllBookedDates = bookedDates.every(bookedDate =>
+        editingRecruitment.available_dates?.some(d => d.datetime === bookedDate.datetime)
+      );
+      
+      if (!hasAllBookedDates) {
+        alert('予約済みの日時は削除できません');
+        return;
+      }
+    }
+    
     setEditLoading(true);
     try {
       const { id, ...updateData } = editingRecruitment;
@@ -433,6 +515,83 @@ export const DashboardPage = () => {
     );
   };
 
+  // 日時管理UIコンポーネント
+  const renderDateTimeManager = (isEdit: boolean) => {
+    const dates = isEdit ? (editingRecruitment?.available_dates || []) : newRecruitmentData.available_dates;
+    const dateValue = isEdit ? editSlotDate : newSlotDate;
+    const timeValue = isEdit ? editSlotTime : newSlotTime;
+    const setDateValue = isEdit ? setEditSlotDate : setNewSlotDate;
+    const setTimeValue = isEdit ? setEditSlotTime : setNewSlotTime;
+    const addFunc = isEdit ? addEditSlot : addSlot;
+    const removeFunc = isEdit ? removeEditSlot : removeSlot;
+
+    return (
+      <div className={styles.inputWrapper}>
+        <label className={styles.label}>
+          施術可能な日時を追加 <span className={styles.required}>*</span>
+        </label>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <Input 
+            type="date" 
+            value={dateValue} 
+            onChange={e => setDateValue(e.target.value)}
+            style={{ flex: '1 1 150px', minWidth: '150px' }}
+          />
+          <Input 
+            type="time" 
+            value={timeValue} 
+            onChange={e => setTimeValue(e.target.value)}
+            style={{ flex: '1 1 120px', minWidth: '120px' }}
+          />
+          <Button onClick={addFunc} size="sm">追加</Button>
+        </div>
+        
+        {dates.length > 0 && (
+          <div style={{ 
+            marginTop: 'var(--spacing-md)', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 'var(--spacing-xs)' 
+          }}>
+            {dates.map(date => (
+              <div 
+                key={date.datetime} 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  padding: 'var(--spacing-sm)',
+                  backgroundColor: date.is_booked ? 'var(--color-gray-200)' : 'var(--color-bg-secondary)',
+                  borderRadius: 'var(--radius-md)'
+                }}
+              >
+                <span>
+                  {formatDateTime(date.datetime)}
+                  {date.is_booked && <strong style={{ marginLeft: 'var(--spacing-sm)', color: 'var(--color-danger)' }}>（予約済み）</strong>}
+                </span>
+                {!date.is_booked && (
+                  <button 
+                    onClick={() => removeFunc(date.datetime)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontSize: 'var(--font-size-xl)',
+                      cursor: 'pointer',
+                      color: 'var(--color-danger)',
+                      padding: '0 var(--spacing-sm)'
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -522,6 +681,11 @@ export const DashboardPage = () => {
                           <p className={styles.applicationSalon}>
                             <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
                           </p>
+                          {res.message && (
+                            <p className={styles.applicationSalon}>
+                              <strong>メッセージ:</strong> {res.message}
+                            </p>
+                          )}
                         </div>
                         <span className={getReservationStatusLabel(res.status).className}>
                           {getReservationStatusLabel(res.status).text}
@@ -649,63 +813,7 @@ export const DashboardPage = () => {
       {/* 募集作成モーダル */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="新規募集作成" size="lg">
         {renderRecruitmentForm(newRecruitmentData, setNewRecruitmentData, false)}
-        
-        {/* ★ 変更: 日時追加UI */}
-        <div className={styles.inputWrapper}>
-          <label className={styles.label}>
-            施術可能な日時を追加 <span className={styles.required}>*</span>
-          </label>
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
-            <Input 
-              type="date" 
-              value={newSlotDate} 
-              onChange={e => setNewSlotDate(e.target.value)}
-            />
-            <Input 
-              type="time" 
-              value={newSlotTime} 
-              onChange={e => setNewSlotTime(e.target.value)}
-            />
-            <Button onClick={addSlot} size="sm">追加</Button>
-          </div>
-          
-          {newRecruitmentData.available_dates.length > 0 && (
-            <div style={{ 
-              marginTop: 'var(--spacing-md)', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: 'var(--spacing-xs)' 
-            }}>
-              {newRecruitmentData.available_dates.map(date => (
-                <div 
-                  key={date.datetime} 
-                  style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    padding: 'var(--spacing-sm)',
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    borderRadius: 'var(--radius-md)'
-                  }}
-                >
-                  <span>{formatDateTime(date.datetime)}</span>
-                  <button 
-                    onClick={() => removeSlot(date.datetime)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      fontSize: 'var(--font-size-xl)',
-                      cursor: 'pointer',
-                      color: 'var(--color-danger)'
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {renderDateTimeManager(false)}
         
         <div className={styles.modalActions}>
           <Button variant="outline" onClick={() => setShowCreateModal(false)}>キャンセル</Button>
@@ -728,6 +836,8 @@ export const DashboardPage = () => {
       {editingRecruitment && (
         <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="募集内容を編集" size="lg">
           {renderRecruitmentForm(editingRecruitment, setEditingRecruitment, true)}
+          {renderDateTimeManager(true)}
+          
           <div className={styles.modalActions}>
             <Button variant="outline" onClick={() => setShowEditModal(false)}>キャンセル</Button>
             <Button variant="primary" onClick={handleUpdateRecruitment} loading={editLoading}>更新</Button>

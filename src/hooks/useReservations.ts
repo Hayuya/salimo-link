@@ -9,6 +9,7 @@ export const useReservations = () => {
 
   const fetchReservationsByStudent = async (studentId: string): Promise<ReservationWithDetails[]> => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from('reservations')
@@ -20,11 +21,13 @@ export const useReservations = () => {
         .eq('student_id', studentId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data || [];
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const errorMessage = err.message || '予約情報の取得に失敗しました';
+      setError(errorMessage);
+      console.error('fetchReservationsByStudent error:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -32,6 +35,7 @@ export const useReservations = () => {
 
   const fetchReservationsBySalon = async (salonId: string): Promise<ReservationWithDetails[]> => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from('reservations')
@@ -43,11 +47,13 @@ export const useReservations = () => {
         .eq('salon_id', salonId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data || [];
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const errorMessage = err.message || '予約情報の取得に失敗しました';
+      setError(errorMessage);
+      console.error('fetchReservationsBySalon error:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -61,6 +67,7 @@ export const useReservations = () => {
     message?: string
   ): Promise<string> => {
     setLoading(true);
+    setError(null);
     try {
       // データベースのmake_reservation関数を使用
       const { data, error } = await supabase.rpc('make_reservation', {
@@ -71,11 +78,25 @@ export const useReservations = () => {
         p_message: message || null,
       });
 
-      if (error) throw error;
+      if (error) {
+        // エラーメッセージを日本語化
+        let errorMessage = error.message;
+        if (errorMessage.includes('already booked')) {
+          errorMessage = 'この日時はすでに予約されています';
+        } else if (errorMessage.includes('not found or closed')) {
+          errorMessage = '募集が見つからないか、募集が終了しています';
+        } else if (errorMessage.includes('Invalid reservation datetime')) {
+          errorMessage = '選択された日時は予約できません';
+        }
+        throw new Error(errorMessage);
+      }
+      
       return data; // 予約IDを返す
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const errorMessage = err.message || '予約の作成に失敗しました';
+      setError(errorMessage);
+      console.error('createReservation error:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -86,6 +107,7 @@ export const useReservations = () => {
     status: ReservationUpdate['status']
   ): Promise<Reservation> => {
     setLoading(true);
+    setError(null);
     try {
       // ステータスを更新
       const { data: updatedReservation, error } = await supabase
@@ -95,7 +117,7 @@ export const useReservations = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) throw new Error(error.message);
 
       // キャンセルされた場合はavailable_datesを更新
       if (status === 'cancelled_by_salon' || status === 'cancelled_by_student') {
@@ -103,13 +125,19 @@ export const useReservations = () => {
           p_reservation_id: id
         });
         
-        if (cancelError) throw cancelError;
+        if (cancelError) {
+          console.error('cancel_reservation error:', cancelError);
+          // キャンセル処理のエラーは警告のみとして扱う
+          console.warn('予約の日時を空き枠に戻す処理に失敗しました');
+        }
       }
       
       return updatedReservation;
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const errorMessage = err.message || '予約のステータス更新に失敗しました';
+      setError(errorMessage);
+      console.error('updateReservationStatus error:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
