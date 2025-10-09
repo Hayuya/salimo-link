@@ -1,5 +1,5 @@
 // src/recruitment/useRecruitments.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   Recruitment,
@@ -13,7 +13,7 @@ export const useRecruitments = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRecruitments = async () => {
+  const fetchRecruitments = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -32,9 +32,9 @@ export const useRecruitments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchRecruitmentById = async (id: string): Promise<RecruitmentWithDetails | null> => {
+  const fetchRecruitmentById = useCallback(async (id: string): Promise<RecruitmentWithDetails | null> => {
     try {
       const { data, error } = await supabase
         .from('recruitments')
@@ -50,9 +50,9 @@ export const useRecruitments = () => {
     } catch (err: any) {
       throw err;
     }
-  };
+  }, []);
 
-  const fetchRecruitmentsBySalonId = async (salonId: string): Promise<Recruitment[]> => {
+  const fetchRecruitmentsBySalonId = useCallback(async (salonId: string): Promise<Recruitment[]> => {
     try {
       const { data, error } = await supabase
         .from('recruitments')
@@ -65,24 +65,24 @@ export const useRecruitments = () => {
     } catch (err: any) {
       throw err;
     }
-  };
+  }, []);
 
-  const createRecruitment = async (data: RecruitmentInsert): Promise<Recruitment> => {
+  const createRecruitment = useCallback(async (data: RecruitmentInsert): Promise<Recruitment> => {
     try {
       const { data: newRecruitment, error } = await supabase
         .from('recruitments')
         .insert(data)
         .select()
         .single();
-      
+
       if (error) throw error;
       return newRecruitment;
     } catch (err: any) {
       throw err;
     }
-  };
+  }, []);
 
-  const updateRecruitment = async (id: string, data: RecruitmentUpdate): Promise<Recruitment> => {
+  const updateRecruitment = useCallback(async (id: string, data: RecruitmentUpdate): Promise<Recruitment> => {
     try {
       const { data: updatedRecruitment, error } = await supabase
         .from('recruitments')
@@ -96,9 +96,9 @@ export const useRecruitments = () => {
     } catch (err: any) {
       throw err;
     }
-  };
+  }, []);
 
-  const deleteRecruitment = async (id: string): Promise<void> => {
+  const deleteRecruitment = useCallback(async (id: string): Promise<void> => {
     try {
       const { error } = await supabase
         .from('recruitments')
@@ -109,13 +109,13 @@ export const useRecruitments = () => {
     } catch (err: any) {
       throw err;
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRecruitments();
-  }, []);
+  }, [fetchRecruitments]);
 
-  return {
+  return useMemo(() => ({
     recruitments,
     loading,
     error,
@@ -125,5 +125,15 @@ export const useRecruitments = () => {
     createRecruitment,
     updateRecruitment,
     deleteRecruitment,
-  };
+  }), [
+    recruitments,
+    loading,
+    error,
+    fetchRecruitments,
+    fetchRecruitmentById,
+    fetchRecruitmentsBySalonId,
+    createRecruitment,
+    updateRecruitment,
+    deleteRecruitment,
+  ]);
 };

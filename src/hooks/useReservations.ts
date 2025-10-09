@@ -1,5 +1,5 @@
 // src/hooks/useReservations.ts
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Reservation, ReservationWithDetails, ReservationUpdate } from '@/types';
 
@@ -7,7 +7,7 @@ export const useReservations = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReservationsByStudent = async (studentId: string): Promise<ReservationWithDetails[]> => {
+  const fetchReservationsByStudent = useCallback(async (studentId: string): Promise<ReservationWithDetails[]> => {
     setLoading(true);
     setError(null);
     try {
@@ -31,9 +31,9 @@ export const useReservations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchReservationsBySalon = async (salonId: string): Promise<ReservationWithDetails[]> => {
+  const fetchReservationsBySalon = useCallback(async (salonId: string): Promise<ReservationWithDetails[]> => {
     setLoading(true);
     setError(null);
     try {
@@ -57,9 +57,9 @@ export const useReservations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const createReservation = async (
+  const createReservation = useCallback(async (
     recruitmentId: string,
     studentId: string,
     salonId: string,
@@ -100,9 +100,9 @@ export const useReservations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateReservationStatus = async (
+  const updateReservationStatus = useCallback(async (
     id: string,
     status: ReservationUpdate['status']
   ): Promise<Reservation> => {
@@ -141,14 +141,21 @@ export const useReservations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  return {
+  return useMemo(() => ({
     loading,
     error,
     fetchReservationsByStudent,
     fetchReservationsBySalon,
     createReservation,
     updateReservationStatus,
-  };
+  }), [
+    loading,
+    error,
+    fetchReservationsByStudent,
+    fetchReservationsBySalon,
+    createReservation,
+    updateReservationStatus,
+  ]);
 };
