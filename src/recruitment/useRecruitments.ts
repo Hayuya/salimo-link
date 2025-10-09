@@ -115,6 +115,27 @@ export const useRecruitments = () => {
     fetchRecruitments();
   }, [fetchRecruitments]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('recruitments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'recruitments',
+        },
+        () => {
+          fetchRecruitments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchRecruitments]);
+
   return useMemo(() => ({
     recruitments,
     loading,
