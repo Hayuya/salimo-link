@@ -15,6 +15,7 @@
   background-size: cover;
   background-position: center top;
   z-index: -1;
+  pointer-events: none;
 }
 
 .hero {

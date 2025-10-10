@@ -4,8 +4,22 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-2xl) var(--container-padding);
-  background: radial-gradient(90% 120% at 20% 20%, rgba(236, 235, 255, 0.85), transparent),
-    radial-gradient(100% 120% at 80% 0%, rgba(242, 109, 162, 0.25), transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 120% at 12% -10%, rgba(236, 235, 255, 0.9), rgba(255, 255, 255, 0)),
+    radial-gradient(90% 80% at 85% -5%, rgba(242, 109, 162, 0.22), transparent),
+    linear-gradient(180deg, #fdfaff 0%, #f8f7fb 40%, #f5f3ff 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .content {
