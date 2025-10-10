@@ -45,6 +45,7 @@ export interface Salon {
   description?: string;
   address?: string;
   phone_number?: string;
+  website_url?: string;
   photo_url?: string;
   created_at: string;
   updated_at: string;
@@ -57,6 +58,7 @@ export interface SalonInsert {
   description?: string;
   address?: string;
   phone_number?: string;
+  website_url?: string;
   photo_url?: string;
 }
 
@@ -65,6 +67,7 @@ export interface SalonUpdate {
   description?: string;
   address?: string;
   phone_number?: string;
+  website_url?: string;
   photo_url?: string;
 }
 

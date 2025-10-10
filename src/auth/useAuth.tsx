@@ -166,6 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               description: authUser.user_metadata.description || null,
               address: authUser.user_metadata.address || null,
               phone_number: authUser.user_metadata.phone_number || null,
+              website_url: authUser.user_metadata.website_url || null,
               photo_url: authUser.user_metadata.photo_url || null,
             })
             .select()

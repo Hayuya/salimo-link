@@ -77,6 +77,7 @@ export const DashboardPage = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [expandedReservations, setExpandedReservations] = useState<Record<string, boolean>>({});
 
   // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
@@ -112,6 +113,10 @@ export const DashboardPage = () => {
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
+
+  useEffect(() => {
+    setExpandedReservations({});
+  }, [reservations]);
 
   const handleUpdateProfile = async () => {
     setProfileLoading(true);
@@ -341,6 +346,13 @@ export const DashboardPage = () => {
     }
   };
 
+  const toggleReservationDetails = (id: string) => {
+    setExpandedReservations(prev => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   const toggleMenu = (menu: MenuType, isEdit = false) => {
     const target = isEdit ? editingRecruitment : newRecruitmentData;
     const setter = isEdit ? setEditingRecruitment : setNewRecruitmentData;
@@ -368,74 +380,100 @@ export const DashboardPage = () => {
   const pendingReservations = reservations.filter(res => res.status === 'pending');
   const nonPendingReservations = reservations.filter(res => res.status !== 'pending');
 
-  const renderSalonReservation = (res: ReservationWithDetails) => (
-    <div
-      key={res.id}
-      className={[
-        styles.applicationItem,
-        res.status === 'pending' ? styles.pendingReservation : '',
-      ].filter(Boolean).join(' ')}
-    >
-      <div className={styles.applicationHeader}>
-        <div className={styles.reservationDetails}>
-          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-            {res.recruitment.title}
-          </Link>
-          <div className={styles.studentInfo}>
-            <p className={styles.studentInfoRow}>
+  const renderSalonReservation = (res: ReservationWithDetails) => {
+    const isExpanded = !!expandedReservations[res.id];
+    const statusLabel = getReservationStatusLabel(res.status);
+
+    return (
+      <div
+        key={res.id}
+        className={[
+          styles.applicationItem,
+          res.status === 'pending' ? styles.pendingReservation : '',
+        ].filter(Boolean).join(' ')}
+      >
+        <div className={styles.applicationHeader}>
+          <div className={styles.reservationSummary}>
+            <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+              {res.recruitment.title}
+            </Link>
+            <p className={styles.applicationSalon}>
               <strong>予約者:</strong> {res.student.name}
             </p>
-            {res.student.school_name && (
-              <p className={styles.studentInfoRow}>
-                <strong>学校:</strong> {res.student.school_name}
-              </p>
-            )}
-            <p className={styles.studentInfoRow}>
-              <strong>メール:</strong>{' '}
-              <a className={styles.contactLink} href={`mailto:${res.student.email}`}>
-                {res.student.email}
-              </a>
+            <p className={styles.applicationSalon}>
+              <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
             </p>
-            {res.student.instagram_url && (
+          </div>
+          <div className={styles.headerMeta}>
+            <span className={statusLabel.className}>{statusLabel.text}</span>
+            <button
+              type="button"
+              className={styles.toggleDetailsButton}
+              onClick={() => toggleReservationDetails(res.id)}
+              aria-expanded={isExpanded}
+            >
+              {isExpanded ? '詳細を閉じる' : '詳細を見る'}
+              <span
+                className={[
+                  styles.toggleIcon,
+                  isExpanded ? styles.toggleIconOpen : ''
+                ].filter(Boolean).join(' ')}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+
+        {isExpanded && (
+          <div className={styles.applicationBody}>
+            <div className={styles.studentInfo}>
+              {res.student.school_name && (
+                <p className={styles.studentInfoRow}>
+                  <strong>学校:</strong> {res.student.school_name}
+                </p>
+              )}
               <p className={styles.studentInfoRow}>
-                <strong>Instagram:</strong>{' '}
-                <a
-                  className={styles.contactLink}
-                  href={res.student.instagram_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {res.student.instagram_url}
+                <strong>メール:</strong>{' '}
+                <a className={styles.contactLink} href={`mailto:${res.student.email}`}>
+                  {res.student.email}
                 </a>
+              </p>
+              {res.student.instagram_url && (
+                <p className={styles.studentInfoRow}>
+                  <strong>Instagram:</strong>{' '}
+                  <a
+                    className={styles.contactLink}
+                    href={res.student.instagram_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {res.student.instagram_url}
+                  </a>
+                </p>
+              )}
+            </div>
+            <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
+            {res.message && (
+              <p className={styles.applicationSalon}>
+                <strong>メッセージ:</strong> {res.message}
               </p>
             )}
           </div>
-          <p className={styles.applicationSalon}>
-            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-          </p>
-          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-          {res.message && (
-            <p className={styles.applicationSalon}>
-              <strong>メッセージ:</strong> {res.message}
-            </p>
-          )}
-        </div>
-        <span className={getReservationStatusLabel(res.status).className}>
-          {getReservationStatusLabel(res.status).text}
-        </span>
+        )}
+
+        {res.status === 'pending' && (
+          <div className={styles.recruitmentActions}>
+            <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
+              承認
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
+              キャンセル
+            </Button>
+          </div>
+        )}
       </div>
-      {res.status === 'pending' && (
-        <div className={styles.recruitmentActions}>
-          <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
-            承認
-          </Button>
-          <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
-            キャンセル
-          </Button>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   const renderRecruitmentForm = (
     data: typeof newRecruitmentData | typeof editingRecruitment | null,
@@ -697,6 +735,21 @@ export const DashboardPage = () => {
               <p><strong>住所:</strong> {(user.profile as Salon).address || '未設定'}</p>
               <p><strong>メールアドレス:</strong> {user.email}</p>
               <p><strong>電話番号:</strong> {(user.profile as Salon).phone_number || '未設定'}</p>
+              <p>
+                <strong>WEBサイト:</strong>{' '}
+                {(user.profile as Salon).website_url ? (
+                  <a
+                    className={styles.contactLink}
+                    href={(user.profile as Salon).website_url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {(user.profile as Salon).website_url}
+                  </a>
+                ) : (
+                  '未設定'
+                )}
+              </p>
             </div>
           )}
         </Card>
@@ -894,6 +947,13 @@ export const DashboardPage = () => {
                 label="電話番号" 
                 value={profileData.phone_number || ''} 
                 onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })} 
+                fullWidth
+              />
+              <Input
+                label="WEBサイトURL"
+                value={profileData.website_url || ''}
+                onChange={(e) => setProfileData({ ...profileData, website_url: e.target.value })}
+                placeholder="https://example.com"
                 fullWidth
               />
               <div className={styles.inputWrapper}>

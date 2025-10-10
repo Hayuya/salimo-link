@@ -11,6 +11,59 @@
   gap: var(--spacing-lg);
 }
 
+.dropdownSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.dropdownTrigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dropdownTrigger:hover,
+.dropdownTrigger:focus {
+  border-color: var(--color-border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.dropdownTitle {
+  text-align: left;
+  flex: 1;
+}
+
+.dropdownIcon {
+  width: 16px;
+  height: 16px;
+  border-right: 2px solid var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-text-secondary);
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+
+.dropdownIconOpen {
+  transform: rotate(-135deg);
+}
+
+.dropdownContent {
+  margin-top: var(--spacing-lg);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--color-white);
+}
+
 .salonHeader {
   display: flex;
   gap: var(--spacing-lg);
@@ -43,6 +96,37 @@
   font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+.contactItem {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.contactLabel {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.contactLink {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.contactLink:hover {
+  text-decoration: none;
+}
+
+.salonDescription {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
 }
 
 .recruitmentHeader {

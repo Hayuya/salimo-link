@@ -20,6 +20,7 @@ export const SignupForm = () => {
   // サロン用フィールド
   const [salonName, setSalonName] = useState('');
   const [address, setAddress] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
   
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -93,6 +94,7 @@ export const SignupForm = () => {
             email,
             salon_name: salonName,
             address,
+            website_url: websiteUrl || undefined,
           };
 
       await signUp(email, password, userType, profileData);
@@ -210,6 +212,15 @@ export const SignupForm = () => {
             error={errors.address}
             placeholder="東京都渋谷区..."
             required
+            fullWidth
+          />
+
+          <Input
+            type="url"
+            label="WEBサイトURL（任意）"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://example.com"
             fullWidth
           />
         </>

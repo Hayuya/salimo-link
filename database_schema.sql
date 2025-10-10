@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS salons (
   description TEXT,
   address TEXT,
   phone_number TEXT,
+  website_url TEXT,
   photo_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -139,7 +140,7 @@ BEGIN
     );
   ELSIF user_type = 'salon' THEN
     -- Create salon profile
-    INSERT INTO salons (id, email, salon_name, description, address, phone_number, photo_url)
+    INSERT INTO salons (id, email, salon_name, description, address, phone_number, website_url, photo_url)
     VALUES (
       NEW.id,
       NEW.email,
@@ -147,6 +148,7 @@ BEGIN
       NEW.raw_user_meta_data->>'description',
       NEW.raw_user_meta_data->>'address',
       NEW.raw_user_meta_data->>'phone_number',
+      NEW.raw_user_meta_data->>'website_url',
       NEW.raw_user_meta_data->>'photo_url'
     );
   END IF;
