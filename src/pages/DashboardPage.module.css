@@ -139,6 +139,12 @@
   color: var(--color-text-secondary);
 }
 
+.helperText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
 .radioGroup {
   display: flex;
   flex-wrap: wrap;

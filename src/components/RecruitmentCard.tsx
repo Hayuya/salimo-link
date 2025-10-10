@@ -13,6 +13,8 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
   const availableSlotsCount = recruitment.available_dates.filter(
     date => !date.is_booked
   ).length;
+  const supportsChatConsultation = recruitment.allow_chat_consultation;
+  const hasAvailableSlots = availableSlotsCount > 0;
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>
@@ -59,11 +61,19 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
         <div className={styles.footer}>
           <div className={styles.slotInfo}>
             <span className={styles.slotLabel}>空き枠:</span>
-            <span className={styles.slotCount}>{availableSlotsCount}件</span>
+            <span className={styles.slotCount}>
+              {hasAvailableSlots
+                ? `${availableSlotsCount}件`
+                : supportsChatConsultation
+                  ? 'チャット相談可'
+                  : 'なし'}
+            </span>
           </div>
 
-          {availableSlotsCount > 0 ? (
-            <span className={styles.statusActive}>予約可能</span>
+          {hasAvailableSlots || supportsChatConsultation ? (
+            <span className={styles.statusActive}>
+              {supportsChatConsultation && !hasAvailableSlots ? 'チャット相談可' : '予約可能'}
+            </span>
           ) : (
             <span className={styles.statusClosed}>予約不可</span>
           )}

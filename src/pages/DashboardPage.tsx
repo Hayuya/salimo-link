@@ -56,6 +56,7 @@ const initialRecruitmentState = {
   has_reward: false,
   reward_details: '',
   available_dates: [] as AvailableDate[],
+  allow_chat_consultation: false,
   is_fully_booked: false,
 };
 
@@ -344,8 +345,8 @@ useEffect(() => {
       return;
     }
     
-    if (newRecruitmentData.available_dates.length === 0) {
-      alert('施術可能な日時を1つ以上追加してください');
+    if (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.allow_chat_consultation) {
+      alert('施術可能な日時を追加するか、「チャットで相談する」を選択してください');
       return;
     }
     
@@ -377,6 +378,11 @@ useEffect(() => {
     
     if (!editingRecruitment.menus || editingRecruitment.menus.length === 0) {
       alert('メニューを1つ以上選択してください');
+      return;
+    }
+
+    if ((!editingRecruitment.available_dates || editingRecruitment.available_dates.length === 0) && !editingRecruitment.allow_chat_consultation) {
+      alert('施術可能な日時を追加するか、「チャットで相談する」を選択してください');
       return;
     }
     
@@ -706,10 +712,21 @@ useEffect(() => {
     const addFunc = isEdit ? addEditSlot : addSlot;
     const removeFunc = isEdit ? removeEditSlot : removeSlot;
 
+    const targetRecruitment = isEdit ? editingRecruitment : newRecruitmentData;
+    const allowChat = targetRecruitment?.allow_chat_consultation ?? false;
+    const handleAllowChatChange = (checked: boolean) => {
+      if (isEdit) {
+        setEditingRecruitment(prev => prev ? { ...prev, allow_chat_consultation: checked } : prev);
+      } else {
+        setNewRecruitmentData(prev => ({ ...prev, allow_chat_consultation: checked }));
+      }
+    };
+
     return (
       <div className={styles.inputWrapper}>
         <label className={styles.label}>
-          施術可能な日時を追加 <span className={styles.required}>*</span>
+          施術可能な日時を追加
+          {!allowChat && <span className={styles.required}>*</span>}
         </label>
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Input 
@@ -726,6 +743,17 @@ useEffect(() => {
           />
           <Button onClick={addFunc} size="sm">追加</Button>
         </div>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={allowChat}
+            onChange={e => handleAllowChatChange(e.target.checked)}
+          />
+          <span>日時は後からチャットで相談する</span>
+        </label>
+        <p className={styles.helperText}>
+          チャットで相談するを選択すると、空き日時の追加なしで募集を公開できます。
+        </p>
         
         {dates.length > 0 && (
           <div style={{ 
@@ -926,7 +954,7 @@ useEffect(() => {
             disabled={
               newRecruitmentData.menus.length === 0 || 
               !newRecruitmentData.title || 
-              newRecruitmentData.available_dates.length === 0
+              (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.allow_chat_consultation)
             }
           >
             作成

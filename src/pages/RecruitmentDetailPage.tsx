@@ -23,6 +23,9 @@ export const RecruitmentDetailPage = () => {
   const [recruitment, setRecruitment] = useState<RecruitmentWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDatetime, setSelectedDatetime] = useState<string | null>(null);
+  const [isChatReservation, setIsChatReservation] = useState(false);
+  const [chatDate, setChatDate] = useState('');
+  const [chatTime, setChatTime] = useState('');
   const [message, setMessage] = useState('');
   const [isSalonInfoOpen, setIsSalonInfoOpen] = useState(false);
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
@@ -37,6 +40,24 @@ export const RecruitmentDetailPage = () => {
     }
   }, [id, fetchRecruitmentById]);
 
+  const handleChatConsultation = () => {
+    if (!recruitment || !recruitment.allow_chat_consultation) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (user.userType !== 'student') return;
+    if (!chatDate || !chatTime) {
+      alert('希望する日付と時間を入力してください');
+      return;
+    }
+
+    const jstDatetime = `${chatDate}T${chatTime}:00+09:00`;
+    const isoDatetime = new Date(jstDatetime).toISOString();
+    setIsChatReservation(true);
+    setSelectedDatetime(isoDatetime);
+  };
+
   const handleReservation = async () => {
     if (!user || user.userType !== 'student' || !selectedDatetime || !recruitment) return;
     if (!allConditionsChecked) return;
@@ -47,11 +68,19 @@ export const RecruitmentDetailPage = () => {
         user.id,
         recruitment.salon_id,
         selectedDatetime,
-        message
+        message,
+        isChatReservation
       );
-      alert('仮予約が完了しました。サロンからの承認をお待ちください。');
+      alert(
+        isChatReservation
+          ? 'チャット相談のリクエストを送信しました。サロンからの連絡をお待ちください。'
+          : '仮予約が完了しました。サロンからの承認をお待ちください。'
+      );
       setSelectedDatetime(null);
+      setIsChatReservation(false);
       setMessage('');
+      setChatDate('');
+      setChatTime('');
       // 予約後は募集情報を再取得
       const updated = await fetchRecruitmentById(recruitment.id);
       setRecruitment(updated);
@@ -262,6 +291,9 @@ export const RecruitmentDetailPage = () => {
                     variant="outline"
                     onClick={() => {
                       if (user) {
+                        setIsChatReservation(false);
+                        setChatDate('');
+                        setChatTime('');
                         setSelectedDatetime(date.datetime);
                       } else {
                         navigate('/login');
@@ -274,7 +306,45 @@ export const RecruitmentDetailPage = () => {
                 ))}
               </div>
             ) : (
-              <p className={styles.closedMessage}>現在予約可能な日時がありません</p>
+              <p className={styles.closedMessage}>
+                {recruitment.allow_chat_consultation
+                  ? 'カレンダー上の空きはありませんが、チャットで日時を相談できます。'
+                  : '現在予約可能な日時がありません'}
+              </p>
+            )}
+
+            {recruitment.allow_chat_consultation && (
+              <div className={styles.chatConsultationBlock}>
+                <h4 className={styles.chatTitle}>チャットで日時を相談する</h4>
+                <p className={styles.chatDescription}>
+                  希望日時が決まっていない場合でも募集に申し込めます。希望する日付と時間を入力し、チャットで最終調整を行ってください。
+                </p>
+                <div className={styles.chatInputs}>
+                  <label className={styles.chatInputField}>
+                    <span>希望日</span>
+                    <input
+                      type="date"
+                      value={chatDate}
+                      onChange={e => setChatDate(e.target.value)}
+                    />
+                  </label>
+                  <label className={styles.chatInputField}>
+                    <span>希望時間</span>
+                    <input
+                      type="time"
+                      value={chatTime}
+                      onChange={e => setChatTime(e.target.value)}
+                    />
+                  </label>
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={handleChatConsultation}
+                  disabled={!chatDate || !chatTime}
+                >
+                  チャットで相談する
+                </Button>
+              </div>
             )}
           </div>
         </Card>
@@ -284,13 +354,18 @@ export const RecruitmentDetailPage = () => {
       {selectedDatetime && (
         <Modal 
           isOpen={!!selectedDatetime} 
-          onClose={() => setSelectedDatetime(null)} 
-          title="予約確認" 
+          onClose={() => {
+            setSelectedDatetime(null);
+            setIsChatReservation(false);
+          }} 
+          title={isChatReservation ? 'チャット相談を開始' : '予約確認'} 
           size="md"
         >
           <div className={styles.modalContent}>
             <p className={styles.modalDescription}>
-              以下の日時で仮予約します。よろしいですか?
+              {isChatReservation
+                ? 'チャットで日時を相談するリクエストを送信します。よろしいですか?'
+                : '以下の日時で仮予約します。よろしいですか?'}
             </p>
             <div style={{ 
               padding: 'var(--spacing-md)', 
@@ -346,6 +421,7 @@ export const RecruitmentDetailPage = () => {
                 variant="outline" 
                 onClick={() => {
                   setSelectedDatetime(null);
+                  setIsChatReservation(false);
                   setMessage('');
                 }}
               >
@@ -357,7 +433,7 @@ export const RecruitmentDetailPage = () => {
                 loading={reservationLoading}
                 disabled={!allConditionsChecked}
               >
-                仮予約を確定する
+                {isChatReservation ? 'チャットを開始する' : '仮予約を確定する'}
               </Button>
             </div>
           </div>

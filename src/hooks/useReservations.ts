@@ -64,7 +64,8 @@ export const useReservations = () => {
     studentId: string,
     salonId: string,
     reservationDatetime: string,
-    message?: string
+    message?: string,
+    isChatConsultation: boolean = false
   ): Promise<string> => {
     setLoading(true);
     setError(null);
@@ -76,6 +77,7 @@ export const useReservations = () => {
         p_salon_id: salonId,
         p_reservation_datetime: reservationDatetime,
         p_message: message || null,
+        p_is_chat_consultation: isChatConsultation,
       });
 
       if (error) {
@@ -87,6 +89,8 @@ export const useReservations = () => {
           errorMessage = '募集が見つからないか、募集が終了しています';
         } else if (errorMessage.includes('Invalid reservation datetime')) {
           errorMessage = '選択された日時は予約できません';
+        } else if (errorMessage.includes('Chat consultation not allowed')) {
+          errorMessage = 'この募集ではチャットでの相談はできません';
         }
         throw new Error(errorMessage);
       }

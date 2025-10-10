@@ -320,6 +320,59 @@
   font-size: var(--font-size-sm);
 }
 
+.chatConsultationBlock {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  background: rgba(124, 93, 247, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.chatTitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.chatDescription {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.chatInputs {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.chatInputField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.chatInputField input {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(114, 111, 150, 0.3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  background: white;
+}
+
+.chatInputField input:focus {
+  outline: none;
+  border-color: rgba(124, 93, 247, 0.6);
+  box-shadow: 0 0 0 3px rgba(124, 93, 247, 0.15);
+}
+
 .error {
   text-align: center;
   color: #f26da2;

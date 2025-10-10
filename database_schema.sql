@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS recruitments (
   has_reward BOOLEAN NOT NULL DEFAULT false,
   reward_details TEXT,
   available_dates JSONB NOT NULL DEFAULT '[]'::jsonb,
+  allow_chat_consultation BOOLEAN NOT NULL DEFAULT false,
   is_fully_booked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS reservations (
   reservation_datetime TIMESTAMPTZ NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending',
   message TEXT,
+  is_chat_consultation BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -283,47 +285,58 @@ CREATE OR REPLACE FUNCTION make_reservation(
   p_student_id UUID,
   p_salon_id UUID,
   p_reservation_datetime TIMESTAMPTZ,
-  p_message TEXT DEFAULT NULL
+  p_message TEXT DEFAULT NULL,
+  p_is_chat_consultation BOOLEAN DEFAULT FALSE
 )
 RETURNS UUID AS $$
 DECLARE
   v_reservation_id UUID;
   v_available_dates JSONB;
+  v_allow_chat BOOLEAN := FALSE;
   v_date_found BOOLEAN := FALSE;
   v_updated_dates JSONB := '[]'::jsonb;
   v_date_obj JSONB;
 BEGIN
-  -- Get current available_dates
-  SELECT available_dates INTO v_available_dates
+  -- Get current available_dates and chat setting
+  SELECT available_dates, allow_chat_consultation
+  INTO v_available_dates, v_allow_chat
   FROM recruitments
   WHERE id = p_recruitment_id AND status = 'active';
   
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Recruitment not found or closed';
   END IF;
-  
-  -- Check if the datetime exists and is not booked
-  FOR v_date_obj IN SELECT * FROM jsonb_array_elements(v_available_dates)
-  LOOP
-    IF (v_date_obj->>'datetime')::timestamptz = p_reservation_datetime THEN
-      v_date_found := TRUE;
-      IF (v_date_obj->>'is_booked')::boolean = TRUE THEN
-        RAISE EXCEPTION 'This time slot is already booked';
-      END IF;
-      -- Mark as booked
-      v_updated_dates := v_updated_dates || jsonb_build_object(
-        'datetime', v_date_obj->>'datetime',
-        'is_booked', true
-      );
-    ELSE
-      v_updated_dates := v_updated_dates || v_date_obj;
-    END IF;
-  END LOOP;
-  
-  IF NOT v_date_found THEN
-    RAISE EXCEPTION 'Invalid reservation datetime';
+
+  IF p_is_chat_consultation AND NOT v_allow_chat THEN
+    RAISE EXCEPTION 'Chat consultation not allowed for this recruitment';
   END IF;
-  
+
+  IF p_is_chat_consultation THEN
+    v_updated_dates := COALESCE(v_available_dates, '[]'::jsonb);
+  ELSE
+    -- Check if the datetime exists and is not booked
+    FOR v_date_obj IN SELECT * FROM jsonb_array_elements(COALESCE(v_available_dates, '[]'::jsonb))
+    LOOP
+      IF (v_date_obj->>'datetime')::timestamptz = p_reservation_datetime THEN
+        v_date_found := TRUE;
+        IF (v_date_obj->>'is_booked')::boolean = TRUE THEN
+          RAISE EXCEPTION 'This time slot is already booked';
+        END IF;
+        -- Mark as booked
+        v_updated_dates := v_updated_dates || jsonb_build_object(
+          'datetime', v_date_obj->>'datetime',
+          'is_booked', true
+        );
+      ELSE
+        v_updated_dates := v_updated_dates || v_date_obj;
+      END IF;
+    END LOOP;
+    
+    IF NOT v_date_found THEN
+      RAISE EXCEPTION 'Invalid reservation datetime';
+    END IF;
+  END IF;
+
   -- Update recruitment's available_dates and close the recruitment
   UPDATE recruitments
   SET available_dates = v_updated_dates,
@@ -337,14 +350,16 @@ BEGIN
     salon_id,
     reservation_datetime,
     status,
-    message
+    message,
+    is_chat_consultation
   ) VALUES (
     p_recruitment_id,
     p_student_id,
     p_salon_id,
     p_reservation_datetime,
     'pending',
-    p_message
+    p_message,
+    p_is_chat_consultation
   ) RETURNING id INTO v_reservation_id;
   
   RETURN v_reservation_id;
@@ -366,10 +381,12 @@ DECLARE
   v_date_obj JSONB;
   v_active_reservations INTEGER;
   v_has_open_slot BOOLEAN := FALSE;
+  v_is_chat_consultation BOOLEAN := FALSE;
+  v_allow_chat BOOLEAN := FALSE;
 BEGIN
   -- Get reservation details
-  SELECT recruitment_id, reservation_datetime
-  INTO v_recruitment_id, v_reservation_datetime
+  SELECT recruitment_id, reservation_datetime, is_chat_consultation
+  INTO v_recruitment_id, v_reservation_datetime, v_is_chat_consultation
   FROM reservations
   WHERE id = p_reservation_id;
   
@@ -378,22 +395,27 @@ BEGIN
   END IF;
   
   -- Get current available_dates
-  SELECT available_dates INTO v_available_dates
+  SELECT available_dates, allow_chat_consultation
+  INTO v_available_dates, v_allow_chat
   FROM recruitments
   WHERE id = v_recruitment_id;
   
-  -- Unmark the datetime as booked
-  FOR v_date_obj IN SELECT * FROM jsonb_array_elements(v_available_dates)
-  LOOP
-    IF (v_date_obj->>'datetime')::timestamptz = v_reservation_datetime THEN
-      v_updated_dates := v_updated_dates || jsonb_build_object(
-        'datetime', v_date_obj->>'datetime',
-        'is_booked', false
-      );
-    ELSE
-      v_updated_dates := v_updated_dates || v_date_obj;
-    END IF;
-  END LOOP;
+  IF v_is_chat_consultation THEN
+    v_updated_dates := COALESCE(v_available_dates, '[]'::jsonb);
+  ELSE
+    -- Unmark the datetime as booked
+    FOR v_date_obj IN SELECT * FROM jsonb_array_elements(COALESCE(v_available_dates, '[]'::jsonb))
+    LOOP
+      IF (v_date_obj->>'datetime')::timestamptz = v_reservation_datetime THEN
+        v_updated_dates := v_updated_dates || jsonb_build_object(
+          'datetime', v_date_obj->>'datetime',
+          'is_booked', false
+        );
+      ELSE
+        v_updated_dates := v_updated_dates || v_date_obj;
+      END IF;
+    END LOOP;
+  END IF;
 
   -- Check for remaining pending/confirmed reservations
   SELECT COUNT(*) INTO v_active_reservations
@@ -404,7 +426,7 @@ BEGIN
   -- Determine if there is at least one open slot
   SELECT EXISTS (
     SELECT 1
-    FROM jsonb_array_elements(v_updated_dates) elem
+    FROM jsonb_array_elements(COALESCE(v_updated_dates, '[]'::jsonb)) elem
     WHERE (elem->>'is_booked')::boolean = FALSE
   ) INTO v_has_open_slot;
   
@@ -412,8 +434,8 @@ BEGIN
   UPDATE recruitments
   SET available_dates = v_updated_dates,
       status = CASE
-        WHEN v_active_reservations = 0 AND v_has_open_slot THEN 'active'
-        WHEN v_active_reservations = 0 AND NOT v_has_open_slot THEN 'closed'
+        WHEN v_active_reservations = 0 AND (v_has_open_slot OR v_allow_chat) THEN 'active'
+        WHEN v_active_reservations = 0 AND NOT (v_has_open_slot OR v_allow_chat) THEN 'closed'
         ELSE 'closed'
       END
   WHERE id = v_recruitment_id;

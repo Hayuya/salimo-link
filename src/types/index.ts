@@ -118,6 +118,7 @@ export interface Recruitment {
   
   // ★ 変更: JSONB配列で管理
   available_dates: AvailableDate[];
+  allow_chat_consultation: boolean;
   is_fully_booked: boolean;
   
   created_at: string;
@@ -144,6 +145,7 @@ export interface RecruitmentInsert {
   
   // ★ 変更: JSONB配列で管理
   available_dates: AvailableDate[];
+  allow_chat_consultation: boolean;
   is_fully_booked: boolean;
 }
 
@@ -160,6 +162,7 @@ export interface RecruitmentUpdate {
   has_reward?: boolean;
   reward_details?: string;
   available_dates?: AvailableDate[];
+  allow_chat_consultation?: boolean;
   is_fully_booked?: boolean;
 }
 
@@ -177,6 +180,7 @@ export interface Reservation {
   
   status: ReservationStatus;
   message?: string;
+  is_chat_consultation: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -202,6 +206,7 @@ export interface ReservationInsert {
   reservation_datetime: string;
   message?: string;
   status: ReservationStatus;
+  is_chat_consultation?: boolean;
 }
 
 export interface ReservationUpdate {
