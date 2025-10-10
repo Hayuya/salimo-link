@@ -1,0 +1,467 @@
+.container {
+  min-height: calc(100vh - 80px);
+}
+
+/* ヒーローセクション */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-4xl) var(--container-padding) var(--spacing-3xl);
+  background: linear-gradient(135deg, rgba(236, 235, 255, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+.heroDecorations {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.decorCircle1 {
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.15), rgba(124, 93, 247, 0.05));
+  animation: float 8s ease-in-out infinite;
+}
+
+.decorCircle2 {
+  position: absolute;
+  bottom: 20%;
+  left: 5%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(242, 109, 162, 0.15), rgba(242, 109, 162, 0.05));
+  animation: float 6s ease-in-out infinite 1s;
+}
+
+.decorSquare {
+  position: absolute;
+  top: 30%;
+  left: 15%;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.1), transparent);
+  border-radius: 20px;
+  transform: rotate(15deg);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.heroTitle {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: 1.2;
+  color: #2b2543;
+}
+
+.titleAccent {
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroSubtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* セクション共通 */
+.section {
+  padding: var(--spacing-3xl) var(--container-padding);
+}
+
+.sectionContent {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0 0 var(--spacing-2xl) 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+/* 特徴カード */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.featureCard {
+  padding: var(--spacing-2xl);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px rgba(124, 93, 247, 0.08);
+  border: 2px solid rgba(124, 93, 247, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(124, 93, 247, 0.15);
+  border-color: rgba(124, 93, 247, 0.2);
+}
+
+.featureIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 8px 24px rgba(124, 93, 247, 0.3);
+}
+
+.featureIcon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.featureCard h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.featureCard p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* 使い方ステップ */
+.usageSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.stepCard {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+  padding: var(--spacing-xl);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 12px rgba(124, 93, 247, 0.08);
+  border: 2px solid rgba(124, 93, 247, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stepCard:hover {
+  transform: translateX(8px);
+  box-shadow: 0 4px 20px rgba(124, 93, 247, 0.15);
+  border-color: rgba(124, 93, 247, 0.2);
+}
+
+.stepNumber {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  border-radius: 50%;
+  color: white;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 4px 16px rgba(124, 93, 247, 0.3);
+}
+
+.stepContent h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.stepContent p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* 対象ユーザー */
+.targetUsers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-2xl);
+  margin-top: var(--spacing-xl);
+}
+
+.targetCard {
+  padding: var(--spacing-2xl);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px rgba(124, 93, 247, 0.08);
+  border: 2px solid rgba(124, 93, 247, 0.1);
+  transition: all 0.3s ease;
+}
+
+.targetCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(124, 93, 247, 0.15);
+}
+
+.targetIcon {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.targetCard h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.targetCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.targetCard li {
+  position: relative;
+  padding-left: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.targetCard li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #7c5df7;
+  font-weight: var(--font-weight-bold);
+}
+
+/* 安全性セクション */
+.safetySection {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl);
+  background: linear-gradient(135deg, rgba(236, 235, 255, 0.5), rgba(255, 255, 255, 0.9));
+  border-radius: var(--radius-2xl);
+  border: 2px solid rgba(124, 93, 247, 0.15);
+}
+
+.safetyIcon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 8px 32px rgba(124, 93, 247, 0.3);
+}
+
+.safetyIcon svg {
+  width: 50px;
+  height: 50px;
+}
+
+.safetyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.safetyItem {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  padding: var(--spacing-lg);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(124, 93, 247, 0.06);
+}
+
+.safetyCheck {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  border-radius: 50%;
+  color: white;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+.safetyItem h4 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.safetyItem p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* CTAセクション */
+.ctaSection {
+  padding: var(--spacing-4xl) var(--container-padding);
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  text-align: center;
+}
+
+.ctaContent {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.ctaContent h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.ctaContent p {
+  font-size: var(--font-size-lg);
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 var(--spacing-2xl) 0;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaButtons button {
+  min-width: 180px;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: var(--font-size-3xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .targetUsers {
+    grid-template-columns: 1fr;
+  }
+
+  .safetySection {
+    padding: var(--spacing-lg);
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+  }
+
+  .ctaButtons button {
+    width: 100%;
+  }
+
+  .decorCircle1,
+  .decorCircle2,
+  .decorSquare {
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--spacing-2xl) var(--container-padding);
+  }
+
+  .hero {
+    padding: var(--spacing-2xl) var(--container-padding);
+  }
+
+  .featureCard,
+  .stepCard,
+  .targetCard {
+    padding: var(--spacing-lg);
+  }
+
+  .stepNumber {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    font-size: var(--font-size-xl);
+  }
+}

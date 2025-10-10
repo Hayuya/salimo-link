@@ -1,5 +1,8 @@
+// src/routes/AppRoutes.tsx
 import { Routes, Route } from 'react-router-dom';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import { TopPage } from '@/pages/TopPage';
+import { AboutPage } from '@/pages/AboutPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { SignupPage } from '@/pages/SignupPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -9,25 +12,31 @@ import { ProtectedRoute } from './ProtectedRoute';
 
 export const AppRoutes = () => {
   return (
-    <Routes>
-      {/* 公開ルート */}
-      <Route path="/" element={<TopPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/recruitment/:id" element={<RecruitmentDetailPage />} />
+    <>
+      {/* ページ遷移時に自動的に最上部にスクロール */}
+      <ScrollToTop />
+      
+      <Routes>
+        {/* 公開ルート */}
+        <Route path="/" element={<TopPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/recruitment/:id" element={<RecruitmentDetailPage />} />
 
-      {/* 保護されたルート（ログイン必須） */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* 保護されたルート（ログイン必須） */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 404 */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 };
