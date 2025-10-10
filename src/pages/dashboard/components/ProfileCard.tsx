@@ -1,15 +1,12 @@
 import { Card } from '@/components/Card';
-import { Button } from '@/components/Button';
 import { AuthUser, Salon, Student } from '@/types';
 import styles from './ProfileCard.module.css';
 
 interface ProfileCardProps {
   user: AuthUser;
-  onDeleteAccount: () => void;
-  deleteLoading: boolean;
 }
 
-export const ProfileCard = ({ user, onDeleteAccount, deleteLoading }: ProfileCardProps) => {
+export const ProfileCard = ({ user }: ProfileCardProps) => {
   return (
     <Card padding="lg" className={styles.card}>
       <h2 className={styles.title}>プロフィール</h2>
@@ -42,22 +39,6 @@ export const ProfileCard = ({ user, onDeleteAccount, deleteLoading }: ProfileCar
             />
           </>
         )}
-      </div>
-
-      <div className={styles.dangerZone}>
-        <h3 className={styles.dangerTitle}>アカウント削除</h3>
-        <p className={styles.dangerDescription}>
-          アカウントを削除すると、登録した募集・予約情報・チャット履歴がすべて削除されます。
-          この操作は取り消せません。
-        </p>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={onDeleteAccount}
-          loading={deleteLoading}
-        >
-          アカウントを削除する
-        </Button>
       </div>
     </Card>
   );

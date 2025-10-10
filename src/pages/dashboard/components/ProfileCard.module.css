@@ -41,28 +41,3 @@
   color: var(--color-primary-hover);
   border-color: rgba(124, 93, 247, 0.6);
 }
-
-.dangerZone {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
-  border: 1px solid rgba(240, 98, 117, 0.2);
-  border-radius: var(--radius-lg);
-  background-color: rgba(240, 98, 117, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.dangerTitle {
-  margin: 0;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: #d9344c;
-}
-
-.dangerDescription {
-  margin: 0;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-normal);
-}

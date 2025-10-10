@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useReservations } from '@/hooks/useReservations';
@@ -90,6 +90,8 @@ export const DashboardPage = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [latestMessages, setLatestMessages] = useState<Record<string, ReservationMessage | null>>({});
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showProfileActions, setShowProfileActions] = useState(false);
+  const profileActionsRef = useRef<HTMLDivElement | null>(null);
 
   // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
@@ -209,6 +211,22 @@ useEffect(() => {
     });
   };
 }, [reservations]);
+
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      profileActionsRef.current &&
+      !profileActionsRef.current.contains(event.target as Node)
+    ) {
+      setShowProfileActions(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
 
   const handleUpdateProfile = async () => {
     setProfileLoading(true);
@@ -456,6 +474,7 @@ useEffect(() => {
   };
 
   const handleDeleteAccount = async () => {
+    setShowProfileActions(false);
     if (!window.confirm('アカウントを本当に削除しますか？この操作は取り消せません。')) {
       return;
     }
@@ -509,6 +528,12 @@ useEffect(() => {
     const latest = latestMessages[reservationId];
     if (!latest) return false;
     return latest.sender_id !== user.id;
+  };
+
+  const handleOpenProfileModal = () => {
+    setProfileData(user!.profile);
+    setShowProfileModal(true);
+    setShowProfileActions(false);
   };
 
   if (loading) return <Spinner fullScreen />;
@@ -755,22 +780,38 @@ useEffect(() => {
           <h1 className={styles.title}>マイページ</h1>
           <div className={styles.headerActions}>
             <Link to="/"><Button variant="secondary">募集一覧へ</Button></Link>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setProfileData(user.profile);
-                setShowProfileModal(true);
-              }}
-            >
-              プロフィール編集
-            </Button>
+            <div className={styles.actionMenu} ref={profileActionsRef}>
+              <Button
+                variant="outline"
+                onClick={() => setShowProfileActions(prev => !prev)}
+              >
+                アカウント設定
+              </Button>
+              {showProfileActions && (
+                <div className={styles.actionDropdown}>
+                  <button
+                    type="button"
+                    className={styles.actionItem}
+                    onClick={handleOpenProfileModal}
+                  >
+                    プロフィール編集
+                  </button>
+                  <button
+                    type="button"
+                    className={[styles.actionItem, styles.actionDanger].join(' ')}
+                    onClick={handleDeleteAccount}
+                    disabled={deleteLoading}
+                  >
+                    {deleteLoading ? '削除中…' : 'アカウント削除'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <ProfileCard
           user={user}
-          onDeleteAccount={handleDeleteAccount}
-          deleteLoading={deleteLoading}
         />
 
         {user.userType === 'student' ? (
