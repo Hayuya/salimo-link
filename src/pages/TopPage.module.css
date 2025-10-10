@@ -291,7 +291,7 @@
 .section {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 var(--container-padding) var(--spacing-3xl);
+  padding: var(--spacing-2xl) var(--container-padding) var(--spacing-3xl);
   position: relative;
   z-index: 1;
 }
