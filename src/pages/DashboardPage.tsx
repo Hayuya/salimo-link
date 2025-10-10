@@ -38,6 +38,10 @@ import { Input } from '@/components/Input';
 import { Spinner } from '@/components/Spinner';
 import { ReservationChatModal } from '@/components/ReservationChatModal';
 import { supabase } from '@/lib/supabase';
+import { ProfileCard } from './dashboard/components/ProfileCard';
+import { StudentReservationsSection } from './dashboard/components/StudentReservationsSection';
+import { SalonReservationsSection } from './dashboard/components/SalonReservationsSection';
+import { RecruitmentManagementSection } from './dashboard/components/RecruitmentManagementSection';
 import styles from './DashboardPage.module.css';
 
 const initialRecruitmentState = {
@@ -498,292 +502,6 @@ useEffect(() => {
     res => res.status !== 'pending' && res.status !== 'confirmed'
   );
 
-  const renderRecruitmentDetails = (recruitment: ReservationWithDetails['recruitment']) => (
-    <div className={styles.recruitmentInfo}>
-      <p className={styles.detailTitle}>募集詳細</p>
-      {recruitment.description && (
-        <p className={styles.detailDescription}>{recruitment.description}</p>
-      )}
-      {recruitment.menus?.length > 0 && (
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>メニュー</span>
-          <div className={styles.tagList}>
-            {recruitment.menus.map(menu => (
-              <span key={menu} className={styles.tag}>
-                {MENU_LABELS[menu]}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className={styles.conditionGrid}>
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>性別</span>
-          <span className={styles.detailValue}>
-            {GENDER_LABELS[recruitment.gender_requirement]}
-          </span>
-        </div>
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>髪の長さ</span>
-          <span className={styles.detailValue}>
-            {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}
-          </span>
-        </div>
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>モデル経験</span>
-          <span className={styles.detailValue}>
-            {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}
-          </span>
-        </div>
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>撮影</span>
-          <span className={styles.detailValue}>
-            {PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}
-          </span>
-        </div>
-        {recruitment.treatment_duration && (
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>施術時間</span>
-            <span className={styles.detailValue}>
-              {recruitment.treatment_duration}
-            </span>
-          </div>
-        )}
-        {recruitment.has_reward && (
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>謝礼</span>
-            <span className={styles.detailValue}>
-              {recruitment.reward_details || 'あり'}
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderSalonReservation = (res: ReservationWithDetails) => {
-    const isExpanded = !!expandedReservations[res.id];
-    const statusLabel = getReservationStatusLabel(res.status);
-
-    return (
-      <div
-        key={res.id}
-        className={[
-          styles.applicationItem,
-          res.status === 'pending' ? styles.pendingReservation : '',
-          res.status === 'confirmed' ? styles.confirmedReservation : '',
-        ].filter(Boolean).join(' ')}
-      >
-        <div className={styles.applicationHeader}>
-          <div className={styles.reservationSummary}>
-            <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-              {res.recruitment.title}
-            </Link>
-            <p className={styles.applicationSalon}>
-              <strong>予約者:</strong> {res.student.name}
-            </p>
-            <p className={styles.applicationSalon}>
-              <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-            </p>
-          </div>
-          <div className={styles.headerMeta}>
-            <span className={statusLabel.className}>{statusLabel.text}</span>
-            {res.status === 'confirmed' && (
-              <Button
-                size="sm"
-                variant="primary"
-                className={[
-                  styles.chatButton,
-                  hasUnreadMessage(res.id) ? styles.chatButtonUnread : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => handleOpenChat(res)}
-              >
-                <span>チャット</span>
-                {hasUnreadMessage(res.id) && <span className={styles.chatBadge}>!</span>}
-              </Button>
-            )}
-            <button
-              type="button"
-              className={styles.toggleDetailsButton}
-              onClick={() => toggleReservationDetails(res.id)}
-              aria-expanded={isExpanded}
-            >
-              {isExpanded ? '詳細を閉じる' : '詳細を見る'}
-              <span
-                className={[
-                  styles.toggleIcon,
-                  isExpanded ? styles.toggleIconOpen : ''
-                ].filter(Boolean).join(' ')}
-                aria-hidden="true"
-              />
-            </button>
-          </div>
-        </div>
-
-        {isExpanded && (
-          <div className={styles.applicationBody}>
-            <div className={styles.studentInfo}>
-              {res.student.school_name && (
-                <p className={styles.studentInfoRow}>
-                  <strong>学校:</strong> {res.student.school_name}
-                </p>
-              )}
-              <p className={styles.studentInfoRow}>
-                <strong>メール:</strong>{' '}
-                <a className={styles.contactLink} href={`mailto:${res.student.email}`}>
-                  {res.student.email}
-                </a>
-              </p>
-              {res.student.instagram_url && (
-                <p className={styles.studentInfoRow}>
-                  <strong>Instagram:</strong>{' '}
-                  <a
-                    className={styles.contactLink}
-                    href={res.student.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {res.student.instagram_url}
-                  </a>
-                </p>
-              )}
-            </div>
-            <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-            {res.message && (
-              <p className={styles.applicationSalon}>
-                <strong>メッセージ:</strong> {res.message}
-              </p>
-            )}
-            {renderRecruitmentDetails(res.recruitment)}
-          </div>
-        )}
-
-        {res.status === 'pending' && (
-          <div className={styles.recruitmentActions}>
-            <Button size="sm" variant="primary" onClick={() => handleUpdateReservation(res.id, 'confirmed')}>
-              承認
-            </Button>
-            <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
-              キャンセル
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderStudentReservation = (res: ReservationWithDetails) => {
-    const isExpanded = !!expandedReservations[res.id];
-    const statusLabel = getReservationStatusLabel(res.status);
-
-    return (
-      <div
-        key={res.id}
-        className={[
-          styles.applicationItem,
-          res.status === 'pending' ? styles.pendingReservation : '',
-          res.status === 'confirmed' ? styles.confirmedReservation : '',
-        ].filter(Boolean).join(' ')}
-      >
-        <div className={styles.applicationHeader}>
-          <div className={styles.reservationSummary}>
-            <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-              {res.recruitment.title}
-            </Link>
-            <p className={styles.applicationSalon}>
-              <strong>サロン:</strong> {res.recruitment.salon.salon_name}
-            </p>
-            <p className={styles.applicationSalon}>
-              <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-            </p>
-          </div>
-          <div className={styles.headerMeta}>
-            <span className={statusLabel.className}>{statusLabel.text}</span>
-            {res.status === 'confirmed' && (
-              <Button
-                size="sm"
-                variant="primary"
-                className={[
-                  styles.chatButton,
-                  hasUnreadMessage(res.id) ? styles.chatButtonUnread : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => handleOpenChat(res)}
-              >
-                <span>チャット</span>
-                {hasUnreadMessage(res.id) && <span className={styles.chatBadge}>!</span>}
-              </Button>
-            )}
-            <button
-              type="button"
-              className={styles.toggleDetailsButton}
-              onClick={() => toggleReservationDetails(res.id)}
-              aria-expanded={isExpanded}
-            >
-              {isExpanded ? '詳細を閉じる' : '詳細を見る'}
-              <span
-                className={[
-                  styles.toggleIcon,
-                  isExpanded ? styles.toggleIconOpen : ''
-                ].filter(Boolean).join(' ')}
-                aria-hidden="true"
-              />
-            </button>
-          </div>
-        </div>
-
-        {isExpanded && (
-          <div className={styles.applicationBody}>
-            <div className={styles.studentInfo}>
-              {res.recruitment.salon.address && (
-                <p className={styles.studentInfoRow}>
-                  <strong>住所:</strong> {res.recruitment.salon.address}
-                </p>
-              )}
-              {res.recruitment.salon.phone_number && (
-                <p className={styles.studentInfoRow}>
-                  <strong>電話:</strong> {res.recruitment.salon.phone_number}
-                </p>
-              )}
-              <p className={styles.studentInfoRow}>
-                <strong>メール:</strong>{' '}
-                <a
-                  className={styles.contactLink}
-                  href={`mailto:${res.recruitment.salon.email}`}
-                >
-                  {res.recruitment.salon.email}
-                </a>
-              </p>
-              {res.recruitment.salon.website_url && (
-                <p className={styles.studentInfoRow}>
-                  <strong>WEBサイト:</strong>{' '}
-                  <a
-                    className={styles.contactLink}
-                    href={res.recruitment.salon.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {res.recruitment.salon.website_url}
-                  </a>
-                </p>
-              )}
-            </div>
-            <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-            {res.status === 'confirmed' && (
-              <p className={styles.confirmedNote}>
-                予約が確定しています。サロンからの追加連絡を確認してください。
-              </p>
-            )}
-            {res.message && (
-              <p className={styles.applicationSalon}>
-                <strong>送信メッセージ:</strong> {res.message}
-              </p>
-            )}
-            {renderRecruitmentDetails(res.recruitment)}
-          </div>
-        )}
-      </div>
-    );
-  };
 
   const renderRecruitmentForm = (
     data: typeof newRecruitmentData | typeof editingRecruitment | null,
@@ -1019,11 +737,11 @@ useEffect(() => {
           <h1 className={styles.title}>マイページ</h1>
           <div className={styles.headerActions}>
             <Link to="/"><Button variant="secondary">募集一覧へ</Button></Link>
-            <Button 
-              variant="outline" 
-              onClick={() => { 
-                setProfileData(user.profile); 
-                setShowProfileModal(true); 
+            <Button
+              variant="outline"
+              onClick={() => {
+                setProfileData(user.profile);
+                setShowProfileModal(true);
               }}
             >
               プロフィール編集
@@ -1031,168 +749,39 @@ useEffect(() => {
           </div>
         </div>
 
-        <Card padding="lg">
-          <h2 className={styles.sectionTitle}>プロフィール</h2>
-          {user.userType === 'student' ? (
-            <div className={styles.profileInfo}>
-              <p><strong>名前:</strong> {(user.profile as Student).name}</p>
-              <p><strong>学校名:</strong> {(user.profile as Student).school_name || '未設定'}</p>
-              <p><strong>メールアドレス:</strong> {user.email}</p>
-            </div>
-          ) : (
-            <div className={styles.profileInfo}>
-              <p><strong>サロン名:</strong> {(user.profile as Salon).salon_name}</p>
-              <p><strong>住所:</strong> {(user.profile as Salon).address || '未設定'}</p>
-              <p><strong>メールアドレス:</strong> {user.email}</p>
-              <p><strong>電話番号:</strong> {(user.profile as Salon).phone_number || '未設定'}</p>
-              <p>
-                <strong>WEBサイト:</strong>{' '}
-                {(user.profile as Salon).website_url ? (
-                  <a
-                    className={styles.contactLink}
-                    href={(user.profile as Salon).website_url!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {(user.profile as Salon).website_url}
-                  </a>
-                ) : (
-                  '未設定'
-                )}
-              </p>
-            </div>
-          )}
-        </Card>
+        <ProfileCard user={user} />
 
-        {user.userType === 'student' && (
+        {user.userType === 'student' ? (
+          <StudentReservationsSection
+            pendingReservations={pendingReservations}
+            confirmedReservations={confirmedReservations}
+            otherReservations={otherReservations}
+            expandedReservations={expandedReservations}
+            onToggleDetails={toggleReservationDetails}
+            onOpenChat={handleOpenChat}
+            hasUnreadMessage={hasUnreadMessage}
+            getReservationStatusLabel={getReservationStatusLabel}
+          />
+        ) : (
           <>
-            {pendingReservations.length > 0 && (
-              <Card padding="lg" className={styles.pendingCard}>
-                <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle}>承認待ちの予約</h2>
-                </div>
-                <p className={styles.pendingDescription}>
-                  サロンからの承認をお待ちください。連絡が届いたら早めに返信しましょう。
-                </p>
-                <div className={styles.applicationList}>
-                  {pendingReservations.map(renderStudentReservation)}
-                </div>
-              </Card>
-            )}
-
-            <Card padding="lg">
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>確定済みの予約</h2>
-              </div>
-              {confirmedReservations.length === 0 ? (
-                <p className={styles.emptyMessage}>
-                  {pendingReservations.length > 0 ? 'まだ確定した予約はありません' : '確定した予約はありません'}
-                </p>
-              ) : (
-                <div className={styles.applicationList}>
-                  {confirmedReservations.map(renderStudentReservation)}
-                </div>
-              )}
-            </Card>
-
-            <Card padding="lg">
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>キャンセル・終了した予約</h2>
-              </div>
-              {otherReservations.length === 0 ? (
-                <p className={styles.emptyMessage}>
-                  {pendingReservations.length > 0 || confirmedReservations.length > 0
-                    ? 'キャンセル・終了した予約はありません'
-                    : 'まだ予約履歴がありません'}
-                </p>
-              ) : (
-                <div className={styles.applicationList}>
-                  {otherReservations.map(renderStudentReservation)}
-                </div>
-              )}
-            </Card>
-          </>
-        )}
-
-        {user.userType === 'salon' && (
-          <>
-            <Card padding="lg">
-              <h2 className={styles.sectionTitle}>予約管理</h2>
-              {reservations.length === 0 ? (
-                <p className={styles.emptyMessage}>現在、予約はありません</p>
-              ) : (
-                <div className={styles.reservationSections}>
-                  {pendingReservations.length > 0 && (
-                    <div className={styles.reservationSection}>
-                      <h3 className={styles.subSectionTitle}>承認待ち</h3>
-                      <div className={styles.applicationList}>
-                        {pendingReservations.map(renderSalonReservation)}
-                      </div>
-                    </div>
-                  )}
-                  {confirmedReservations.length > 0 && (
-                    <div className={styles.reservationSection}>
-                      <h3 className={styles.subSectionTitle}>確定済み</h3>
-                      <div className={styles.applicationList}>
-                        {confirmedReservations.map(renderSalonReservation)}
-                      </div>
-                    </div>
-                  )}
-                  {otherReservations.length > 0 && (
-                    <div className={styles.reservationSection}>
-                      <h3 className={styles.subSectionTitle}>キャンセル・その他</h3>
-                      <div className={styles.applicationList}>
-                        {otherReservations.map(renderSalonReservation)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </Card>
-            
-            <Card padding="lg">
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>募集管理</h2>
-                <Button variant="primary" onClick={() => setShowCreateModal(true)}>新規募集作成</Button>
-              </div>
-              {recruitments.length === 0 ? (
-                <p className={styles.emptyMessage}>まだ募集を作成していません</p>
-              ) : (
-                <div className={styles.recruitmentList}>
-                  {recruitments.map((rec) => (
-                    <div key={rec.id} className={styles.recruitmentItem}>
-                      <div className={styles.recruitmentHeader}>
-                        <Link to={`/recruitment/${rec.id}`} className={styles.recruitmentTitle}>
-                          {rec.title}
-                        </Link>
-                        <span className={rec.status === 'active' ? styles.statusActive : styles.statusClosed}>
-                          {rec.status === 'active' ? '公開中' : '非公開'}
-                        </span>
-                      </div>
-                      <p className={styles.applicationDate}>
-                        空き枠: {rec.available_dates.filter(d => !d.is_booked).length}件
-                      </p>
-                      <div className={styles.recruitmentActions}>
-                        <Button variant="outline" size="sm" onClick={() => handleOpenEditModal(rec)}>
-                          編集
-                        </Button>
-                        {rec.status === 'active' 
-                          ? <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'closed')}>
-                              非公開にする
-                            </Button>
-                          : <Button variant="outline" size="sm" onClick={() => handleToggleRecruitmentStatus(rec.id, 'active')}>
-                              公開する
-                            </Button>
-                        }
-                        <Button variant="danger" size="sm" onClick={() => handleDeleteRecruitment(rec.id)}>
-                          削除
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
+            <SalonReservationsSection
+              pendingReservations={pendingReservations}
+              confirmedReservations={confirmedReservations}
+              otherReservations={otherReservations}
+              expandedReservations={expandedReservations}
+              onToggleDetails={toggleReservationDetails}
+              onUpdateStatus={handleUpdateReservation}
+              onOpenChat={handleOpenChat}
+              hasUnreadMessage={hasUnreadMessage}
+              getReservationStatusLabel={getReservationStatusLabel}
+            />
+            <RecruitmentManagementSection
+              recruitments={recruitments}
+              onCreateClick={() => setShowCreateModal(true)}
+              onEditClick={handleOpenEditModal}
+              onToggleStatus={handleToggleRecruitmentStatus}
+              onDelete={handleDeleteRecruitment}
+            />
           </>
         )}
       </div>
