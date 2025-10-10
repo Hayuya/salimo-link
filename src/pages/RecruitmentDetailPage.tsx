@@ -223,34 +223,43 @@ export const RecruitmentDetailPage = () => {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>サロン情報</h3>
             <div className={styles.salonInfoCard}>
-              <div className={styles.salonInfoCardHeader}>
-                <span className={styles.salonBadgeIcon} aria-hidden="true" />
-              </div>
-              <div className={styles.salonHeader}>
+              <div className={styles.salonInfoHeader}>
+                <div className={styles.salonInfoTitle}>
+                  <span className={styles.salonInfoIcon} aria-hidden="true" />
+                  <p>サロン情報</p>
+                </div>
                 {recruitment.salon.photo_url && (
                   <img
                     src={recruitment.salon.photo_url}
                     alt={recruitment.salon.salon_name}
-                    className={styles.salonImage}
+                    className={styles.salonThumbnail}
                   />
                 )}
-                <div className={styles.salonInfo}>
-                  <h4 className={styles.salonName}>{recruitment.salon.salon_name}</h4>
-                  {recruitment.salon.address && (
-                    <p className={styles.address}>
-                      <span className={styles.addressIcon} aria-hidden="true" />
+              </div>
+              <dl className={styles.salonInfoList}>
+                <div className={styles.salonInfoItem}>
+                  <dt className={styles.infoLabel}>サロン名</dt>
+                  <dd className={styles.infoValue}>{recruitment.salon.salon_name}</dd>
+                </div>
+                {recruitment.salon.address && (
+                  <div className={styles.salonInfoItem}>
+                    <dt className={styles.infoLabel}>住所</dt>
+                    <dd className={[styles.infoValue, styles.addressValue].join(' ')}>
+                      <span className={styles.addressMarker} aria-hidden="true" />
                       <span>{recruitment.salon.address}</span>
-                    </p>
-                  )}
-                  {recruitment.salon.phone_number && (
-                    <p className={styles.contactItem}>
-                      <span className={styles.contactLabel}>電話番号:</span>
-                      <span>{recruitment.salon.phone_number}</span>
-                    </p>
-                  )}
-                  {recruitment.salon.website_url && (
-                    <p className={styles.contactItem}>
-                      <span className={styles.contactLabel}>WEBサイト:</span>
+                    </dd>
+                  </div>
+                )}
+                {recruitment.salon.phone_number && (
+                  <div className={styles.salonInfoItem}>
+                    <dt className={styles.infoLabel}>電話</dt>
+                    <dd className={styles.infoValue}>{recruitment.salon.phone_number}</dd>
+                  </div>
+                )}
+                {recruitment.salon.website_url && (
+                  <div className={styles.salonInfoItem}>
+                    <dt className={styles.infoLabel}>WEBサイト</dt>
+                    <dd className={styles.infoValue}>
                       <a
                         href={recruitment.salon.website_url}
                         target="_blank"
@@ -259,13 +268,13 @@ export const RecruitmentDetailPage = () => {
                       >
                         {recruitment.salon.website_url}
                       </a>
-                    </p>
-                  )}
-                  {recruitment.salon.description && (
-                    <p className={styles.salonDescription}>{recruitment.salon.description}</p>
-                  )}
-                </div>
-              </div>
+                    </dd>
+                  </div>
+                )}
+              </dl>
+              {recruitment.salon.description && (
+                <p className={styles.salonDescription}>{recruitment.salon.description}</p>
+              )}
             </div>
           </div>
 

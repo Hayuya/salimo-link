@@ -174,6 +174,155 @@
   overflow-wrap: break-word;
 }
 
+/* サロン情報 - シンプルレイアウト */
+.salonInfoCard {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-xl);
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1px solid #e6e7f0;
+  box-shadow: 0 12px 30px rgba(43, 37, 67, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.salonInfoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.salonInfoTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.salonInfoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.18), rgba(242, 109, 162, 0.18));
+  position: relative;
+}
+
+.salonInfoIcon::before,
+.salonInfoIcon::after {
+  content: '';
+  position: absolute;
+  background: #7c5df7;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.salonInfoIcon::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 8px;
+}
+
+.salonInfoIcon::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 50% 50% 0;
+  bottom: 7px;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.salonThumbnail {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 1px solid #e1e4f3;
+  box-shadow: 0 6px 16px rgba(43, 37, 67, 0.08);
+}
+
+.salonInfoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.salonInfoItem {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.infoLabel {
+  min-width: 96px;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.infoValue {
+  margin: 0;
+  flex: 1;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  word-break: break-word;
+}
+
+.addressValue {
+  position: relative;
+}
+
+.addressMarker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(242, 109, 162, 0.32), rgba(124, 93, 247, 0.22));
+  position: relative;
+  flex-shrink: 0;
+}
+
+.addressMarker::before,
+.addressMarker::after {
+  content: '';
+  position: absolute;
+  background: #f26da2;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.addressMarker::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  top: 5px;
+}
+
+.addressMarker::after {
+  width: 7px;
+  height: 7px;
+  border-radius: 50% 50% 50% 0;
+  bottom: 4px;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.salonDescription {
+  margin: 0;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid #eef0f8;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
 /* 募集情報カード */
 .recruitmentHeader {
   display: flex;
@@ -493,52 +642,38 @@
 
   .salonInfoCard {
     padding: var(--spacing-lg);
-    margin-left: 0;
-    margin-right: 0;
-    border-radius: var(--radius-xl);
   }
 
-  .salonInfoCardHeader {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .salonHeader {
+  .salonInfoHeader {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--spacing-md);
+    align-items: flex-start;
+    gap: var(--spacing-sm);
   }
 
-  .salonImage {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
+  .salonInfoTitle {
+    font-size: var(--font-size-base);
   }
 
-  .salonInfo {
-    width: 100%;
-    align-items: center;
-    text-align: center;
+  .salonThumbnail {
+    width: 120px;
+    height: 120px;
   }
 
-  .salonName {
-    font-size: var(--font-size-lg);
+  .salonInfoItem {
+    flex-direction: column;
+    gap: var(--spacing-xs);
   }
 
-  .contactItem {
-    justify-content: center;
+  .infoLabel {
+    min-width: 0;
+  }
+
+  .infoValue {
     font-size: var(--font-size-sm);
-  }
-
-  .address {
-    font-size: var(--font-size-sm);
-    justify-content: center;
   }
 
   .salonDescription {
     font-size: var(--font-size-sm);
-    text-align: center;
   }
 
   .recruitmentHeader {
@@ -569,33 +704,35 @@
 }
 
 @media (max-width: 480px) {
-  .salonBadgeIcon {
+  .salonInfoCard {
+    padding: var(--spacing-sm);
+  }
+
+  .salonInfoHeader {
+    align-items: stretch;
+  }
+
+  .salonInfoTitle {
+    justify-content: flex-start;
+    font-size: var(--font-size-sm);
+  }
+
+  .salonInfoIcon {
     width: 28px;
     height: 28px;
   }
 
-  .salonBadgeIcon::before {
-    top: 8px;
+  .salonThumbnail {
+    width: 100%;
+    height: auto;
+    max-width: none;
   }
 
-  .salonBadgeIcon::after {
-    bottom: 6px;
+  .infoValue {
+    font-size: var(--font-size-xs);
   }
 
-  .salonBadgeTitle {
-    font-size: var(--font-size-base);
-  }
-
-  .addressIcon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .salonName {
-    font-size: var(--font-size-base);
-  }
-
-  .salonInfoCard {
-    padding: var(--spacing-sm);
+  .salonDescription {
+    font-size: var(--font-size-xs);
   }
 }
