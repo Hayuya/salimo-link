@@ -16,8 +16,17 @@ export const TopPage = () => {
     <div className={styles.container}>
       {!user && (
         <div className={styles.hero}>
+          {/* 背景装飾図形 */}
+          <div className={styles.heroDecorations}>
+            <div className={styles.decorCircle1}></div>
+            <div className={styles.decorCircle2}></div>
+            <div className={styles.decorCircle3}></div>
+            <div className={styles.decorSquare1}></div>
+            <div className={styles.decorSquare2}></div>
+          </div>
+
           <div className={styles.heroInner}>
-            <div>
+            <div className={styles.heroContent}>
               <h1 className={styles.heroTitle}>
                 カットモデルを探す学生と<br />
                 美容室アシスタントを繋ぐ
@@ -25,6 +34,59 @@ export const TopPage = () => {
               <p className={styles.heroSubtitle}>
                 安全で洗練された出会いをサポート。美容とファッションの世界観に寄り添ったマッチングプラットフォームです。
               </p>
+
+              {/* 特徴セクション */}
+              <div className={styles.heroFeatures}>
+                <div className={styles.featureItem}>
+                  <div className={styles.featureIcon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className={styles.featureText}>
+                    <h3>学校メール認証</h3>
+                    <p>安全な本人確認</p>
+                  </div>
+                </div>
+
+                <div className={styles.featureItem}>
+                  <div className={styles.featureIcon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className={styles.featureText}>
+                    <h3>簡単予約</h3>
+                    <p>日時を選んで即座に予約</p>
+                  </div>
+                </div>
+
+                <div className={styles.featureItem}>
+                  <div className={styles.featureIcon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <div className={styles.featureText}>
+                    <h3>信頼の出会い</h3>
+                    <p>学生とサロンを繋ぐ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ヒーロー画像エリア */}
+            <div className={styles.heroVisual}>
+              <div className={styles.visualCard}>
+                <div className={styles.visualIcon}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+                  </svg>
+                </div>
+                <h3>美容の世界へ</h3>
+                <p>プロの技術を体験</p>
+              </div>
             </div>
           </div>
         </div>

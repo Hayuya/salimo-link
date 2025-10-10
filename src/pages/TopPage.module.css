@@ -26,21 +26,122 @@
     radial-gradient(65% 65% at 15% 85%, rgba(124, 93, 247, 0.16), transparent);
 }
 
+/* 装飾図形 */
+.heroDecorations {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.decorCircle1 {
+  position: absolute;
+  top: 10%;
+  right: 8%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(242, 109, 162, 0.15), rgba(242, 109, 162, 0.05));
+  animation: float 6s ease-in-out infinite;
+}
+
+.decorCircle2 {
+  position: absolute;
+  bottom: 15%;
+  left: 5%;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.12), rgba(124, 93, 247, 0.04));
+  animation: float 8s ease-in-out infinite 1s;
+}
+
+.decorCircle3 {
+  position: absolute;
+  top: 50%;
+  right: 25%;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(242, 109, 162, 0.2);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.decorSquare1 {
+  position: absolute;
+  top: 25%;
+  left: 10%;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.08), transparent);
+  transform: rotate(15deg);
+  border-radius: 20px;
+  animation: rotate 20s linear infinite;
+}
+
+.decorSquare2 {
+  position: absolute;
+  bottom: 20%;
+  right: 15%;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(242, 109, 162, 0.1), transparent);
+  transform: rotate(-25deg);
+  border-radius: 15px;
+  animation: rotate 15s linear infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .heroInner {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--spacing-4xl) var(--container-padding) var(--spacing-3xl);
   display: grid;
-  gap: var(--spacing-2xl);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3xl);
   align-items: center;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 .heroTitle {
   font-size: var(--font-size-4xl);
   font-weight: var(--font-weight-bold);
-  margin: 0 0 var(--spacing-md) 0;
+  margin: 0;
   line-height: 1.2;
   letter-spacing: var(--letter-spacing-tight);
   color: #2b2543;
@@ -50,9 +151,125 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-medium);
   margin: 0;
-  max-width: 560px;
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
+}
+
+/* 特徴セクション */
+.heroFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(124, 93, 247, 0.1);
+  transition: all 0.3s ease;
+}
+
+.featureItem:hover {
+  transform: translateX(8px);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(124, 93, 247, 0.2);
+  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.1);
+}
+
+.featureIcon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.1), rgba(242, 109, 162, 0.1));
+  border-radius: var(--radius-md);
+  color: #7c5df7;
+}
+
+.featureIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.featureText h3 {
+  margin: 0 0 4px 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.featureText p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ビジュアルエリア */
+.heroVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.visualCard {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-3xl);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(124, 93, 247, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  animation: cardFloat 6s ease-in-out infinite;
+}
+
+@keyframes cardFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(2deg);
+  }
+}
+
+.visualIcon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7c5df7, #f26da2);
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 10px 30px rgba(124, 93, 247, 0.3);
+}
+
+.visualIcon svg {
+  width: 60px;
+  height: 60px;
+}
+
+.visualCard h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.visualCard p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
 }
 
 .section {
@@ -109,10 +326,37 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* レスポンシブ対応 */
 @media (max-width: 900px) {
   .heroInner {
-    gap: var(--spacing-xl);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2xl);
     padding: var(--spacing-3xl) var(--container-padding) var(--spacing-2xl);
+  }
+
+  .heroVisual {
+    order: -1;
+  }
+
+  .visualCard {
+    padding: var(--spacing-2xl);
+  }
+
+  .visualIcon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .visualIcon svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .decorCircle1,
+  .decorCircle2,
+  .decorSquare1,
+  .decorSquare2 {
+    display: none;
   }
 }
 
@@ -128,10 +372,22 @@
 
   .heroSubtitle {
     font-size: var(--font-size-base);
-    max-width: none;
+  }
+
+  .heroFeatures {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .featureItem {
+    text-align: left;
   }
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .visualCard h3 {
+    font-size: var(--font-size-xl);
   }
 }

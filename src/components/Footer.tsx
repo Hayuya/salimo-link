@@ -27,11 +27,6 @@ export const Footer = () => {
               <Link to="/privacy" className={styles.link}>プライバシーポリシー</Link>
               <Link to="/contact" className={styles.link}>お問い合わせ</Link>
             </div>
-            <div className={styles.linkGroup}>
-                <h4 className={styles.linkTitle}>SNS</h4>
-                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className={styles.link}>X (Twitter)</a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.link}>Instagram</a>
-            </div>
           </div>
         </div>
         <div className={styles.copyright}>
