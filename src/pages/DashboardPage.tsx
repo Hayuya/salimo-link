@@ -482,6 +482,7 @@ useEffect(() => {
   };
   
   const hasUnreadMessage = (reservationId: string) => {
+    if (!user) return false;
     const latest = latestMessages[reservationId];
     if (!latest) return false;
     return latest.sender_id !== user.id;
