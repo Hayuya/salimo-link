@@ -111,8 +111,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // プロフィールが見つからない場合 - 手動作成を試みる
-      console.warn('プロフィールが見つかりません。自動作成を試みます...');
+      // プロファイルが見つからない場合 - 手動作成を試みる
+      console.warn('プロファイルが見つかりません。自動作成を試みます...');
       
       // auth.usersからメタデータを取得
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
@@ -127,13 +127,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log('User metadata:', authUser.user_metadata);
 
         if (userType === 'student') {
-          // 学生プロフィールを手動作成
+          // 学生プロファイルを手動作成
           const { data: newStudent, error: createError } = await supabase
             .from('students')
             .insert({
               id: userId,
               email: email,
-              name: authUser.user_metadata.name || '',
+              name: authUser.user_metadata.name || 'Student User',
               school_name: authUser.user_metadata.school_name || null,
               instagram_url: authUser.user_metadata.instagram_url || null,
               avatar_url: authUser.user_metadata.avatar_url || null,
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (createError) {
             console.error('Student profile creation error:', createError);
-            throw new Error('学生プロフィールの作成に失敗しました');
+            throw new Error('学生プロファイルの作成に失敗しました');
           }
 
           console.log('Created student profile:', newStudent);
@@ -156,13 +156,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setLoading(false);
           return;
         } else if (userType === 'salon') {
-          // サロンプロフィールを手動作成
+          // サロンプロファイルを手動作成
           const { data: newSalon, error: createError } = await supabase
             .from('salons')
             .insert({
               id: userId,
               email: email,
-              salon_name: authUser.user_metadata.salon_name || '',
+              salon_name: authUser.user_metadata.salon_name || 'Salon User',
               description: authUser.user_metadata.description || null,
               address: authUser.user_metadata.address || null,
               phone_number: authUser.user_metadata.phone_number || null,
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (createError) {
             console.error('Salon profile creation error:', createError);
-            throw new Error('サロンプロフィールの作成に失敗しました');
+            throw new Error('サロンプロファイルの作成に失敗しました');
           }
 
           console.log('Created salon profile:', newSalon);
@@ -190,13 +190,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // それでも見つからない場合はエラー
-      console.error('プロフィールの作成に失敗しました');
-      alert('プロフィールの読み込みに失敗しました。ログアウトして再度ログインしてください。');
+      console.error('プロファイルの作成に失敗しました');
+      alert('プロファイルの読み込みに失敗しました。ログアウトして再度ログインしてください。');
       setUser(null);
       setLoading(false);
     } catch (error) {
-      console.error('プロフィール読み込みエラー:', error);
-      alert('プロフィールの読み込み中にエラーが発生しました。詳細はコンソールを確認してください。');
+      console.error('プロファイル読み込みエラー:', error);
+      alert('プロファイルの読み込み中にエラーが発生しました。詳細はコンソールを確認してください。');
       setUser(null);
       setLoading(false);
     }
@@ -229,7 +229,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log('Sign up started with:', { email, userType, profileData });
 
-      // プロフィールデータをメタデータとして含めてユーザー登録
+      // 1. Supabase Auth でユーザー作成（メタデータも保存）
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -246,18 +246,91 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (authError) throw authError;
       if (!authData.user) throw new Error('ユーザー作成に失敗しました');
 
-      // メール確認が必要な場合
-      if (authData.user && !authData.session) {
-        alert('確認メールを送信しました。メールを確認してアカウントを有効化してください。');
-        return;
+      // 2. プロファイルを手動で作成
+      console.log('Creating profile for user:', authData.user.id);
+
+      if (userType === 'student') {
+        const studentData = profileData as StudentInsert;
+        const { data: newStudent, error: profileError } = await supabase
+          .from('students')
+          .insert({
+            id: authData.user.id,
+            email: authData.user.email!,
+            name: studentData.name || 'Student User',
+            school_name: studentData.school_name || null,
+            instagram_url: studentData.instagram_url || null,
+            avatar_url: studentData.avatar_url || null,
+          })
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error('Student profile creation error:', profileError);
+          // プロファイル作成に失敗した場合、作成したユーザーを削除
+          await supabase.auth.admin.deleteUser(authData.user.id);
+          throw new Error('学生プロファイルの作成に失敗しました');
+        }
+
+        console.log('Created student profile:', newStudent);
+
+        // メール確認が必要な場合
+        if (!authData.session) {
+          alert('確認メールを送信しました。メールを確認してアカウントを有効化してください。');
+          return;
+        }
+
+        // セッションがある場合は即座にログイン状態にする
+        setUser({
+          id: authData.user.id,
+          email: authData.user.email!,
+          userType: 'student',
+          profile: newStudent,
+        });
+        setLoading(false);
+
+      } else if (userType === 'salon') {
+        const salonData = profileData as SalonInsert;
+        const { data: newSalon, error: profileError } = await supabase
+          .from('salons')
+          .insert({
+            id: authData.user.id,
+            email: authData.user.email!,
+            salon_name: salonData.salon_name || 'Salon User',
+            description: salonData.description || null,
+            address: salonData.address || null,
+            phone_number: salonData.phone_number || null,
+            website_url: salonData.website_url || null,
+            photo_url: salonData.photo_url || null,
+          })
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error('Salon profile creation error:', profileError);
+          // プロファイル作成に失敗した場合、作成したユーザーを削除
+          await supabase.auth.admin.deleteUser(authData.user.id);
+          throw new Error('サロンプロファイルの作成に失敗しました');
+        }
+
+        console.log('Created salon profile:', newSalon);
+
+        // メール確認が必要な場合
+        if (!authData.session) {
+          alert('確認メールを送信しました。メールを確認してアカウントを有効化してください。');
+          return;
+        }
+
+        // セッションがある場合は即座にログイン状態にする
+        setUser({
+          id: authData.user.id,
+          email: authData.user.email!,
+          userType: 'salon',
+          profile: newSalon,
+        });
+        setLoading(false);
       }
 
-      // セッションがあればプロフィールを読み込み（メール確認不要の場合）
-      if (authData.session) {
-        // 少し待ってからプロフィールを読み込む（トリガーの実行を待つ）
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await loadUserProfile(authData.user.id, authData.user.email!);
-      }
+      console.log('Sign up completed successfully');
     } catch (error: any) {
       console.error('新規登録エラー:', error);
       throw new Error(error.message || '新規登録に失敗しました');
@@ -287,11 +360,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
 
-      // プロフィール再読み込み
+      // プロファイル再読み込み
       await loadUserProfile(user.id, user.email);
     } catch (error: any) {
-      console.error('プロフィール更新エラー:', error);
-      throw new Error(error.message || 'プロフィール更新に失敗しました');
+      console.error('プロファイル更新エラー:', error);
+      throw new Error(error.message || 'プロファイル更新に失敗しました');
     }
   };
 
