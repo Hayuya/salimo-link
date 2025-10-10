@@ -181,6 +181,7 @@ export const AboutPage = () => {
             <Button 
               variant="primary" 
               size="lg"
+              className={styles.ctaPrimaryButton}
               onClick={() => navigate('/signup')}
             >
               新規登録
@@ -188,6 +189,7 @@ export const AboutPage = () => {
             <Button 
               variant="outline" 
               size="lg"
+              className={styles.ctaOutlineButton}
               onClick={() => navigate('/')}
             >
               募集を見る
