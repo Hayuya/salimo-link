@@ -1,7 +1,7 @@
 .container {
   min-height: calc(100vh - 80px);
   padding: var(--spacing-2xl) var(--container-padding) var(--spacing-3xl);
-  background: linear-gradient(135deg, rgba(236, 235, 255, 0.3) 0%, rgba(255, 255, 255, 0.9) 100%);
+  background: #fafafa;
 }
 
 .content {
@@ -12,100 +12,62 @@
   gap: var(--spacing-xl);
 }
 
-/* サロン情報ドロップダウン */
-.dropdownSection {
-  margin-bottom: var(--spacing-xl);
-}
-
-.dropdownTrigger {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+/* サロン情報ボタン（募集内容セクション内） */
+.salonInfoButton {
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 235, 255, 0.8));
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.08);
-  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
 }
 
-.dropdownTrigger:hover {
-  border-color: rgba(124, 93, 247, 0.3);
-  box-shadow: 0 8px 24px rgba(124, 93, 247, 0.15);
-  transform: translateY(-2px);
+.salonInfoButton:hover {
+  border-color: #7c5df7;
+  color: #7c5df7;
+  background: #fafafa;
 }
 
-.dropdownTitle {
-  text-align: left;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.dropdownTitle::before {
-  content: '🏪';
-  font-size: var(--font-size-xl);
-}
-
-.dropdownIcon {
-  width: 20px;
-  height: 20px;
-  border-right: 3px solid #7c5df7;
-  border-bottom: 3px solid #7c5df7;
+.salonInfoIcon {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
   transform: rotate(45deg);
   transition: transform 0.3s ease;
 }
 
-.dropdownIconOpen {
+.salonInfoIconOpen {
   transform: rotate(-135deg);
 }
 
-.dropdownContent {
-  margin-top: var(--spacing-lg);
-  border: 2px solid rgba(124, 93, 247, 0.12);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-2xl);
-  background: white;
-  box-shadow: 0 8px 32px rgba(124, 93, 247, 0.12);
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.salonDropdownContent {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: #fafafa;
+  border-radius: var(--radius-md);
+  border: 1px solid #e0e0e0;
 }
 
 .salonHeader {
   display: flex;
   gap: var(--spacing-xl);
   align-items: flex-start;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: 2px solid rgba(124, 93, 247, 0.1);
 }
 
 .salonImage {
-  width: 160px;
-  height: 160px;
-  border-radius: var(--radius-xl);
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 12px 32px rgba(124, 93, 247, 0.2);
-  border: 3px solid white;
+  border: 1px solid #e0e0e0;
 }
 
 .salonInfo {
@@ -113,27 +75,16 @@
 }
 
 .salonName {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, #7c5df7, #f26da2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 var(--spacing-md) 0;
-  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
 }
 
 .address {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  margin: 0 0 var(--spacing-sm) 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-.address::before {
-  content: '📍';
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
 .contactItem {
@@ -153,24 +104,23 @@
 .contactLink {
   color: #7c5df7;
   text-decoration: none;
-  border-bottom: 1px solid rgba(124, 93, 247, 0.3);
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .contactLink:hover {
-  border-color: #7c5df7;
-  color: #f26da2;
+  color: #5a3dd4;
+  text-decoration: underline;
 }
 
 .salonDescription {
   margin-top: var(--spacing-md);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
   white-space: pre-wrap;
   padding: var(--spacing-md);
-  background: rgba(236, 235, 255, 0.3);
-  border-radius: var(--radius-md);
+  background: #fafafa;
+  border-radius: var(--radius-sm);
 }
 
 /* 募集情報カード */
@@ -179,76 +129,58 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(124, 93, 247, 0.05), rgba(242, 109, 162, 0.05));
-  border-radius: var(--radius-xl);
-  border: 2px solid rgba(124, 93, 247, 0.1);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .recruitmentTitle {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
   flex: 1;
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .statusActive,
 .statusClosed {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .statusActive {
-  background: linear-gradient(135deg, #16bfa2, #0f8f78);
+  background: #16bfa2;
   color: white;
 }
 
 .statusClosed {
-  background: rgba(114, 111, 150, 0.2);
-  color: var(--color-text-tertiary);
+  background: #e0e0e0;
+  color: #666;
 }
 
 /* セクション */
 .section {
-  margin-bottom: var(--spacing-2xl);
-  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
   background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: 0 2px 12px rgba(124, 93, 247, 0.06);
-  border: 1px solid rgba(124, 93, 247, 0.08);
-  transition: all 0.3s ease;
-}
-
-.section:hover {
-  box-shadow: 0 4px 20px rgba(124, 93, 247, 0.12);
-  transform: translateY(-2px);
+  border-radius: var(--radius-md);
+  border: 1px solid #e0e0e0;
 }
 
 .sectionTitle {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0 0 var(--spacing-md) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid rgba(124, 93, 247, 0.15);
-}
-
-.sectionTitle::before {
-  content: '';
-  width: 4px;
-  height: 24px;
-  background: linear-gradient(135deg, #7c5df7, #f26da2);
-  border-radius: var(--radius-sm);
+  justify-content: space-between;
+  gap: var(--spacing-md);
 }
 
 .description {
@@ -257,6 +189,25 @@
   line-height: var(--line-height-relaxed);
   margin: 0;
   white-space: pre-wrap;
+}
+
+/* メニュー表示（コンパクト） */
+.menusContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.menuTag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 条件リスト */
@@ -269,21 +220,14 @@
   display: flex;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background: linear-gradient(135deg, rgba(236, 235, 255, 0.5), rgba(255, 255, 255, 0.8));
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(124, 93, 247, 0.1);
-  transition: all 0.3s ease;
-}
-
-.conditionItem:hover {
-  background: linear-gradient(135deg, rgba(236, 235, 255, 0.7), rgba(255, 255, 255, 1));
-  border-color: rgba(124, 93, 247, 0.2);
-  transform: translateX(4px);
+  background: #fafafa;
+  border-radius: var(--radius-sm);
+  border: 1px solid #f0f0f0;
 }
 
 .conditionLabel {
-  font-weight: var(--font-weight-bold);
-  color: #7c5df7;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
   min-width: 120px;
 }
 
@@ -297,15 +241,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(236, 235, 255, 0.6), rgba(255, 255, 255, 0.9));
-  border-radius: var(--radius-lg);
-  border: 2px solid rgba(124, 93, 247, 0.15);
+  padding: var(--spacing-md);
+  background: #fafafa;
+  border-radius: var(--radius-md);
+  border: 1px solid #e0e0e0;
 }
 
 .checklistTitle {
   margin: 0;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
 }
@@ -324,18 +268,12 @@
   color: var(--color-text-primary);
   padding: var(--spacing-xs);
   cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s ease;
-}
-
-.checklistItem:hover {
-  background: rgba(255, 255, 255, 0.7);
 }
 
 .checklistItem input {
-  margin-top: 3px;
-  width: 18px;
-  height: 18px;
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
   accent-color: #7c5df7;
 }
@@ -350,20 +288,20 @@
 /* メッセージ */
 .appliedMessage {
   text-align: center;
-  padding: var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(22, 191, 162, 0.15), rgba(15, 143, 120, 0.1));
+  padding: var(--spacing-md);
+  background: #e8f5f3;
   color: #0f8f78;
-  border-radius: var(--radius-lg);
-  font-weight: var(--font-weight-bold);
-  border: 2px solid rgba(22, 191, 162, 0.3);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid #16bfa2;
 }
 
 .closedMessage {
   text-align: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   color: var(--color-text-secondary);
   margin: 0;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
 }
 
 .error {
@@ -371,7 +309,7 @@
   color: #f26da2;
   margin-bottom: var(--spacing-md);
   padding: var(--spacing-md);
-  background: rgba(242, 109, 162, 0.1);
+  background: #fef0f4;
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
 }
@@ -406,9 +344,9 @@
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
   background-color: white;
-  border: 2px solid rgba(124, 93, 247, 0.2);
+  border: 1px solid #e0e0e0;
   border-radius: var(--radius-md);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   outline: none;
   resize: vertical;
   font-family: inherit;
@@ -418,13 +356,13 @@
 
 .textarea:focus {
   border-color: #7c5df7;
-  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+  box-shadow: 0 0 0 3px rgba(124, 93, 247, 0.1);
 }
 
 .errorBox {
   padding: var(--spacing-md);
-  background: rgba(242, 109, 162, 0.1);
-  border: 2px solid #f26da2;
+  background: #fef0f4;
+  border: 1px solid #f26da2;
   border-radius: var(--radius-md);
   color: #f26da2;
   font-size: var(--font-size-sm);
@@ -445,6 +383,16 @@
     padding: var(--spacing-lg) var(--container-padding);
   }
 
+  .sectionTitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .salonInfoButton {
+    align-self: flex-end;
+  }
+
   .salonHeader {
     flex-direction: column;
     align-items: center;
@@ -458,7 +406,7 @@
   }
 
   .salonName {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
   }
 
   .recruitmentHeader {
@@ -467,7 +415,7 @@
   }
 
   .recruitmentTitle {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
   }
 
   .section {
@@ -489,12 +437,8 @@
 }
 
 @media (max-width: 480px) {
-  .dropdownTitle::before {
-    font-size: var(--font-size-base);
-  }
-
-  .dropdownTrigger {
-    padding: var(--spacing-md);
-    font-size: var(--font-size-base);
+  .salonInfoButton {
+    font-size: var(--font-size-xs);
+    padding: 4px var(--spacing-xs);
   }
 }
