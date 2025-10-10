@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS recruitments (
   has_reward BOOLEAN NOT NULL DEFAULT false,
   reward_details TEXT,
   available_dates JSONB NOT NULL DEFAULT '[]'::jsonb,
+  is_fully_booked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   

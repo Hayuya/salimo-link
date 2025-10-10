@@ -53,6 +53,7 @@ const initialRecruitmentState = {
   has_reward: false,
   reward_details: '',
   available_dates: [] as AvailableDate[],
+  is_fully_booked: false,
 };
 
 export const DashboardPage = () => {

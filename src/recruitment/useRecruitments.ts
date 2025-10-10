@@ -25,12 +25,14 @@ export const useRecruitments = () => {
           reservations:reservations(status)
         `)
         .eq('status', 'active')
+        .eq('is_fully_booked', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       const filteredRecruitments = (data || [])
         .filter(recruitment => {
           if (recruitment.status !== 'active') return false;
+          if (recruitment.is_fully_booked) return false;
           const hasPendingOrConfirmed = Array.isArray(recruitment.reservations)
             ? recruitment.reservations.some(
                 (res: { status: string }) =>
@@ -89,7 +91,10 @@ export const useRecruitments = () => {
     try {
       const { data: newRecruitment, error } = await supabase
         .from('recruitments')
-        .insert(data)
+        .insert({
+          ...data,
+          is_fully_booked: data.is_fully_booked ?? false,
+        })
         .select()
         .single();
 

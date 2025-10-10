@@ -94,7 +94,7 @@ export const useReservations = () => {
       if (data) {
         const { error: closeError } = await supabase
           .from('recruitments')
-          .update({ status: 'closed' })
+          .update({ status: 'closed', is_fully_booked: true })
           .eq('id', recruitmentId);
 
         if (closeError) {
@@ -155,7 +155,7 @@ export const useReservations = () => {
           } else if ((activeReservations?.length || 0) === 0) {
             const { error: reopenError } = await supabase
               .from('recruitments')
-              .update({ status: 'active' })
+              .update({ status: 'active', is_fully_booked: false })
               .eq('id', recruitmentId);
 
             if (reopenError) {
