@@ -226,7 +226,6 @@ BEGIN
   user_type := NEW.raw_user_meta_data->>'user_type';
   
   IF user_type = 'student' THEN
-    -- Create student profile
     INSERT INTO students (id, email, name, school_name, instagram_url, avatar_url)
     VALUES (
       NEW.id,
@@ -235,9 +234,15 @@ BEGIN
       NEW.raw_user_meta_data->>'school_name',
       NEW.raw_user_meta_data->>'instagram_url',
       NEW.raw_user_meta_data->>'avatar_url'
-    );
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      email = EXCLUDED.email,
+      name = EXCLUDED.name,
+      school_name = EXCLUDED.school_name,
+      instagram_url = EXCLUDED.instagram_url,
+      avatar_url = EXCLUDED.avatar_url,
+      updated_at = NOW();
   ELSIF user_type = 'salon' THEN
-    -- Create salon profile
     INSERT INTO salons (id, email, salon_name, description, address, phone_number, website_url, photo_url)
     VALUES (
       NEW.id,
@@ -248,7 +253,16 @@ BEGIN
       NEW.raw_user_meta_data->>'phone_number',
       NEW.raw_user_meta_data->>'website_url',
       NEW.raw_user_meta_data->>'photo_url'
-    );
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      email = EXCLUDED.email,
+      salon_name = EXCLUDED.salon_name,
+      description = EXCLUDED.description,
+      address = EXCLUDED.address,
+      phone_number = EXCLUDED.phone_number,
+      website_url = EXCLUDED.website_url,
+      photo_url = EXCLUDED.photo_url,
+      updated_at = NOW();
   END IF;
   
   RETURN NEW;
