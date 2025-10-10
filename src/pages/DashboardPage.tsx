@@ -31,7 +31,6 @@ import {
   EXPERIENCE_OPTIONS,
   EXPERIENCE_LABELS
 } from '@/utils/recruitment';
-import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
 import { Input } from '@/components/Input';
