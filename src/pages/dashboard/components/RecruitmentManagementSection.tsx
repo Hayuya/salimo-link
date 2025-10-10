@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { formatDateTime } from '@/utils/date';
 import { Recruitment } from '@/types';
@@ -7,8 +8,8 @@ interface RecruitmentManagementSectionProps {
   recruitments: Recruitment[];
   onCreateClick: () => void;
   onEditClick: (recruitment: Recruitment) => void;
-  onToggleStatus: (id: string, status: 'active' | 'closed') => void;
-  onDelete: (id: string) => void;
+  onToggleStatus: (id: string, status: 'active' | 'closed') => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
 }
 
 export const RecruitmentManagementSection = ({
@@ -40,9 +41,9 @@ export const RecruitmentManagementSection = ({
             return (
               <div key={recruitment.id} className={styles.card}>
                 <div className={styles.cardHeader}>
-                  <a href={`/recruitment/${recruitment.id}`} className={styles.titleLink}>
+                  <Link to={`/recruitment/${recruitment.id}`} className={styles.titleLink}>
                     {recruitment.title}
-                  </a>
+                  </Link>
                   <span className={isActive ? styles.statusActive : styles.statusClosed}>
                     {isActive ? '公開中' : '非公開'}
                   </span>
