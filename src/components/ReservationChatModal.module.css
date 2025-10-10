@@ -85,6 +85,12 @@
   font-family: inherit;
 }
 
+.sendingIndicator {
+  align-self: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
 .emptyState {
   margin: 0;
   text-align: center;

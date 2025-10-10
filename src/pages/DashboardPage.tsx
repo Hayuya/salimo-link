@@ -15,6 +15,7 @@ import {
   RecruitmentUpdate,
   ReservationWithDetails,
   ReservationStatus,
+  ReservationMessage,
   AvailableDate,
 } from '@/types';
 import { formatDateTime } from '@/utils/date';
@@ -36,6 +37,7 @@ import { Modal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Spinner } from '@/components/Spinner';
 import { ReservationChatModal } from '@/components/ReservationChatModal';
+import { supabase } from '@/lib/supabase';
 import styles from './DashboardPage.module.css';
 
 const initialRecruitmentState = {
@@ -81,6 +83,7 @@ export const DashboardPage = () => {
   const [expandedReservations, setExpandedReservations] = useState<Record<string, boolean>>({});
   const [chatReservation, setChatReservation] = useState<ReservationWithDetails | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [latestMessages, setLatestMessages] = useState<Record<string, ReservationMessage | null>>({});
 
   // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
@@ -117,9 +120,89 @@ export const DashboardPage = () => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  useEffect(() => {
-    setExpandedReservations({});
-  }, [reservations]);
+useEffect(() => {
+  setExpandedReservations({});
+}, [reservations]);
+
+useEffect(() => {
+  const confirmedIds = reservations
+    .filter(res => res.status === 'confirmed')
+    .map(res => res.id);
+
+  if (confirmedIds.length === 0) {
+    setLatestMessages({});
+    return;
+  }
+
+  let isActive = true;
+
+  const loadLatestMessages = async () => {
+    const { data, error } = await supabase
+      .from('reservation_messages')
+      .select('*')
+      .in('reservation_id', confirmedIds)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load latest messages:', error);
+      return;
+    }
+
+    if (!isActive) return;
+
+    const map: Record<string, ReservationMessage | null> = {};
+    for (const message of data || []) {
+      if (!map[message.reservation_id]) {
+        map[message.reservation_id] = message as ReservationMessage;
+      }
+    }
+    setLatestMessages(map);
+  };
+
+  loadLatestMessages();
+
+  return () => {
+    isActive = false;
+  };
+}, [reservations]);
+
+useEffect(() => {
+  const confirmedReservations = reservations.filter(res => res.status === 'confirmed');
+  if (confirmedReservations.length === 0) return;
+
+  const channels = confirmedReservations.map(reservation =>
+    supabase
+      .channel(`reservation-messages-dashboard-${reservation.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'reservation_messages',
+          filter: `reservation_id=eq.${reservation.id}`,
+        },
+        payload => {
+          const newMessage = payload.new as ReservationMessage;
+          setLatestMessages(prev => {
+            if (prev[reservation.id]?.id === newMessage.id) {
+              return prev;
+            }
+            return {
+              ...prev,
+              [reservation.id]: newMessage,
+            };
+          });
+        }
+      )
+      .subscribe()
+  );
+
+  return () => {
+    channels.forEach(channel => {
+      supabase.removeChannel(channel);
+    });
+  };
+}, [reservations]);
 
   const handleUpdateProfile = async () => {
     setProfileLoading(true);
@@ -366,6 +449,17 @@ export const DashboardPage = () => {
     setChatReservation(null);
   };
 
+  const handleChatMessageActivity = useCallback(
+    (message: ReservationMessage | null) => {
+      if (!chatReservation) return;
+      setLatestMessages(prev => ({
+        ...prev,
+        [chatReservation.id]: message,
+      }));
+    },
+    [chatReservation]
+  );
+
   const toggleMenu = (menu: MenuType, isEdit = false) => {
     const target = isEdit ? editingRecruitment : newRecruitmentData;
     const setter = isEdit ? setEditingRecruitment : setNewRecruitmentData;
@@ -385,6 +479,12 @@ export const DashboardPage = () => {
       case 'cancelled_by_student': return { text: '本人キャンセル', className: styles.statusWithdrawn };
       default: return { text: status, className: '' };
     }
+  };
+  
+  const hasUnreadMessage = (reservationId: string) => {
+    const latest = latestMessages[reservationId];
+    if (!latest) return false;
+    return latest.sender_id !== user.id;
   };
 
   if (loading) return <Spinner fullScreen />;
@@ -486,19 +586,18 @@ export const DashboardPage = () => {
           </div>
           <div className={styles.headerMeta}>
             <span className={statusLabel.className}>{statusLabel.text}</span>
-            <Link
-              to={`/recruitment/${res.recruitment_id}`}
-              className={styles.detailLinkButton}
-            >
-              募集詳細を見る
-            </Link>
             {res.status === 'confirmed' && (
               <Button
                 size="sm"
                 variant="primary"
+                className={[
+                  styles.chatButton,
+                  hasUnreadMessage(res.id) ? styles.chatButtonUnread : '',
+                ].filter(Boolean).join(' ')}
                 onClick={() => handleOpenChat(res)}
               >
-                チャットを開く
+                <span>チャット</span>
+                {hasUnreadMessage(res.id) && <span className={styles.chatBadge}>!</span>}
               </Button>
             )}
             <button
@@ -598,19 +697,18 @@ export const DashboardPage = () => {
           </div>
           <div className={styles.headerMeta}>
             <span className={statusLabel.className}>{statusLabel.text}</span>
-            <Link
-              to={`/recruitment/${res.recruitment_id}`}
-              className={styles.detailLinkButton}
-            >
-              募集詳細を見る
-            </Link>
             {res.status === 'confirmed' && (
               <Button
                 size="sm"
                 variant="primary"
+                className={[
+                  styles.chatButton,
+                  hasUnreadMessage(res.id) ? styles.chatButtonUnread : '',
+                ].filter(Boolean).join(' ')}
                 onClick={() => handleOpenChat(res)}
               >
-                チャットを開く
+                <span>チャット</span>
+                {hasUnreadMessage(res.id) && <span className={styles.chatBadge}>!</span>}
               </Button>
             )}
             <button
@@ -1201,6 +1299,7 @@ export const DashboardPage = () => {
         reservation={chatReservation}
         currentUserId={user.id}
         currentUserType={user.userType}
+        onMessageActivity={handleChatMessageActivity}
       />
     </div>
   );

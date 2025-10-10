@@ -12,6 +12,7 @@ interface ReservationChatModalProps {
   reservation: ReservationWithDetails | null;
   currentUserId: string;
   currentUserType: UserType;
+  onMessageActivity?: (message: ReservationMessage | null) => void;
 }
 
 export const ReservationChatModal = ({
@@ -20,6 +21,7 @@ export const ReservationChatModal = ({
   reservation,
   currentUserId,
   currentUserType,
+  onMessageActivity,
 }: ReservationChatModalProps) => {
   const [messages, setMessages] = useState<ReservationMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,9 +51,14 @@ export const ReservationChatModal = ({
       console.error('Failed to fetch messages:', error);
     } else {
       setMessages(data || []);
+      if (data && data.length > 0) {
+        onMessageActivity?.(data[data.length - 1]);
+      } else {
+        onMessageActivity?.(null);
+      }
     }
     setLoading(false);
-  }, [reservationId]);
+  }, [reservationId, onMessageActivity]);
 
   const handleSendMessage = useCallback(async () => {
     const trimmed = newMessage.trim();
@@ -75,6 +82,7 @@ export const ReservationChatModal = ({
   useEffect(() => {
     if (!isOpen || !reservationId) {
       setMessages([]);
+      setNewMessage('');
       return;
     }
     fetchMessages();
@@ -94,7 +102,13 @@ export const ReservationChatModal = ({
         },
         payload => {
           const newRecord = payload.new as ReservationMessage;
-          setMessages(prev => [...prev, newRecord]);
+          setMessages(prev => {
+            if (prev.some(message => message.id === newRecord.id)) {
+              return prev;
+            }
+            return [...prev, newRecord];
+          });
+          onMessageActivity?.(newRecord);
         }
       )
       .subscribe();
@@ -102,7 +116,7 @@ export const ReservationChatModal = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isOpen, reservationId]);
+  }, [isOpen, reservationId, onMessageActivity]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -164,6 +178,7 @@ export const ReservationChatModal = ({
             placeholder="メッセージを入力"
             disabled={sending}
           />
+          {sending && <span className={styles.sendingIndicator}>送信中...</span>}
           <Button
             variant="primary"
             onClick={handleSendMessage}
