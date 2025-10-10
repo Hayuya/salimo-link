@@ -183,6 +183,15 @@ export interface ReservationWithDetails extends Reservation {
   recruitment: RecruitmentWithDetails;
 }
 
+export interface ReservationMessage {
+  id: string;
+  reservation_id: string;
+  sender_id: string;
+  message: string;
+  created_at: string;
+  sender_type: UserType;
+}
+
 export interface ReservationInsert {
   recruitment_id: string;
   student_id: string;

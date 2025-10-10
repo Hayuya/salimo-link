@@ -76,9 +76,24 @@ CREATE TABLE IF NOT EXISTS reservations (
   message TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
+
   CONSTRAINT reservations_status_check CHECK (status IN ('pending', 'confirmed', 'cancelled_by_salon', 'cancelled_by_student'))
 );
+
+-- ==========================================
+-- Reservation Messages Table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS reservation_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  reservation_id UUID NOT NULL REFERENCES reservations(id) ON DELETE CASCADE,
+  sender_id UUID NOT NULL,
+  sender_type TEXT NOT NULL CHECK (sender_type IN ('student', 'salon')),
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reservation_messages_reservation_id_created_at
+  ON reservation_messages (reservation_id, created_at);
 
 -- ==========================================
 -- Indexes

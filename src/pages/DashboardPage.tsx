@@ -35,6 +35,7 @@ import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Spinner } from '@/components/Spinner';
+import { ReservationChatModal } from '@/components/ReservationChatModal';
 import styles from './DashboardPage.module.css';
 
 const initialRecruitmentState = {
@@ -78,6 +79,8 @@ export const DashboardPage = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [expandedReservations, setExpandedReservations] = useState<Record<string, boolean>>({});
+  const [chatReservation, setChatReservation] = useState<ReservationWithDetails | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
@@ -353,6 +356,16 @@ export const DashboardPage = () => {
     }));
   };
 
+  const handleOpenChat = (reservation: ReservationWithDetails) => {
+    setChatReservation(reservation);
+    setIsChatOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false);
+    setChatReservation(null);
+  };
+
   const toggleMenu = (menu: MenuType, isEdit = false) => {
     const target = isEdit ? editingRecruitment : newRecruitmentData;
     const setter = isEdit ? setEditingRecruitment : setNewRecruitmentData;
@@ -479,6 +492,15 @@ export const DashboardPage = () => {
             >
               募集詳細を見る
             </Link>
+            {res.status === 'confirmed' && (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => handleOpenChat(res)}
+              >
+                チャットを開く
+              </Button>
+            )}
             <button
               type="button"
               className={styles.toggleDetailsButton}
@@ -576,6 +598,21 @@ export const DashboardPage = () => {
           </div>
           <div className={styles.headerMeta}>
             <span className={statusLabel.className}>{statusLabel.text}</span>
+            <Link
+              to={`/recruitment/${res.recruitment_id}`}
+              className={styles.detailLinkButton}
+            >
+              募集詳細を見る
+            </Link>
+            {res.status === 'confirmed' && (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => handleOpenChat(res)}
+              >
+                チャットを開く
+              </Button>
+            )}
             <button
               type="button"
               className={styles.toggleDetailsButton}
@@ -1157,6 +1194,14 @@ export const DashboardPage = () => {
           </div>
         </Modal>
       )}
+
+      <ReservationChatModal
+        isOpen={isChatOpen}
+        onClose={handleCloseChat}
+        reservation={chatReservation}
+        currentUserId={user.id}
+        currentUserType={user.userType}
+      />
     </div>
   );
 };
