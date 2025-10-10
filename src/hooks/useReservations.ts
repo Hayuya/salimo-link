@@ -91,17 +91,8 @@ export const useReservations = () => {
         throw new Error(errorMessage);
       }
 
-      if (data) {
-        const { error: closeError } = await supabase
-          .from('recruitments')
-          .update({ status: 'closed', is_fully_booked: true })
-          .eq('id', recruitmentId);
+      // is_fully_bookedはDBトリガーで更新される
 
-        if (closeError) {
-          console.error('Failed to close recruitment after reservation:', closeError);
-        }
-      }
-      
       return data; // 予約IDを返す
     } catch (err: any) {
       const errorMessage = err.message || '予約の作成に失敗しました';
@@ -142,27 +133,7 @@ export const useReservations = () => {
           console.warn('予約の日時を空き枠に戻す処理に失敗しました');
         }
 
-        if (updatedReservation?.recruitment_id) {
-          const recruitmentId = updatedReservation.recruitment_id;
-          const { data: activeReservations, error: activeError } = await supabase
-            .from('reservations')
-            .select('id')
-            .eq('recruitment_id', recruitmentId)
-            .in('status', ['pending', 'confirmed']);
-
-          if (activeError) {
-            console.error('Failed to check active reservations:', activeError);
-          } else if ((activeReservations?.length || 0) === 0) {
-            const { error: reopenError } = await supabase
-              .from('recruitments')
-              .update({ status: 'active', is_fully_booked: false })
-              .eq('id', recruitmentId);
-
-            if (reopenError) {
-              console.error('Failed to reopen recruitment:', reopenError);
-            }
-          }
-        }
+        // トリガーがis_fully_bookedを更新する
       }
       
       return updatedReservation;

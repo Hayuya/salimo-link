@@ -82,6 +82,59 @@ CREATE TABLE IF NOT EXISTS reservations (
 );
 
 -- ==========================================
+-- Recruitment booking state trigger
+-- ==========================================
+CREATE OR REPLACE FUNCTION refresh_recruitment_booking_state(p_recruitment_id UUID)
+RETURNS void AS $$
+DECLARE
+  v_has_active BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM reservations
+    WHERE recruitment_id = p_recruitment_id
+      AND status IN ('pending', 'confirmed')
+  ) INTO v_has_active;
+
+  UPDATE recruitments
+  SET is_fully_booked = v_has_active
+  WHERE id = p_recruitment_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION trg_update_recruitment_booking_state()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_recruitment_id UUID;
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    v_recruitment_id := OLD.recruitment_id;
+  ELSE
+    v_recruitment_id := NEW.recruitment_id;
+  END IF;
+
+  PERFORM refresh_recruitment_booking_state(v_recruitment_id);
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_reservation_update_booking_state ON reservations;
+CREATE TRIGGER trg_reservation_update_booking_state
+AFTER INSERT OR UPDATE OR DELETE ON reservations
+FOR EACH ROW EXECUTE FUNCTION trg_update_recruitment_booking_state();
+
+-- 初期データの整合性確保
+DO $$
+BEGIN
+  UPDATE recruitments r
+  SET is_fully_booked = EXISTS (
+    SELECT 1 FROM reservations
+    WHERE recruitment_id = r.id
+      AND status IN ('pending', 'confirmed')
+  );
+END;
+$$;
+
+-- ==========================================
 -- Reservation Messages Table
 -- ==========================================
 CREATE TABLE IF NOT EXISTS reservation_messages (

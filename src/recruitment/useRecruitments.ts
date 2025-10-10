@@ -21,8 +21,7 @@ export const useRecruitments = () => {
         .from('recruitments')
         .select(`
           *,
-          salon:salons(*),
-          reservations:reservations(status)
+          salon:salons(*)
         `)
         .eq('status', 'active')
         .eq('is_fully_booked', false)
@@ -33,19 +32,12 @@ export const useRecruitments = () => {
         .filter(recruitment => {
           if (recruitment.status !== 'active') return false;
           if (recruitment.is_fully_booked) return false;
-          const hasPendingOrConfirmed = Array.isArray(recruitment.reservations)
-            ? recruitment.reservations.some(
-                (res: { status: string }) =>
-                  res.status === 'pending' || res.status === 'confirmed'
-              )
-            : false;
-          if (hasPendingOrConfirmed) return false;
           if (!Array.isArray(recruitment.available_dates)) return true;
           return (recruitment.available_dates as AvailableDate[]).some(
             (date: AvailableDate) => !date.is_booked
           );
         })
-        .map(({ reservations, ...rest }) => rest as RecruitmentWithDetails);
+        .map(rest => rest as RecruitmentWithDetails);
       setRecruitments(filteredRecruitments);
     } catch (err: any) {
       setError(err.message);
