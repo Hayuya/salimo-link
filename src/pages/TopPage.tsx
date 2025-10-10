@@ -1,10 +1,12 @@
 import { useRecruitments } from '@/recruitment';
+import { useAuth } from '@/auth';
 import { RecruitmentCard } from '@/components/RecruitmentCard';
 import { Spinner } from '@/components/Spinner';
 import styles from './TopPage.module.css';
 
 export const TopPage = () => {
   const { recruitments, loading, error } = useRecruitments();
+  const { user } = useAuth();
 
   if (loading) {
     return <Spinner fullScreen />;
@@ -12,15 +14,17 @@ export const TopPage = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.hero}>
-        <h1 className={styles.heroTitle}>
-          カットモデルを探す学生と<br />
-          美容室アシスタントを繋ぐ
-        </h1>
-        <p className={styles.heroSubtitle}>
-          安全・簡単・無料で、あなたにぴったりの出会いを
-        </p>
-      </div>
+      {!user && (
+        <div className={styles.hero}>
+          <h1 className={styles.heroTitle}>
+            カットモデルを探す学生と<br />
+            美容室アシスタントを繋ぐ
+          </h1>
+          <p className={styles.heroSubtitle}>
+            安全・簡単・無料で、あなたにぴったりの出会いを
+          </p>
+        </div>
+      )}
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
