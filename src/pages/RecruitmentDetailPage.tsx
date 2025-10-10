@@ -27,7 +27,6 @@ export const RecruitmentDetailPage = () => {
   const [chatDate, setChatDate] = useState('');
   const [chatTime, setChatTime] = useState('');
   const [message, setMessage] = useState('');
-  const [isSalonInfoOpen, setIsSalonInfoOpen] = useState(false);
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -164,68 +163,8 @@ export const RecruitmentDetailPage = () => {
 
           {recruitment.description && (
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>
-                <span>募集内容</span>
-                <button
-                  type="button"
-                  className={styles.salonInfoButton}
-                  onClick={() => setIsSalonInfoOpen(prev => !prev)}
-                  aria-expanded={isSalonInfoOpen}
-                >
-                  <span>サロン情報</span>
-                  <span
-                    className={[
-                      styles.salonInfoIcon,
-                      isSalonInfoOpen ? styles.salonInfoIconOpen : ''
-                    ].filter(Boolean).join(' ')}
-                    aria-hidden="true"
-                  />
-                </button>
-              </h3>
+              <h3 className={styles.sectionTitle}>募集内容</h3>
               <p className={styles.description}>{recruitment.description}</p>
-              
-              {/* サロン情報ドロップダウン */}
-              {isSalonInfoOpen && (
-                <div className={styles.salonDropdownContent}>
-                  <div className={styles.salonHeader}>
-                    {recruitment.salon.photo_url && (
-                      <img
-                        src={recruitment.salon.photo_url}
-                        alt={recruitment.salon.salon_name}
-                        className={styles.salonImage}
-                      />
-                    )}
-                    <div className={styles.salonInfo}>
-                      <h4 className={styles.salonName}>{recruitment.salon.salon_name}</h4>
-                      {recruitment.salon.address && (
-                        <p className={styles.address}>{recruitment.salon.address}</p>
-                      )}
-                      {recruitment.salon.phone_number && (
-                        <p className={styles.contactItem}>
-                          <span className={styles.contactLabel}>電話番号:</span>
-                          <span>{recruitment.salon.phone_number}</span>
-                        </p>
-                      )}
-                      {recruitment.salon.website_url && (
-                        <p className={styles.contactItem}>
-                          <span className={styles.contactLabel}>WEBサイト:</span>
-                          <a
-                            href={recruitment.salon.website_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={styles.contactLink}
-                          >
-                            {recruitment.salon.website_url}
-                          </a>
-                        </p>
-                      )}
-                      {recruitment.salon.description && (
-                        <p className={styles.salonDescription}>{recruitment.salon.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -277,6 +216,56 @@ export const RecruitmentDetailPage = () => {
                   </span>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* サロン情報 */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>サロン情報</h3>
+            <div className={styles.salonInfoCard}>
+              <div className={styles.salonInfoCardHeader}>
+                <span className={styles.salonBadgeIcon} aria-hidden="true" />
+              </div>
+              <div className={styles.salonHeader}>
+                {recruitment.salon.photo_url && (
+                  <img
+                    src={recruitment.salon.photo_url}
+                    alt={recruitment.salon.salon_name}
+                    className={styles.salonImage}
+                  />
+                )}
+                <div className={styles.salonInfo}>
+                  <h4 className={styles.salonName}>{recruitment.salon.salon_name}</h4>
+                  {recruitment.salon.address && (
+                    <p className={styles.address}>
+                      <span className={styles.addressIcon} aria-hidden="true" />
+                      <span>{recruitment.salon.address}</span>
+                    </p>
+                  )}
+                  {recruitment.salon.phone_number && (
+                    <p className={styles.contactItem}>
+                      <span className={styles.contactLabel}>電話番号:</span>
+                      <span>{recruitment.salon.phone_number}</span>
+                    </p>
+                  )}
+                  {recruitment.salon.website_url && (
+                    <p className={styles.contactItem}>
+                      <span className={styles.contactLabel}>WEBサイト:</span>
+                      <a
+                        href={recruitment.salon.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.contactLink}
+                      >
+                        {recruitment.salon.website_url}
+                      </a>
+                    </p>
+                  )}
+                  {recruitment.salon.description && (
+                    <p className={styles.salonDescription}>{recruitment.salon.description}</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
