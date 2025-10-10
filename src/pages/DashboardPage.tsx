@@ -743,17 +743,19 @@ useEffect(() => {
           />
           <Button onClick={addFunc} size="sm">追加</Button>
         </div>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            checked={allowChat}
-            onChange={e => handleAllowChatChange(e.target.checked)}
-          />
-          <span>日時は後からチャットで相談する</span>
-        </label>
-        <p className={styles.helperText}>
-          チャットで相談するを選択すると、空き日時の追加なしで募集を公開できます。
-        </p>
+        <div className={styles.chatToggle}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={allowChat}
+              onChange={e => handleAllowChatChange(e.target.checked)}
+            />
+            <span>日時は後からチャットで相談する</span>
+          </label>
+          <p className={styles.helperText}>
+            チャット相談を選ぶと、空き日時を追加せずに募集を公開できます。
+          </p>
+        </div>
         
         {dates.length > 0 && (
           <div style={{ 

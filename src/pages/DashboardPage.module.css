@@ -145,6 +145,16 @@
   line-height: 1.5;
 }
 
+.chatToggle {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(124, 93, 247, 0.08);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
 .radioGroup {
   display: flex;
   flex-wrap: wrap;
