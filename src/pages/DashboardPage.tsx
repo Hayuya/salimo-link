@@ -410,6 +410,12 @@ export const DashboardPage = () => {
           </div>
           <div className={styles.headerMeta}>
             <span className={statusLabel.className}>{statusLabel.text}</span>
+            <Link
+              to={`/recruitment/${res.recruitment_id}`}
+              className={styles.detailLinkButton}
+            >
+              募集詳細を見る
+            </Link>
             <button
               type="button"
               className={styles.toggleDetailsButton}

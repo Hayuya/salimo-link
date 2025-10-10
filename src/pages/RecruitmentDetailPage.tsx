@@ -60,11 +60,10 @@ export const RecruitmentDetailPage = () => {
     }
   };
 
-  if (loading) return <Spinner fullScreen />;
-  if (!recruitment) return <div>募集情報が見つかりませんでした</div>;
-
-  // ★ 変更: available_dates配列から予約可能な日時を抽出
-  const availableDates = recruitment.available_dates.filter(date => !date.is_booked);
+  const availableDates = useMemo(
+    () => (recruitment ? recruitment.available_dates.filter(date => !date.is_booked) : []),
+    [recruitment]
+  );
 
   const conditionsToConfirm = useMemo(() => {
     if (!recruitment) return [];
@@ -118,6 +117,9 @@ export const RecruitmentDetailPage = () => {
   const allConditionsChecked =
     conditionsToConfirm.length === 0 ||
     conditionsToConfirm.every(condition => conditionChecks[condition.id]);
+
+  if (loading) return <Spinner fullScreen />;
+  if (!recruitment) return <div>募集情報が見つかりませんでした</div>;
 
   return (
     <div className={styles.container}>

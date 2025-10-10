@@ -126,6 +126,28 @@
   gap: var(--spacing-xs);
 }
 
+.detailLinkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-medium);
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.detailLinkButton:hover,
+.detailLinkButton:focus {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .applicationTitle {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
