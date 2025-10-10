@@ -153,6 +153,71 @@
   gap: var(--spacing-sm);
 }
 
+.recruitmentInfo {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.detailTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.detailDescription {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: pre-wrap;
+}
+
+.conditionGrid {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.detailRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+}
+
+.detailLabel {
+  min-width: 100px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.detailValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.tagList {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-light);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
 .toggleDetailsButton {
   display: inline-flex;
   align-items: center;

@@ -378,7 +378,10 @@ export const DashboardPage = () => {
   if (!user) return null;
   
   const pendingReservations = reservations.filter(res => res.status === 'pending');
-  const nonPendingReservations = reservations.filter(res => res.status !== 'pending');
+  const confirmedReservations = reservations.filter(res => res.status === 'confirmed');
+  const otherReservations = reservations.filter(
+    res => res.status !== 'pending' && res.status !== 'confirmed'
+  );
 
   const renderSalonReservation = (res: ReservationWithDetails) => {
     const isExpanded = !!expandedReservations[res.id];
@@ -390,6 +393,7 @@ export const DashboardPage = () => {
         className={[
           styles.applicationItem,
           res.status === 'pending' ? styles.pendingReservation : '',
+          res.status === 'confirmed' ? styles.confirmedReservation : '',
         ].filter(Boolean).join(' ')}
       >
         <div className={styles.applicationHeader}>
@@ -458,6 +462,66 @@ export const DashboardPage = () => {
                 <strong>メッセージ:</strong> {res.message}
               </p>
             )}
+            <div className={styles.recruitmentInfo}>
+              <p className={styles.detailTitle}>募集詳細</p>
+              {res.recruitment.description && (
+                <p className={styles.detailDescription}>{res.recruitment.description}</p>
+              )}
+              {res.recruitment.menus?.length > 0 && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>メニュー</span>
+                  <div className={styles.tagList}>
+                    {res.recruitment.menus.map(menu => (
+                      <span key={menu} className={styles.tag}>
+                        {MENU_LABELS[menu]}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className={styles.conditionGrid}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>性別</span>
+                  <span className={styles.detailValue}>
+                    {GENDER_LABELS[res.recruitment.gender_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>髪の長さ</span>
+                  <span className={styles.detailValue}>
+                    {HAIR_LENGTH_LABELS[res.recruitment.hair_length_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>モデル経験</span>
+                  <span className={styles.detailValue}>
+                    {EXPERIENCE_LABELS[res.recruitment.model_experience_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>撮影</span>
+                  <span className={styles.detailValue}>
+                    {PHOTO_SHOOT_LABELS[res.recruitment.photo_shoot_requirement]}
+                  </span>
+                </div>
+                {res.recruitment.treatment_duration && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>施術時間</span>
+                    <span className={styles.detailValue}>
+                      {res.recruitment.treatment_duration}
+                    </span>
+                  </div>
+                )}
+                {res.recruitment.has_reward && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>謝礼</span>
+                    <span className={styles.detailValue}>
+                      {res.recruitment.reward_details || 'あり'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -469,6 +533,164 @@ export const DashboardPage = () => {
             <Button size="sm" variant="danger" onClick={() => handleUpdateReservation(res.id, 'cancelled_by_salon')}>
               キャンセル
             </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderStudentReservation = (res: ReservationWithDetails) => {
+    const isExpanded = !!expandedReservations[res.id];
+    const statusLabel = getReservationStatusLabel(res.status);
+
+    return (
+      <div
+        key={res.id}
+        className={[
+          styles.applicationItem,
+          res.status === 'pending' ? styles.pendingReservation : '',
+          res.status === 'confirmed' ? styles.confirmedReservation : '',
+        ].filter(Boolean).join(' ')}
+      >
+        <div className={styles.applicationHeader}>
+          <div className={styles.reservationSummary}>
+            <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
+              {res.recruitment.title}
+            </Link>
+            <p className={styles.applicationSalon}>
+              <strong>サロン:</strong> {res.recruitment.salon.salon_name}
+            </p>
+            <p className={styles.applicationSalon}>
+              <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
+            </p>
+          </div>
+          <div className={styles.headerMeta}>
+            <span className={statusLabel.className}>{statusLabel.text}</span>
+            <button
+              type="button"
+              className={styles.toggleDetailsButton}
+              onClick={() => toggleReservationDetails(res.id)}
+              aria-expanded={isExpanded}
+            >
+              {isExpanded ? '詳細を閉じる' : '詳細を見る'}
+              <span
+                className={[
+                  styles.toggleIcon,
+                  isExpanded ? styles.toggleIconOpen : ''
+                ].filter(Boolean).join(' ')}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+
+        {isExpanded && (
+          <div className={styles.applicationBody}>
+            <div className={styles.studentInfo}>
+              {res.recruitment.salon.address && (
+                <p className={styles.studentInfoRow}>
+                  <strong>住所:</strong> {res.recruitment.salon.address}
+                </p>
+              )}
+              {res.recruitment.salon.phone_number && (
+                <p className={styles.studentInfoRow}>
+                  <strong>電話:</strong> {res.recruitment.salon.phone_number}
+                </p>
+              )}
+              <p className={styles.studentInfoRow}>
+                <strong>メール:</strong>{' '}
+                <a
+                  className={styles.contactLink}
+                  href={`mailto:${res.recruitment.salon.email}`}
+                >
+                  {res.recruitment.salon.email}
+                </a>
+              </p>
+              {res.recruitment.salon.website_url && (
+                <p className={styles.studentInfoRow}>
+                  <strong>WEBサイト:</strong>{' '}
+                  <a
+                    className={styles.contactLink}
+                    href={res.recruitment.salon.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {res.recruitment.salon.website_url}
+                  </a>
+                </p>
+              )}
+            </div>
+            <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
+            {res.status === 'confirmed' && (
+              <p className={styles.confirmedNote}>
+                予約が確定しています。サロンからの追加連絡を確認してください。
+              </p>
+            )}
+            {res.message && (
+              <p className={styles.applicationSalon}>
+                <strong>送信メッセージ:</strong> {res.message}
+              </p>
+            )}
+            <div className={styles.recruitmentInfo}>
+              <p className={styles.detailTitle}>募集詳細</p>
+              {res.recruitment.description && (
+                <p className={styles.detailDescription}>{res.recruitment.description}</p>
+              )}
+              {res.recruitment.menus?.length > 0 && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>メニュー</span>
+                  <div className={styles.tagList}>
+                    {res.recruitment.menus.map(menu => (
+                      <span key={menu} className={styles.tag}>
+                        {MENU_LABELS[menu]}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className={styles.conditionGrid}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>性別</span>
+                  <span className={styles.detailValue}>
+                    {GENDER_LABELS[res.recruitment.gender_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>髪の長さ</span>
+                  <span className={styles.detailValue}>
+                    {HAIR_LENGTH_LABELS[res.recruitment.hair_length_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>モデル経験</span>
+                  <span className={styles.detailValue}>
+                    {EXPERIENCE_LABELS[res.recruitment.model_experience_requirement]}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>撮影</span>
+                  <span className={styles.detailValue}>
+                    {PHOTO_SHOOT_LABELS[res.recruitment.photo_shoot_requirement]}
+                  </span>
+                </div>
+                {res.recruitment.treatment_duration && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>施術時間</span>
+                    <span className={styles.detailValue}>
+                      {res.recruitment.treatment_duration}
+                    </span>
+                  </div>
+                )}
+                {res.recruitment.has_reward && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>謝礼</span>
+                    <span className={styles.detailValue}>
+                      {res.recruitment.reward_details || 'あり'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -765,71 +987,39 @@ export const DashboardPage = () => {
                   サロンからの承認をお待ちください。連絡が届いたら早めに返信しましょう。
                 </p>
                 <div className={styles.applicationList}>
-                  {pendingReservations.map(res => (
-                    <div key={res.id} className={`${styles.applicationItem} ${styles.pendingReservation}`}>
-                      <div className={styles.applicationHeader}>
-                        <div className={styles.reservationDetails}>
-                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-                            {res.recruitment.title}
-                          </Link>
-                          <p className={styles.applicationSalon}>
-                            <strong>サロン:</strong> {res.recruitment.salon.salon_name}
-                          </p>
-                          <p className={styles.applicationSalon}>
-                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-                          </p>
-                          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-                        </div>
-                        <span className={getReservationStatusLabel(res.status).className}>
-                          {getReservationStatusLabel(res.status).text}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                  {pendingReservations.map(renderStudentReservation)}
                 </div>
               </Card>
             )}
 
             <Card padding="lg">
-              <h2 className={styles.sectionTitle}>予約履歴</h2>
-              {nonPendingReservations.length === 0 ? (
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>確定済みの予約</h2>
+              </div>
+              {confirmedReservations.length === 0 ? (
                 <p className={styles.emptyMessage}>
-                  {pendingReservations.length > 0 ? '承認待ち以外の予約はまだありません' : '予約履歴はありません'}
+                  {pendingReservations.length > 0 ? 'まだ確定した予約はありません' : '確定した予約はありません'}
                 </p>
               ) : (
                 <div className={styles.applicationList}>
-                  {nonPendingReservations.map(res => (
-                    <div
-                      key={res.id}
-                      className={[
-                        styles.applicationItem,
-                        res.status === 'confirmed' ? styles.confirmedReservation : '',
-                      ].filter(Boolean).join(' ')}
-                    >
-                      <div className={styles.applicationHeader}>
-                        <div className={styles.reservationDetails}>
-                          <Link to={`/recruitment/${res.recruitment_id}`} className={styles.applicationTitle}>
-                            {res.recruitment.title}
-                          </Link>
-                          <p className={styles.applicationSalon}>
-                            <strong>サロン:</strong> {res.recruitment.salon.salon_name}
-                          </p>
-                          <p className={styles.applicationSalon}>
-                            <strong>予約日時:</strong> {formatDateTime(res.reservation_datetime)}
-                          </p>
-                          <p className={styles.applicationDate}>仮予約日: {formatDateTime(res.created_at)}</p>
-                          {res.status === 'confirmed' && (
-                            <p className={styles.confirmedNote}>
-                              予約が確定しました。集合時間や持ち物などの連絡を確認しましょう。
-                            </p>
-                          )}
-                        </div>
-                        <span className={getReservationStatusLabel(res.status).className}>
-                          {getReservationStatusLabel(res.status).text}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                  {confirmedReservations.map(renderStudentReservation)}
+                </div>
+              )}
+            </Card>
+
+            <Card padding="lg">
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>キャンセル・終了した予約</h2>
+              </div>
+              {otherReservations.length === 0 ? (
+                <p className={styles.emptyMessage}>
+                  {pendingReservations.length > 0 || confirmedReservations.length > 0
+                    ? 'キャンセル・終了した予約はありません'
+                    : 'まだ予約履歴がありません'}
+                </p>
+              ) : (
+                <div className={styles.applicationList}>
+                  {otherReservations.map(renderStudentReservation)}
                 </div>
               )}
             </Card>
@@ -852,11 +1042,19 @@ export const DashboardPage = () => {
                       </div>
                     </div>
                   )}
-                  {nonPendingReservations.length > 0 && (
+                  {confirmedReservations.length > 0 && (
                     <div className={styles.reservationSection}>
-                      <h3 className={styles.subSectionTitle}>その他の予約</h3>
+                      <h3 className={styles.subSectionTitle}>確定済み</h3>
                       <div className={styles.applicationList}>
-                        {nonPendingReservations.map(renderSalonReservation)}
+                        {confirmedReservations.map(renderSalonReservation)}
+                      </div>
+                    </div>
+                  )}
+                  {otherReservations.length > 0 && (
+                    <div className={styles.reservationSection}>
+                      <h3 className={styles.subSectionTitle}>キャンセル・その他</h3>
+                      <div className={styles.applicationList}>
+                        {otherReservations.map(renderSalonReservation)}
                       </div>
                     </div>
                   )}
