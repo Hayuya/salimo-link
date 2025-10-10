@@ -1,5 +1,5 @@
 // src/pages/RecruitmentDetailPage.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
@@ -25,6 +25,7 @@ export const RecruitmentDetailPage = () => {
   const [selectedDatetime, setSelectedDatetime] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [isSalonInfoOpen, setIsSalonInfoOpen] = useState(false);
+  const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (id) {
@@ -38,6 +39,7 @@ export const RecruitmentDetailPage = () => {
 
   const handleReservation = async () => {
     if (!user || user.userType !== 'student' || !selectedDatetime || !recruitment) return;
+    if (!allConditionsChecked) return;
 
     try {
       await createReservation(
@@ -63,6 +65,59 @@ export const RecruitmentDetailPage = () => {
 
   // ★ 変更: available_dates配列から予約可能な日時を抽出
   const availableDates = recruitment.available_dates.filter(date => !date.is_booked);
+
+  const conditionsToConfirm = useMemo(() => {
+    if (!recruitment) return [];
+    const list: { id: string; label: string }[] = [
+      {
+        id: 'gender',
+        label: `性別条件を満たしています（${GENDER_LABELS[recruitment.gender_requirement]}）`
+      },
+      {
+        id: 'hair',
+        label: `髪の長さ条件を満たしています（${HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}）`
+      },
+      {
+        id: 'experience',
+        label: `モデル経験について理解しています（${EXPERIENCE_LABELS[recruitment.model_experience_requirement]}）`
+      },
+      {
+        id: 'photo',
+        label: `撮影可否条件を理解しています（${PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}）`
+      }
+    ];
+
+    if (recruitment.treatment_duration) {
+      list.push({
+        id: 'duration',
+        label: `施術時間（約${recruitment.treatment_duration}）に参加できます`
+      });
+    }
+
+    if (recruitment.has_reward) {
+      list.push({
+        id: 'reward',
+        label: '謝礼内容を確認しました'
+      });
+    }
+
+    return list;
+  }, [recruitment]);
+
+  useEffect(() => {
+    if (selectedDatetime) {
+      const initialChecks = Object.fromEntries(
+        conditionsToConfirm.map(condition => [condition.id, false])
+      );
+      setConditionChecks(initialChecks);
+    } else {
+      setConditionChecks({});
+    }
+  }, [selectedDatetime, conditionsToConfirm]);
+
+  const allConditionsChecked =
+    conditionsToConfirm.length === 0 ||
+    conditionsToConfirm.every(condition => conditionChecks[condition.id]);
 
   return (
     <div className={styles.container}>
@@ -231,23 +286,51 @@ export const RecruitmentDetailPage = () => {
           title="予約確認" 
           size="md"
         >
-          <div className={styles.modalContent}>
-            <p className={styles.modalDescription}>
-              以下の日時で仮予約します。よろしいですか？
-            </p>
-            <div style={{ 
+            <div className={styles.modalContent}>
+              <p className={styles.modalDescription}>
+                以下の日時で仮予約します。よろしいですか？
+              </p>
+              <div style={{ 
               padding: 'var(--spacing-md)', 
               backgroundColor: 'var(--color-bg-secondary)', 
               borderRadius: 'var(--radius-md)',
               fontWeight: 'var(--font-weight-semibold)'
-            }}>
-              {formatDateTime(selectedDatetime)}
-            </div>
+              }}>
+                {formatDateTime(selectedDatetime)}
+              </div>
+
+              {conditionsToConfirm.length > 0 && (
+                <div className={styles.checklistSection}>
+                  <p className={styles.checklistTitle}>募集条件を確認してください</p>
+                  <div className={styles.checklistItems}>
+                    {conditionsToConfirm.map(condition => (
+                      <label key={condition.id} className={styles.checklistItem}>
+                        <input
+                          type="checkbox"
+                          checked={!!conditionChecks[condition.id]}
+                          onChange={e =>
+                            setConditionChecks(prev => ({
+                              ...prev,
+                              [condition.id]: e.target.checked
+                            }))
+                          }
+                        />
+                        <span>{condition.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {!allConditionsChecked && (
+                    <p className={styles.checklistNotice}>
+                      すべての条件に同意すると仮予約が可能になります。
+                    </p>
+                  )}
+                </div>
+              )}
             
-            <div className={styles.inputWrapper}>
-              <label className={styles.label}>サロンへのメッセージ（任意）</label>
-              <textarea
-                className={styles.textarea}
+              <div className={styles.inputWrapper}>
+                <label className={styles.label}>サロンへのメッセージ（任意）</label>
+                <textarea
+                  className={styles.textarea}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="希望する施術内容や質問があれば入力してください"
@@ -269,6 +352,7 @@ export const RecruitmentDetailPage = () => {
                 variant="primary" 
                 onClick={handleReservation} 
                 loading={reservationLoading}
+                disabled={!allConditionsChecked}
               >
                 仮予約を確定する
               </Button>
