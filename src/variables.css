@@ -1,104 +1,118 @@
 :root {
-  /* Colors */
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
-  --color-primary-light: #e0e7ff;
-  
-  --color-secondary: #ec4899;
-  --color-secondary-hover: #db2777;
-  --color-secondary-light: #fce7f3;
-  
-  --color-success: #10b981;
-  --color-success-light: #d1fae5;
-  
-  --color-warning: #f59e0b;
-  --color-warning-light: #fef3c7;
-  
-  --color-danger: #ef4444;
-  --color-danger-light: #fee2e2;
-  
-  --color-info: #3b82f6;
-  --color-info-light: #dbeafe;
-  
-  /* Neutral Colors */
+  /* Brand Palette */
+  --color-primary: #7566f6;
+  --color-primary-hover: #644ff0;
+  --color-primary-light: #ecebff;
+  --color-primary-gradient-start: #7c5df7;
+  --color-primary-gradient-end: #9c6ef5;
+
+  --color-accent: #f26da2;
+  --color-accent-hover: #df538b;
+  --color-accent-light: #ffe5f1;
+
+  --color-success: #16bfa2;
+  --color-success-light: #d6fbf2;
+
+  --color-warning: #f7a94b;
+  --color-warning-light: #fff2db;
+
+  --color-danger: #f06275;
+  --color-danger-light: #ffe3e8;
+
+  --color-info: #4f8ff8;
+  --color-info-light: #e3edff;
+
+  /* Neutral Palette */
   --color-white: #ffffff;
-  --color-black: #000000;
-  
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-  
+  --color-ink-50: #f6f6fb;
+  --color-ink-100: #eeedf7;
+  --color-ink-200: #dedcf0;
+  --color-ink-300: #c6c4dd;
+  --color-ink-400: #9d9abd;
+  --color-ink-500: #726f96;
+  --color-ink-600: #565379;
+  --color-ink-700: #3f3d58;
+  --color-ink-800: #2b2940;
+  --color-ink-900: #1d1b30;
+
   /* Text Colors */
-  --color-text-primary: var(--color-gray-900);
-  --color-text-secondary: var(--color-gray-600);
-  --color-text-tertiary: var(--color-gray-500);
+  --color-text-primary: #27203c;
+  --color-text-secondary: #5b5871;
+  --color-text-tertiary: #8c88a3;
   --color-text-inverse: var(--color-white);
-  
-  /* Background Colors */
-  --color-bg-primary: var(--color-white);
-  --color-bg-secondary: var(--color-gray-50);
-  --color-bg-tertiary: var(--color-gray-100);
-  
+
+  /* Surface Colors */
+  --color-bg-primary: #f9f8fc;
+  --color-bg-secondary: #f2f1fb;
+  --color-bg-tertiary: #ebe9f7;
+  --color-surface: var(--color-white);
+  --color-surface-muted: #f8f6ff;
+
   /* Border Colors */
-  --color-border-light: var(--color-gray-200);
-  --color-border-medium: var(--color-gray-300);
-  --color-border-dark: var(--color-gray-400);
-  
-  /* Spacing */
-  --spacing-xs: 0.25rem;    /* 4px */
-  --spacing-sm: 0.5rem;     /* 8px */
-  --spacing-md: 1rem;       /* 16px */
-  --spacing-lg: 1.5rem;     /* 24px */
-  --spacing-xl: 2rem;       /* 32px */
-  --spacing-2xl: 3rem;      /* 48px */
-  --spacing-3xl: 4rem;      /* 64px */
-  
-  /* Font Sizes */
+  --color-border-light: rgba(114, 111, 150, 0.12);
+  --color-border-medium: rgba(114, 111, 150, 0.24);
+  --color-border-dark: rgba(63, 61, 88, 0.4);
+
+  /* Typography */
+  --font-family-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'YuGothic', 'メイリオ', sans-serif;
+  --font-family-display: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'YuGothic', 'メイリオ', sans-serif;
+
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.875rem;   /* 14px */
   --font-size-base: 1rem;     /* 16px */
   --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
-  
-  /* Font Weights */
-  --font-weight-normal: 400;
+  --font-size-xl: 1.375rem;   /* 22px */
+  --font-size-2xl: 1.625rem;  /* 26px */
+  --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: 2.5rem;    /* 40px */
+  --font-size-5xl: 3rem;      /* 48px */
+
+  --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  
-  /* Line Heights */
+
   --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-  
-  /* Border Radius */
-  --radius-sm: 0.25rem;   /* 4px */
-  --radius-md: 0.5rem;    /* 8px */
-  --radius-lg: 0.75rem;   /* 12px */
-  --radius-xl: 1rem;      /* 16px */
-  --radius-full: 9999px;
-  
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+
+  /* Spacing Scale */
+  --spacing-2xs: 0.125rem;   /* 2px */
+  --spacing-xs: 0.375rem;    /* 6px */
+  --spacing-sm: 0.75rem;     /* 12px */
+  --spacing-md: 1.25rem;     /* 20px */
+  --spacing-lg: 1.75rem;     /* 28px */
+  --spacing-xl: 2.5rem;      /* 40px */
+  --spacing-2xl: 3.5rem;     /* 56px */
+  --spacing-3xl: 4.5rem;     /* 72px */
+  --spacing-4xl: 6rem;       /* 96px */
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.75rem;
+  --radius-pill: 999px;
+  --radius-card: 1.25rem;
+
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
+  --shadow-sm: 0 4px 12px rgba(60, 54, 107, 0.08);
+  --shadow-md: 0 12px 32px rgba(60, 54, 107, 0.12);
+  --shadow-lg: 0 22px 45px rgba(60, 54, 107, 0.14);
+  --shadow-glow: 0 0 40px rgba(124, 93, 247, 0.25);
+
   /* Transitions */
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 300ms ease-in-out;
-  --transition-slow: 500ms ease-in-out;
-  
+  --transition-fast: 150ms ease;
+  --transition-normal: 280ms ease;
+  --transition-slow: 500ms ease;
+
+  /* Backdrop */
+  --backdrop-blur: blur(18px);
+
   /* Z-index */
   --z-index-dropdown: 1000;
   --z-index-sticky: 1020;
@@ -107,8 +121,8 @@
   --z-index-modal: 1050;
   --z-index-popover: 1060;
   --z-index-tooltip: 1070;
-  
-  /* Container */
-  --container-max-width: 1200px;
-  --container-padding: var(--spacing-md);
+
+  /* Layout */
+  --container-max-width: 1120px;
+  --container-padding: clamp(1rem, 4vw, 2.5rem);
 }

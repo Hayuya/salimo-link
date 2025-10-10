@@ -1,8 +1,7 @@
-
 .footer {
-  background-color: var(--color-gray-800);
-  color: var(--color-gray-300);
-  padding: var(--spacing-2xl) var(--container-padding);
+  background: radial-gradient(160% 120% at 50% 0%, rgba(124, 93, 247, 0.25) 0%, rgba(35, 30, 60, 0.95) 65%);
+  color: rgba(255, 255, 255, 0.78);
+  padding: var(--spacing-3xl) var(--container-padding);
   margin-top: auto;
 }
 
@@ -14,27 +13,35 @@
 .mainContent {
   display: flex;
   justify-content: space-between;
-  gap: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--color-gray-700);
+  gap: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-wrap: wrap;
 }
 
 .brand {
-  max-width: 300px;
+  max-width: 320px;
   flex-shrink: 0;
+}
+
+.brandTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  margin: 0;
+  color: var(--color-white);
 }
 
 .tagline {
   margin-top: var(--spacing-md);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .links {
   display: flex;
-  gap: var(--spacing-2xl);
+  gap: var(--spacing-3xl);
   flex-wrap: wrap;
 }
 
@@ -42,35 +49,38 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  min-width: 140px;
 }
 
 .linkTitle {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-white);
-  margin-bottom: var(--spacing-xs);
+  margin: 0 0 var(--spacing-xs) 0;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .link {
   font-size: var(--font-size-sm);
-  color: var(--color-gray-300);
-  transition: color var(--transition-fast);
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform var(--transition-fast), color var(--transition-fast);
 }
 
 .link:hover {
   color: var(--color-white);
-  text-decoration: underline;
+  transform: translateX(4px);
 }
 
 .copyright {
   padding-top: var(--spacing-xl);
   text-align: center;
   font-size: var(--font-size-sm);
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .copyright p {
-    margin: 0;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -78,12 +88,15 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: var(--spacing-2xl);
   }
+
   .links {
     justify-content: center;
     gap: var(--spacing-xl);
     width: 100%;
   }
+
   .linkGroup {
     align-items: center;
   }

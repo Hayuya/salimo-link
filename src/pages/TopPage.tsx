@@ -16,13 +16,17 @@ export const TopPage = () => {
     <div className={styles.container}>
       {!user && (
         <div className={styles.hero}>
-          <h1 className={styles.heroTitle}>
-            カットモデルを探す学生と<br />
-            美容室アシスタントを繋ぐ
-          </h1>
-          <p className={styles.heroSubtitle}>
-            安全・簡単・無料で、あなたにぴったりの出会いを
-          </p>
+          <div className={styles.heroInner}>
+            <div>
+              <h1 className={styles.heroTitle}>
+                カットモデルを探す学生と<br />
+                美容室アシスタントを繋ぐ
+              </h1>
+              <p className={styles.heroSubtitle}>
+                安全で洗練された出会いをサポート。美容とファッションの世界観に寄り添ったマッチングプラットフォームです。
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

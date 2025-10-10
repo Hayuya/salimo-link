@@ -1,5 +1,5 @@
 .spinner {
-  border: 3px solid var(--color-gray-200);
+  border: 3px solid rgba(114, 111, 150, 0.16);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -32,7 +32,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(248, 247, 251, 0.85);
+  backdrop-filter: blur(4px);
   z-index: var(--z-index-modal);
 }
 

@@ -1,10 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
 import { LoginForm } from '@/components/LoginForm';
 import { Card } from '@/components/Card';
+import { Spinner } from '@/components/Spinner';
+import { useAuth } from '@/auth';
 import styles from './LoginPage.module.css';
 
 export const LoginPage = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Spinner fullScreen />;
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>

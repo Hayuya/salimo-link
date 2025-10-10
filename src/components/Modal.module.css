@@ -4,18 +4,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(24, 20, 40, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-modal-backdrop);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
+  backdrop-filter: blur(6px);
 }
 
 .modal {
-  background-color: var(--color-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(245, 242, 255, 0.98));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(124, 93, 247, 0.08);
   max-height: 90vh;
   overflow-y: auto;
   z-index: var(--z-index-modal);
@@ -53,23 +55,24 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 1px solid rgba(124, 93, 247, 0.08);
 }
 
 .title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .closeButton {
   background: none;
   border: none;
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
   color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 0;
+  padding: var(--spacing-2xs);
   width: 32px;
   height: 32px;
   display: flex;
@@ -80,8 +83,8 @@
 }
 
 .closeButton:hover {
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
+  background-color: rgba(124, 93, 247, 0.12);
+  color: var(--color-primary);
 }
 
 .content {
@@ -98,5 +101,6 @@
     max-height: 100vh;
     width: 100% !important;
     max-width: 100% !important;
+    box-shadow: none;
   }
 }

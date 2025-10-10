@@ -1,6 +1,6 @@
 .container {
   min-height: calc(100vh - 80px);
-  padding: var(--spacing-xl) var(--container-padding);
+  padding: var(--spacing-2xl) var(--container-padding) var(--spacing-3xl);
 }
 
 .content {
@@ -8,14 +8,14 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .headerActions {
@@ -28,6 +28,7 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .sectionTitle {
@@ -77,15 +78,18 @@
 }
 
 .applicationItem {
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(124, 93, 247, 0.08);
+  border-radius: var(--radius-card);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .applicationItem:hover {
-  border-color: var(--color-border-medium);
-  box-shadow: var(--shadow-sm);
+  border-color: rgba(124, 93, 247, 0.18);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
 }
 
 .reservationDetails {
@@ -95,13 +99,13 @@
 }
 
 .pendingReservation {
-  border-color: var(--color-info);
-  background-color: var(--color-info-light);
+  border-color: rgba(79, 143, 248, 0.32);
+  background-color: rgba(79, 143, 248, 0.12);
 }
 
 .confirmedReservation {
-  border-color: var(--color-success);
-  background-color: var(--color-success-light);
+  border-color: rgba(22, 191, 162, 0.28);
+  background-color: rgba(22, 191, 162, 0.1);
 }
 
 .applicationHeader {
@@ -173,7 +177,7 @@
 .applicationBody {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border-light);
+  border-top: 1px solid rgba(114, 111, 150, 0.1);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -182,9 +186,9 @@
 .recruitmentInfo {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-secondary);
+  border: 1px solid rgba(114, 111, 150, 0.12);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-muted);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -236,12 +240,13 @@
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-white);
-  border: 1px solid var(--color-border-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(117, 102, 246, 0.15);
+  border: 1px solid rgba(117, 102, 246, 0.2);
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .toggleDetailsButton {
@@ -249,9 +254,9 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border-light);
-  background-color: var(--color-white);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(114, 111, 150, 0.2);
+  background-color: rgba(255, 255, 255, 0.85);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   cursor: pointer;
@@ -260,9 +265,10 @@
 
 .toggleDetailsButton:hover,
 .toggleDetailsButton:focus {
-  border-color: var(--color-border-medium);
-  color: var(--color-text-primary);
+  border-color: rgba(124, 93, 247, 0.4);
+  color: var(--color-primary);
   box-shadow: var(--shadow-sm);
+  background-color: rgba(236, 235, 255, 0.6);
 }
 
 .toggleIcon {
@@ -299,18 +305,21 @@
 }
 
 .recruitmentItem {
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(124, 93, 247, 0.08);
+  border-radius: var(--radius-card);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .recruitmentItem:hover {
-  border-color: var(--color-border-medium);
-  box-shadow: var(--shadow-sm);
+  border-color: rgba(124, 93, 247, 0.2);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 
 .recruitmentHeader {
@@ -381,33 +390,33 @@
 }
 
 .statusPending {
-  background-color: var(--color-info-light);
-  color: var(--color-info);
+  background-color: rgba(79, 143, 248, 0.18);
+  color: #3565c5;
 }
 
 .statusAccepted {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
+  background-color: rgba(22, 191, 162, 0.2);
+  color: #0f8f78;
 }
 
 .statusRejected {
-  background-color: var(--color-danger-light);
-  color: var(--color-danger);
+  background-color: rgba(240, 98, 117, 0.18);
+  color: #d9344c;
 }
 
 .statusWithdrawn {
-  background-color: var(--color-gray-200);
-  color: var(--color-gray-600);
+  background-color: rgba(114, 111, 150, 0.12);
+  color: var(--color-text-tertiary);
 }
 
 .statusActive {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
+  background-color: rgba(22, 191, 162, 0.2);
+  color: #0f8f78;
 }
 
 .statusClosed {
-  background-color: var(--color-gray-200);
-  color: var(--color-gray-600);
+  background-color: rgba(114, 111, 150, 0.12);
+  color: var(--color-text-tertiary);
 }
 
 .pendingCard {

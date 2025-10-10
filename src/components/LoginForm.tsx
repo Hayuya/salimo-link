@@ -41,7 +41,7 @@ export const LoginForm = () => {
     setLoading(true);
     try {
       await signIn(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       setErrors({ general: error.message || 'ログインに失敗しました' });
     } finally {
