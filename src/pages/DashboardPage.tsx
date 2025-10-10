@@ -383,6 +383,69 @@ export const DashboardPage = () => {
     res => res.status !== 'pending' && res.status !== 'confirmed'
   );
 
+  const renderRecruitmentDetails = (recruitment: ReservationWithDetails['recruitment']) => (
+    <div className={styles.recruitmentInfo}>
+      <p className={styles.detailTitle}>募集詳細</p>
+      {recruitment.description && (
+        <p className={styles.detailDescription}>{recruitment.description}</p>
+      )}
+      {recruitment.menus?.length > 0 && (
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>メニュー</span>
+          <div className={styles.tagList}>
+            {recruitment.menus.map(menu => (
+              <span key={menu} className={styles.tag}>
+                {MENU_LABELS[menu]}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className={styles.conditionGrid}>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>性別</span>
+          <span className={styles.detailValue}>
+            {GENDER_LABELS[recruitment.gender_requirement]}
+          </span>
+        </div>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>髪の長さ</span>
+          <span className={styles.detailValue}>
+            {HAIR_LENGTH_LABELS[recruitment.hair_length_requirement]}
+          </span>
+        </div>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>モデル経験</span>
+          <span className={styles.detailValue}>
+            {EXPERIENCE_LABELS[recruitment.model_experience_requirement]}
+          </span>
+        </div>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>撮影</span>
+          <span className={styles.detailValue}>
+            {PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}
+          </span>
+        </div>
+        {recruitment.treatment_duration && (
+          <div className={styles.detailRow}>
+            <span className={styles.detailLabel}>施術時間</span>
+            <span className={styles.detailValue}>
+              {recruitment.treatment_duration}
+            </span>
+          </div>
+        )}
+        {recruitment.has_reward && (
+          <div className={styles.detailRow}>
+            <span className={styles.detailLabel}>謝礼</span>
+            <span className={styles.detailValue}>
+              {recruitment.reward_details || 'あり'}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   const renderSalonReservation = (res: ReservationWithDetails) => {
     const isExpanded = !!expandedReservations[res.id];
     const statusLabel = getReservationStatusLabel(res.status);
@@ -468,66 +531,7 @@ export const DashboardPage = () => {
                 <strong>メッセージ:</strong> {res.message}
               </p>
             )}
-            <div className={styles.recruitmentInfo}>
-              <p className={styles.detailTitle}>募集詳細</p>
-              {res.recruitment.description && (
-                <p className={styles.detailDescription}>{res.recruitment.description}</p>
-              )}
-              {res.recruitment.menus?.length > 0 && (
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>メニュー</span>
-                  <div className={styles.tagList}>
-                    {res.recruitment.menus.map(menu => (
-                      <span key={menu} className={styles.tag}>
-                        {MENU_LABELS[menu]}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className={styles.conditionGrid}>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>性別</span>
-                  <span className={styles.detailValue}>
-                    {GENDER_LABELS[res.recruitment.gender_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>髪の長さ</span>
-                  <span className={styles.detailValue}>
-                    {HAIR_LENGTH_LABELS[res.recruitment.hair_length_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>モデル経験</span>
-                  <span className={styles.detailValue}>
-                    {EXPERIENCE_LABELS[res.recruitment.model_experience_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>撮影</span>
-                  <span className={styles.detailValue}>
-                    {PHOTO_SHOOT_LABELS[res.recruitment.photo_shoot_requirement]}
-                  </span>
-                </div>
-                {res.recruitment.treatment_duration && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>施術時間</span>
-                    <span className={styles.detailValue}>
-                      {res.recruitment.treatment_duration}
-                    </span>
-                  </div>
-                )}
-                {res.recruitment.has_reward && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>謝礼</span>
-                    <span className={styles.detailValue}>
-                      {res.recruitment.reward_details || 'あり'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+            {renderRecruitmentDetails(res.recruitment)}
           </div>
         )}
 
@@ -637,66 +641,7 @@ export const DashboardPage = () => {
                 <strong>送信メッセージ:</strong> {res.message}
               </p>
             )}
-            <div className={styles.recruitmentInfo}>
-              <p className={styles.detailTitle}>募集詳細</p>
-              {res.recruitment.description && (
-                <p className={styles.detailDescription}>{res.recruitment.description}</p>
-              )}
-              {res.recruitment.menus?.length > 0 && (
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>メニュー</span>
-                  <div className={styles.tagList}>
-                    {res.recruitment.menus.map(menu => (
-                      <span key={menu} className={styles.tag}>
-                        {MENU_LABELS[menu]}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className={styles.conditionGrid}>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>性別</span>
-                  <span className={styles.detailValue}>
-                    {GENDER_LABELS[res.recruitment.gender_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>髪の長さ</span>
-                  <span className={styles.detailValue}>
-                    {HAIR_LENGTH_LABELS[res.recruitment.hair_length_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>モデル経験</span>
-                  <span className={styles.detailValue}>
-                    {EXPERIENCE_LABELS[res.recruitment.model_experience_requirement]}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>撮影</span>
-                  <span className={styles.detailValue}>
-                    {PHOTO_SHOOT_LABELS[res.recruitment.photo_shoot_requirement]}
-                  </span>
-                </div>
-                {res.recruitment.treatment_duration && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>施術時間</span>
-                    <span className={styles.detailValue}>
-                      {res.recruitment.treatment_duration}
-                    </span>
-                  </div>
-                )}
-                {res.recruitment.has_reward && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>謝礼</span>
-                    <span className={styles.detailValue}>
-                      {res.recruitment.reward_details || 'あり'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+            {renderRecruitmentDetails(res.recruitment)}
           </div>
         )}
       </div>
