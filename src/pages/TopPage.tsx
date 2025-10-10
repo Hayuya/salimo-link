@@ -124,9 +124,9 @@ export const TopPage = () => {
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>募集中のサロン</h2>
+          <h2 className={styles.sectionTitle}>募集一覧</h2>
           <p className={styles.sectionSubtitle}>
-            {filteredRecruitments.length}件の募集があります
+            現在{filteredRecruitments.length}件の募集があります！
           </p>
         </div>
 
