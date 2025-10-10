@@ -230,4 +230,5 @@ export interface AuthContextType {
   ) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: StudentUpdate | SalonUpdate) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }

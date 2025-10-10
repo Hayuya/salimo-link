@@ -295,6 +295,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    if (!user) throw new Error('ログインしていません');
+
+    const tableName = user.userType === 'student' ? 'students' : 'salons';
+
+    const { error: profileError } = await supabase
+      .from(tableName)
+      .delete()
+      .eq('id', user.id);
+
+    if (profileError) {
+      throw new Error(profileError.message || 'プロフィールの削除に失敗しました');
+    }
+
+    const { error: sectionsError } = await supabase.rpc('delete_user_data', {
+      p_user_id: user.id,
+    });
+
+    if (sectionsError) {
+      console.error('Supabase RPC error:', sectionsError);
+      throw new Error(sectionsError.message || 'ユーザーデータの削除に失敗しました');
+    }
+
+    const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+
+    if (authError) {
+      console.error('Auth delete error:', authError);
+      throw new Error(authError.message || 'アカウントの削除に失敗しました');
+    }
+
+    setUser(null);
+  };
+
   const value = {
     user,
     loading,
@@ -302,6 +335,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signUp,
     signOut,
     updateProfile,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
