@@ -53,12 +53,14 @@
   background: #fafafa;
   border-radius: var(--radius-md);
   border: 1px solid #e0e0e0;
+  overflow: hidden;
 }
 
 .salonHeader {
   display: flex;
   gap: var(--spacing-xl);
   align-items: flex-start;
+  width: 100%;
 }
 
 .salonImage {
@@ -72,6 +74,8 @@
 
 .salonInfo {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .salonName {
@@ -79,12 +83,16 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0 0 var(--spacing-sm) 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .address {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   margin: 0 0 var(--spacing-xs) 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .contactItem {
@@ -94,17 +102,23 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   margin: var(--spacing-xs) 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  flex-wrap: wrap;
 }
 
 .contactLabel {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  flex-shrink: 0;
 }
 
 .contactLink {
   color: #7c5df7;
   text-decoration: none;
   transition: color 0.2s ease;
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .contactLink:hover {
@@ -119,8 +133,10 @@
   line-height: var(--line-height-relaxed);
   white-space: pre-wrap;
   padding: var(--spacing-md);
-  background: #fafafa;
+  background: #f5f5f5;
   border-radius: var(--radius-sm);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* 募集情報カード */
@@ -393,20 +409,48 @@
     align-self: flex-end;
   }
 
+  .salonDropdownContent {
+    padding: var(--spacing-md);
+    margin-left: calc(var(--spacing-md) * -1);
+    margin-right: calc(var(--spacing-md) * -1);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
   .salonHeader {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: var(--spacing-md);
   }
 
   .salonImage {
     width: 100%;
-    max-width: 300px;
-    height: 200px;
+    max-width: 200px;
+    height: 150px;
+  }
+
+  .salonInfo {
+    width: 100%;
   }
 
   .salonName {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
+  }
+
+  .contactItem {
+    justify-content: center;
+    font-size: var(--font-size-xs);
+  }
+
+  .address {
+    font-size: var(--font-size-xs);
+  }
+
+  .salonDescription {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-sm);
   }
 
   .recruitmentHeader {
@@ -440,5 +484,13 @@
   .salonInfoButton {
     font-size: var(--font-size-xs);
     padding: 4px var(--spacing-xs);
+  }
+
+  .salonName {
+    font-size: var(--font-size-base);
+  }
+
+  .salonDropdownContent {
+    padding: var(--spacing-sm);
   }
 }
