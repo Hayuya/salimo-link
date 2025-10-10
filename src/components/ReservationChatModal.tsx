@@ -38,9 +38,12 @@ export const ReservationChatModal = ({
     return reservation.student.name;
   }, [reservation, currentUserType]);
 
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (options?: { showSpinner?: boolean }) => {
+    const { showSpinner = true } = options || {};
     if (!reservationId) return;
-    setLoading(true);
+    if (showSpinner) {
+      setLoading(true);
+    }
     const { data, error } = await supabase
       .from('reservation_messages')
       .select('*')
@@ -99,6 +102,16 @@ export const ReservationChatModal = ({
       return;
     }
     fetchMessages();
+  }, [isOpen, reservationId, fetchMessages]);
+
+  useEffect(() => {
+    if (!isOpen || !reservationId) return;
+    const intervalId = window.setInterval(() => {
+      fetchMessages({ showSpinner: false });
+    }, 10000);
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [isOpen, reservationId, fetchMessages]);
 
   useEffect(() => {
