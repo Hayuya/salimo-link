@@ -1,12 +1,42 @@
+import { useState, useMemo } from 'react';
 import { useRecruitments } from '@/recruitment';
 import { useAuth } from '@/auth';
 import { RecruitmentCard } from '@/components/RecruitmentCard';
 import { Spinner } from '@/components/Spinner';
 import styles from './TopPage.module.css';
+import type { MenuType } from '@/types'; // 正しいMenuTypeをインポート
 
 export const TopPage = () => {
   const { recruitments, loading, error } = useRecruitments();
   const { user } = useAuth();
+  
+  // フィルター状態
+  const [selectedMenu, setSelectedMenu] = useState<string>('all');
+  const [selectedGender, setSelectedGender] = useState<string>('all');
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+
+  // フィルター適用
+  const filteredRecruitments = useMemo(() => {
+    return recruitments.filter(recruitment => {
+      // メニューフィルター
+      if (selectedMenu !== 'all' && !recruitment.menus.includes(selectedMenu as MenuType)) {
+        return false;
+      }
+      
+      // 性別フィルター
+      if (selectedGender !== 'all' && recruitment.gender_requirement !== selectedGender) {
+        return false;
+      }
+      
+      // 予約可能のみ表示
+      if (showAvailableOnly) {
+        const hasAvailable = recruitment.available_dates.some(date => !date.is_booked);
+        if (!hasAvailable) return false;
+      }
+      
+      return true;
+    });
+  }, [recruitments, selectedMenu, selectedGender, showAvailableOnly]);
 
   if (loading) {
     return <Spinner fullScreen />;
@@ -96,8 +126,68 @@ export const TopPage = () => {
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>募集中のサロン</h2>
           <p className={styles.sectionSubtitle}>
-            {recruitments.length}件の募集があります
+            {filteredRecruitments.length}件の募集があります
           </p>
+        </div>
+
+        {/* フィルターセクション */}
+        <div className={styles.filterSection}>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>メニュー</label>
+            <select 
+              className={styles.filterSelect}
+              value={selectedMenu}
+              onChange={(e) => setSelectedMenu(e.target.value)}
+            >
+              <option value="all">すべて</option>
+              <option value="cut">カット</option>
+              <option value="color">カラー</option>
+              <option value="perm">パーマ</option>
+              <option value="treatment">トリートメント</option>
+              <option value="styling">スタイリング</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>性別</label>
+            <select 
+              className={styles.filterSelect}
+              value={selectedGender}
+              onChange={(e) => setSelectedGender(e.target.value)}
+            >
+              <option value="all">すべて</option>
+              <option value="any">指定なし</option>
+              <option value="male">男性</option>
+              <option value="female">女性</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label className={styles.filterCheckbox}>
+              <input
+                type="checkbox"
+                checked={showAvailableOnly}
+                onChange={(e) => setShowAvailableOnly(e.target.checked)}
+              />
+              <span>予約可能のみ表示</span>
+            </label>
+          </div>
+
+          {(selectedMenu !== 'all' || selectedGender !== 'all' || showAvailableOnly) && (
+            <button 
+              className={styles.filterReset}
+              onClick={() => {
+                setSelectedMenu('all');
+                setSelectedGender('all');
+                setShowAvailableOnly(false);
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              絞り込みをリセット
+            </button>
+          )}
         </div>
 
         {error && (
@@ -106,13 +196,13 @@ export const TopPage = () => {
           </div>
         )}
 
-        {recruitments.length === 0 ? (
+        {filteredRecruitments.length === 0 ? (
           <div className={styles.empty}>
-            <p>現在募集中のサロンはありません</p>
+            <p>条件に一致する募集がありません</p>
           </div>
         ) : (
           <div className={styles.grid}>
-            {recruitments.map((recruitment) => (
+            {filteredRecruitments.map((recruitment) => (
               <RecruitmentCard key={recruitment.id} recruitment={recruitment} />
             ))}
           </div>

@@ -13,6 +13,15 @@ import { Modal } from '@/components/Modal';
 import { Spinner } from '@/components/Spinner';
 import styles from './RecruitmentDetailPage.module.css';
 
+// メニューアイコンマッピング
+const MENU_ICONS: Record<string, string> = {
+  cut: '✂️',
+  color: '🎨',
+  perm: '💇',
+  treatment: '✨',
+  styling: '💅'
+};
+
 export const RecruitmentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -119,73 +128,73 @@ export const RecruitmentDetailPage = () => {
     conditionsToConfirm.every(condition => conditionChecks[condition.id]);
 
   if (loading) return <Spinner fullScreen />;
-  if (!recruitment) return <div>募集情報が見つかりませんでした</div>;
+  if (!recruitment) return <div className={styles.error}>募集情報が見つかりませんでした</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         {/* サロン情報 */}
-        <Card padding="lg">
-          <div className={styles.dropdownSection}>
-            <button
-              type="button"
-              className={styles.dropdownTrigger}
-              onClick={() => setIsSalonInfoOpen(prev => !prev)}
-              aria-expanded={isSalonInfoOpen}
-            >
-              <span className={styles.dropdownTitle}>サロン情報</span>
-              <span
-                className={[
-                  styles.dropdownIcon,
-                  isSalonInfoOpen ? styles.dropdownIconOpen : ''
-                ].filter(Boolean).join(' ')}
-                aria-hidden="true"
-              />
-            </button>
-            {isSalonInfoOpen && (
-              <div className={styles.dropdownContent}>
-                <div className={styles.salonHeader}>
-                  {recruitment.salon.photo_url && (
-                    <img
-                      src={recruitment.salon.photo_url}
-                      alt={recruitment.salon.salon_name}
-                      className={styles.salonImage}
-                    />
+        <div className={styles.dropdownSection}>
+          <button
+            type="button"
+            className={styles.dropdownTrigger}
+            onClick={() => setIsSalonInfoOpen(prev => !prev)}
+            aria-expanded={isSalonInfoOpen}
+          >
+            <span className={styles.dropdownTitle}>サロン情報</span>
+            <span
+              className={[
+                styles.dropdownIcon,
+                isSalonInfoOpen ? styles.dropdownIconOpen : ''
+              ].filter(Boolean).join(' ')}
+              aria-hidden="true"
+            />
+          </button>
+          {isSalonInfoOpen && (
+            <div className={styles.dropdownContent}>
+              <div className={styles.salonHeader}>
+                {recruitment.salon.photo_url && (
+                  <img
+                    src={recruitment.salon.photo_url}
+                    alt={recruitment.salon.salon_name}
+                    className={styles.salonImage}
+                  />
+                )}
+                <div className={styles.salonInfo}>
+                  <h1 className={styles.salonName}>{recruitment.salon.salon_name}</h1>
+                  {recruitment.salon.address && (
+                    <p className={styles.address}>{recruitment.salon.address}</p>
                   )}
-                  <div className={styles.salonInfo}>
-                    <h1 className={styles.salonName}>{recruitment.salon.salon_name}</h1>
-                    {recruitment.salon.address && (
-                      <p className={styles.address}>{recruitment.salon.address}</p>
-                    )}
-                    {recruitment.salon.phone_number && (
-                      <p className={styles.contactItem}>
-                        <span className={styles.contactLabel}>電話番号:</span>
-                        <span>{recruitment.salon.phone_number}</span>
-                      </p>
-                    )}
-                    {recruitment.salon.website_url && (
-                      <p className={styles.contactItem}>
-                        <span className={styles.contactLabel}>WEBサイト:</span>
-                        <a
-                          href={recruitment.salon.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.contactLink}
-                        >
-                          {recruitment.salon.website_url}
-                        </a>
-                      </p>
-                    )}
-                    {recruitment.salon.description && (
-                      <p className={styles.salonDescription}>{recruitment.salon.description}</p>
-                    )}
-                  </div>
+                  {recruitment.salon.phone_number && (
+                    <p className={styles.contactItem}>
+                      <span className={styles.contactLabel}>📞 電話番号:</span>
+                      <span>{recruitment.salon.phone_number}</span>
+                    </p>
+                  )}
+                  {recruitment.salon.website_url && (
+                    <p className={styles.contactItem}>
+                      <span className={styles.contactLabel}>🌐 WEBサイト:</span>
+                      <a
+                        href={recruitment.salon.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.contactLink}
+                      >
+                        {recruitment.salon.website_url}
+                      </a>
+                    </p>
+                  )}
+                  {recruitment.salon.description && (
+                    <p className={styles.salonDescription}>{recruitment.salon.description}</p>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* 募集情報 */}
+        <Card>
+          {/* 募集情報ヘッダー */}
           <div className={styles.recruitmentHeader}>
             <h2 className={styles.recruitmentTitle}>{recruitment.title}</h2>
             <span className={recruitment.status === 'active' ? styles.statusActive : styles.statusClosed}>
@@ -207,6 +216,7 @@ export const RecruitmentDetailPage = () => {
               <div className={styles.conditionsList}>
                 {recruitment.menus.map(menu => (
                   <div key={menu} className={styles.conditionItem}>
+                    <span style={{ fontSize: '1.5rem' }}>{MENU_ICONS[menu] || '💈'}</span>
                     <span className={styles.conditionValue}>{MENU_LABELS[menu]}</span>
                   </div>
                 ))}
@@ -253,7 +263,7 @@ export const RecruitmentDetailPage = () => {
 
           {/* 予約可能な日時 */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>予約可能な日時</h3>
+            <h3 className={styles.sectionTitle}>📅 予約可能な日時</h3>
             {availableDates.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {availableDates.map((date, index) => (
@@ -267,9 +277,9 @@ export const RecruitmentDetailPage = () => {
                         navigate('/login');
                       }
                     }}
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', justifyContent: 'flex-start' }}
                   >
-                    {formatDateTime(date.datetime)}
+                    🕐 {formatDateTime(date.datetime)}
                   </Button>
                 ))}
               </div>
@@ -288,51 +298,51 @@ export const RecruitmentDetailPage = () => {
           title="予約確認" 
           size="md"
         >
-            <div className={styles.modalContent}>
-              <p className={styles.modalDescription}>
-                以下の日時で仮予約します。よろしいですか？
-              </p>
-              <div style={{ 
+          <div className={styles.modalContent}>
+            <p className={styles.modalDescription}>
+              以下の日時で仮予約します。よろしいですか？
+            </p>
+            <div style={{ 
               padding: 'var(--spacing-md)', 
               backgroundColor: 'var(--color-bg-secondary)', 
               borderRadius: 'var(--radius-md)',
               fontWeight: 'var(--font-weight-semibold)'
-              }}>
-                {formatDateTime(selectedDatetime)}
-              </div>
+            }}>
+              🕐 {formatDateTime(selectedDatetime)}
+            </div>
 
-              {conditionsToConfirm.length > 0 && (
-                <div className={styles.checklistSection}>
-                  <p className={styles.checklistTitle}>募集条件を確認してください</p>
-                  <div className={styles.checklistItems}>
-                    {conditionsToConfirm.map(condition => (
-                      <label key={condition.id} className={styles.checklistItem}>
-                        <input
-                          type="checkbox"
-                          checked={!!conditionChecks[condition.id]}
-                          onChange={e =>
-                            setConditionChecks(prev => ({
-                              ...prev,
-                              [condition.id]: e.target.checked
-                            }))
-                          }
-                        />
-                        <span>{condition.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                  {!allConditionsChecked && (
-                    <p className={styles.checklistNotice}>
-                      すべての条件に同意すると仮予約が可能になります。
-                    </p>
-                  )}
+            {conditionsToConfirm.length > 0 && (
+              <div className={styles.checklistSection}>
+                <p className={styles.checklistTitle}>📋 募集条件を確認してください</p>
+                <div className={styles.checklistItems}>
+                  {conditionsToConfirm.map(condition => (
+                    <label key={condition.id} className={styles.checklistItem}>
+                      <input
+                        type="checkbox"
+                        checked={!!conditionChecks[condition.id]}
+                        onChange={e =>
+                          setConditionChecks(prev => ({
+                            ...prev,
+                            [condition.id]: e.target.checked
+                          }))
+                        }
+                      />
+                      <span>{condition.label}</span>
+                    </label>
+                  ))}
                 </div>
-              )}
-            
-              <div className={styles.inputWrapper}>
-                <label className={styles.label}>サロンへのメッセージ（任意）</label>
-                <textarea
-                  className={styles.textarea}
+                {!allConditionsChecked && (
+                  <p className={styles.checklistNotice}>
+                    ⚠️ すべての条件に同意すると仮予約が可能になります。
+                  </p>
+                )}
+              </div>
+            )}
+          
+            <div className={styles.inputWrapper}>
+              <label className={styles.label}>💬 サロンへのメッセージ（任意）</label>
+              <textarea
+                className={styles.textarea}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="希望する施術内容や質問があれば入力してください"
