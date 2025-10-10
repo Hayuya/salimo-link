@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useReservations } from '@/hooks/useReservations';
 import { useRecruitments } from '@/recruitment';
@@ -60,7 +60,8 @@ const initialRecruitmentState = {
 };
 
 export const DashboardPage = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, deleteAccount } = useAuth();
+  const navigate = useNavigate();
   const { fetchReservationsByStudent, fetchReservationsBySalon, updateReservationStatus } = useReservations();
   const {
     fetchRecruitmentsBySalonId,
@@ -88,6 +89,7 @@ export const DashboardPage = () => {
   const [chatReservation, setChatReservation] = useState<ReservationWithDetails | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [latestMessages, setLatestMessages] = useState<Record<string, ReservationMessage | null>>({});
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // 新規作成用の日時入力
   const [newSlotDate, setNewSlotDate] = useState('');
@@ -453,6 +455,23 @@ useEffect(() => {
     setChatReservation(null);
   };
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('アカウントを本当に削除しますか？この操作は取り消せません。')) {
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      await deleteAccount();
+      alert('アカウントを削除しました。ご利用ありがとうございました。');
+      navigate('/');
+    } catch (error: any) {
+      alert(error.message || 'アカウントの削除に失敗しました');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleChatMessageActivity = useCallback(
     (message: ReservationMessage | null) => {
       if (!chatReservation) return;
@@ -748,7 +767,11 @@ useEffect(() => {
           </div>
         </div>
 
-        <ProfileCard user={user} />
+        <ProfileCard
+          user={user}
+          onDeleteAccount={handleDeleteAccount}
+          deleteLoading={deleteLoading}
+        />
 
         {user.userType === 'student' ? (
           <StudentReservationsSection

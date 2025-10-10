@@ -186,6 +186,35 @@ CREATE TRIGGER update_reservations_updated_at BEFORE UPDATE ON reservations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ==========================================
+-- Delete User Data RPC
+-- ==========================================
+CREATE OR REPLACE FUNCTION delete_user_data(p_user_id UUID)
+RETURNS void AS $$
+DECLARE
+  v_salon_id UUID;
+BEGIN
+  -- 削除対象募集のチャットメッセージを削除
+  DELETE FROM reservation_messages
+  WHERE reservation_id IN (
+    SELECT id FROM reservations
+    WHERE student_id = p_user_id OR salon_id = p_user_id
+  );
+
+  -- 予約を削除
+  DELETE FROM reservations
+  WHERE student_id = p_user_id OR salon_id = p_user_id;
+
+  -- サロンユーザーの場合は募集も削除
+  DELETE FROM recruitments
+  WHERE salon_id = p_user_id;
+
+  -- プロフィールを削除（students / salons のどちらか）
+  DELETE FROM students WHERE id = p_user_id;
+  DELETE FROM salons WHERE id = p_user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ==========================================
 -- Auth Trigger Function (Profile Creation)
 -- ==========================================
 CREATE OR REPLACE FUNCTION handle_new_user()
