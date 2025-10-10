@@ -64,20 +64,33 @@ export const ReservationChatModal = ({
     const trimmed = newMessage.trim();
     if (!reservationId || !trimmed) return;
     setSending(true);
-    const { error } = await supabase.from('reservation_messages').insert({
-      reservation_id: reservationId,
-      sender_id: currentUserId,
-      sender_type: currentUserType,
-      message: trimmed,
-    });
+    const { data, error } = await supabase
+      .from('reservation_messages')
+      .insert({
+        reservation_id: reservationId,
+        sender_id: currentUserId,
+        sender_type: currentUserType,
+        message: trimmed,
+      })
+      .select()
+      .maybeSingle();
     if (error) {
       console.error('Failed to send message:', error);
       alert('メッセージの送信に失敗しました。');
     } else {
       setNewMessage('');
+      if (data) {
+        setMessages(prev => {
+          if (prev.some(message => message.id === data.id)) {
+            return prev;
+          }
+          return [...prev, data];
+        });
+        onMessageActivity?.(data);
+      }
     }
     setSending(false);
-  }, [reservationId, newMessage, currentUserId, currentUserType]);
+  }, [reservationId, newMessage, currentUserId, currentUserType, onMessageActivity]);
 
   useEffect(() => {
     if (!isOpen || !reservationId) {
