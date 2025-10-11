@@ -58,6 +58,9 @@ export const Header = () => {
               <Link to="/dashboard" className={styles.navLink}>
                 マイページ
               </Link>
+              <Link to="/how-to-use" className={styles.navLink}>
+                つかいかた
+              </Link>
               <div className={styles.dropdown} ref={dropdownRef}>
                  <button 
                     className={styles.profileLink} 
@@ -79,6 +82,9 @@ export const Header = () => {
             <>
               <Link to="/about" className={styles.navLink}>
                 cutmoとは？
+              </Link>
+              <Link to="/how-to-use" className={styles.navLink}>
+                使い方
               </Link>
               <Link to="/login" className={styles.navLink}>
                 ログイン
