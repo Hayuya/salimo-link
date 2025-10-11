@@ -28,6 +28,20 @@ export const RecruitmentDetailPage = () => {
   const [chatTime, setChatTime] = useState('');
   const [message, setMessage] = useState('');
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const isStudentUser = user?.userType === 'student';
+
+  const ensureStudentUser = () => {
+    if (!user) {
+      navigate('/login');
+      return false;
+    }
+    if (user.userType !== 'student') {
+      alert('仮予約は学生ユーザーのみが利用できます');
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     if (id) {
@@ -41,11 +55,7 @@ export const RecruitmentDetailPage = () => {
 
   const handleChatConsultation = () => {
     if (!recruitment || !recruitment.allow_chat_consultation) return;
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    if (user.userType !== 'student') return;
+    if (!ensureStudentUser()) return;
     if (!chatDate || !chatTime) {
       alert('希望する日付と時間を入力してください');
       return;
@@ -55,6 +65,7 @@ export const RecruitmentDetailPage = () => {
     const isoDatetime = new Date(jstDatetime).toISOString();
     setIsChatReservation(true);
     setSelectedDatetime(isoDatetime);
+    setIsReservationModalOpen(true);
   };
 
   const handleReservation = async () => {
@@ -75,11 +86,7 @@ export const RecruitmentDetailPage = () => {
           ? 'チャット相談のリクエストを送信しました。サロンからの連絡をお待ちください。'
           : '仮予約が完了しました。サロンからの承認をお待ちください。'
       );
-      setSelectedDatetime(null);
-      setIsChatReservation(false);
-      setMessage('');
-      setChatDate('');
-      setChatTime('');
+      handleModalClose({ resetChatInputs: true });
       // 予約後は募集情報を再取得
       const updated = await fetchRecruitmentById(recruitment.id);
       setRecruitment(updated);
@@ -92,6 +99,38 @@ export const RecruitmentDetailPage = () => {
     () => (recruitment ? recruitment.available_dates.filter(date => !date.is_booked) : []),
     [recruitment]
   );
+
+  const openReservationModal = (initialDatetime?: string) => {
+    if (!ensureStudentUser() || !recruitment) return;
+    if (!availableDates.length) {
+      alert('現在予約可能な日時がありません');
+      return;
+    }
+
+    setIsChatReservation(false);
+    setChatDate('');
+    setChatTime('');
+    const defaultDatetime =
+      initialDatetime ?? (availableDates.length === 1 ? availableDates[0].datetime : null);
+    setSelectedDatetime(defaultDatetime);
+    setIsReservationModalOpen(true);
+  };
+
+  const handleSelectDatetime = (datetime: string) => {
+    openReservationModal(datetime);
+  };
+
+  const handleModalClose = (options?: { resetChatInputs?: boolean }) => {
+    const { resetChatInputs = false } = options || {};
+    setIsReservationModalOpen(false);
+    setSelectedDatetime(null);
+    setIsChatReservation(false);
+    setMessage('');
+    if (resetChatInputs) {
+      setChatDate('');
+      setChatTime('');
+    }
+  };
 
   const conditionsToConfirm = useMemo(() => {
     if (!recruitment) return [];
@@ -282,26 +321,32 @@ export const RecruitmentDetailPage = () => {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>予約可能な日時</h3>
             {availableDates.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {availableDates.map((date, index) => (
+              <div className={styles.availableDatesBlock}>
+                <div className={styles.availableDatesList}>
+                  {availableDates.map(date => (
+                    <Button
+                      key={date.datetime}
+                      variant="outline"
+                      onClick={() => handleSelectDatetime(date.datetime)}
+                      className={styles.availableDateButton}
+                      disabled={!!user && !isStudentUser}
+                      title={user && !isStudentUser ? '仮予約は学生ユーザーのみ利用できます' : undefined}
+                    >
+                      {formatDateTime(date.datetime)}
+                    </Button>
+                  ))}
+                </div>
+                <div className={styles.reservationAction}>
                   <Button
-                    key={index}
-                    variant="outline"
-                    onClick={() => {
-                      if (user) {
-                        setIsChatReservation(false);
-                        setChatDate('');
-                        setChatTime('');
-                        setSelectedDatetime(date.datetime);
-                      } else {
-                        navigate('/login');
-                      }
-                    }}
-                    style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+                    variant="primary"
+                    fullWidth
+                    onClick={() => openReservationModal()}
+                    disabled={!!user && !isStudentUser}
+                    title={user && !isStudentUser ? '仮予約は学生ユーザーのみ利用できます' : undefined}
                   >
-                    {formatDateTime(date.datetime)}
+                    仮予約する
                   </Button>
-                ))}
+                </div>
               </div>
             ) : (
               <p className={styles.closedMessage}>
@@ -338,7 +383,7 @@ export const RecruitmentDetailPage = () => {
                 <Button
                   variant="secondary"
                   onClick={handleChatConsultation}
-                  disabled={!chatDate || !chatTime}
+                  disabled={!chatDate || !chatTime || (!!user && !isStudentUser)}
                 >
                   チャットで相談する
                 </Button>
@@ -349,13 +394,10 @@ export const RecruitmentDetailPage = () => {
       </div>
 
       {/* 予約確認モーダル */}
-      {selectedDatetime && (
+      {isReservationModalOpen && (
         <Modal 
-          isOpen={!!selectedDatetime} 
-          onClose={() => {
-            setSelectedDatetime(null);
-            setIsChatReservation(false);
-          }} 
+          isOpen={isReservationModalOpen} 
+          onClose={handleModalClose} 
           title={isChatReservation ? 'チャット相談を開始' : '予約確認'} 
           size="md"
         >
@@ -363,17 +405,55 @@ export const RecruitmentDetailPage = () => {
             <p className={styles.modalDescription}>
               {isChatReservation
                 ? 'チャットで日時を相談するリクエストを送信します。よろしいですか?'
-                : '以下の日時で仮予約します。よろしいですか?'}
+                : '希望する日時を選択して仮予約を確定してください。'}
             </p>
-            <div style={{ 
-              padding: 'var(--spacing-md)', 
-              backgroundColor: '#fafafa', 
-              borderRadius: 'var(--radius-md)',
-              fontWeight: 'var(--font-weight-semibold)',
-              border: '1px solid #e0e0e0'
-            }}>
-              {formatDateTime(selectedDatetime)}
-            </div>
+            {!isChatReservation && (
+              <div className={styles.datetimeSelector}>
+                <p className={styles.datetimeSelectorLabel}>予約希望日時</p>
+                {availableDates.length > 0 ? (
+                  <div className={styles.datetimeOptions}>
+                    {availableDates.map(date => {
+                      const checked = selectedDatetime === date.datetime;
+                      return (
+                        <label
+                          key={date.datetime}
+                          className={[
+                            styles.datetimeOption,
+                            checked ? styles.datetimeOptionSelected : ''
+                          ]
+                            .filter(Boolean)
+                            .join(' ')}
+                        >
+                          <input
+                            type="radio"
+                            name="reservationDatetime"
+                            value={date.datetime}
+                            checked={checked}
+                            onChange={() => setSelectedDatetime(date.datetime)}
+                          />
+                          <span>{formatDateTime(date.datetime)}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className={styles.errorBox}>
+                    現在選択できる日時がありません。ページを再読み込みしてください。
+                  </div>
+                )}
+                {!selectedDatetime && (
+                  <p className={styles.datetimeSelectorNotice}>
+                    日時を選択すると仮予約に進めます。
+                  </p>
+                )}
+              </div>
+            )}
+
+            {selectedDatetime && (
+              <div className={styles.selectedDatetimeBox}>
+                {formatDateTime(selectedDatetime)}
+              </div>
+            )}
 
             {conditionsToConfirm.length > 0 && (
               <div className={styles.checklistSection}>
@@ -417,11 +497,7 @@ export const RecruitmentDetailPage = () => {
             <div className={styles.modalActions}>
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  setSelectedDatetime(null);
-                  setIsChatReservation(false);
-                  setMessage('');
-                }}
+                onClick={() => handleModalClose()}
               >
                 キャンセル
               </Button>
@@ -429,7 +505,7 @@ export const RecruitmentDetailPage = () => {
                 variant="primary" 
                 onClick={handleReservation} 
                 loading={reservationLoading}
-                disabled={!allConditionsChecked}
+                disabled={!allConditionsChecked || (!selectedDatetime && !isChatReservation)}
               >
                 {isChatReservation ? 'チャットを開始する' : '仮予約を確定する'}
               </Button>

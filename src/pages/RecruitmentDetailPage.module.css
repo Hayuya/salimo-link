@@ -508,6 +508,28 @@
   font-size: var(--font-size-sm);
 }
 
+.availableDatesBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.availableDatesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.availableDateButton {
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+}
+
+.reservationAction {
+  margin-top: var(--spacing-sm);
+}
+
 .chatConsultationBlock {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
@@ -582,6 +604,63 @@
   font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   margin: 0 0 var(--spacing-md) 0;
+}
+
+.datetimeSelector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.datetimeSelectorLabel {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.datetimeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.datetimeOption {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-md);
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.datetimeOption input {
+  width: 16px;
+  height: 16px;
+  accent-color: #7c5df7;
+}
+
+.datetimeOptionSelected {
+  border-color: #7c5df7;
+  background: rgba(124, 93, 247, 0.08);
+  box-shadow: 0 0 0 2px rgba(124, 93, 247, 0.12);
+}
+
+.datetimeSelectorNotice {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.selectedDatetimeBox {
+  padding: var(--spacing-md);
+  background: #fafafa;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid #e0e0e0;
 }
 
 .inputWrapper {
