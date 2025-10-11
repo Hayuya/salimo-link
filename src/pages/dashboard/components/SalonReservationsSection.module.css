@@ -52,56 +52,142 @@
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .pending {
   border-color: rgba(79, 143, 248, 0.32);
-  background-color: rgba(79, 143, 248, 0.1);
+  background-color: rgba(79, 143, 248, 0.04);
+  border-left: 4px solid rgba(79, 143, 248, 0.8);
 }
 
 .confirmed {
   border-color: rgba(22, 191, 162, 0.28);
-  background-color: rgba(22, 191, 162, 0.08);
+  background-color: rgba(22, 191, 162, 0.04);
+  border-left: 4px solid rgba(22, 191, 162, 0.8);
 }
 
 .cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
 }
 
-.summary {
+/* 予約者アバター */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.2), rgba(79, 143, 248, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  border: 2px solid rgba(124, 93, 247, 0.3);
+}
+
+/* メイン情報エリア */
+.mainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.studentInfo {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  flex: 1;
+}
+
+.studentName {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.schoolBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background-color: rgba(124, 93, 247, 0.1);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .titleLink {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .titleLink:hover {
   text-decoration: underline;
 }
 
-.meta {
-  font-size: var(--font-size-sm);
+/* 予約日時を強調 */
+.datetimeHighlight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.12), rgba(79, 143, 248, 0.08));
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(124, 93, 247, 0.2);
+  margin-top: var(--spacing-xs);
+}
+
+.datetimeIcon {
+  font-size: var(--font-size-lg);
+}
+
+.datetimeText {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
 }
 
+/* アクションエリア */
 .headerActions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap: var(--spacing-xs);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
 }
 
 .chatButton {
@@ -114,6 +200,16 @@
 
 .chatButtonUnread {
   box-shadow: 0 0 0 2px var(--color-primary-light);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--color-primary-light);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.3);
+  }
 }
 
 .chatBadge {
@@ -177,6 +273,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  background-color: rgba(124, 93, 247, 0.03);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
 }
 
 .contact {
@@ -203,10 +302,25 @@
   margin: 0;
 }
 
+.meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* アクションボタンエリア */
 .actionRow {
   margin-top: var(--spacing-md);
   display: flex;
   gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(114, 111, 150, 0.1);
+}
+
+.actionRow button {
+  flex: 1;
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-sm) var(--spacing-lg);
 }
 
 .emptyText {
@@ -222,12 +336,41 @@
   }
 
   .cardHeader {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-lg);
+  }
+
+  .studentName {
+    font-size: var(--font-size-lg);
+  }
+
+  .headerActions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .datetimeHighlight {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .datetimeText {
+    font-size: var(--font-size-sm);
   }
 
   .actionRow {
     flex-direction: column;
-    align-items: stretch;
+  }
+
+  .actionRow button {
+    width: 100%;
   }
 }
