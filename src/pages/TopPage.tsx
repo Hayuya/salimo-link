@@ -31,7 +31,8 @@ export const TopPage = () => {
       // 予約可能のみ表示
       if (showAvailableOnly) {
         const hasAvailable = recruitment.available_dates.some(date => !date.is_booked);
-        if (!hasAvailable && !recruitment.allow_chat_consultation) return false;
+        const hasFlexible = !!recruitment.flexible_schedule_text?.trim();
+        if (!hasAvailable && !hasFlexible) return false;
       }
       
       return true;

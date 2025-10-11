@@ -13,7 +13,8 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
   const availableSlotsCount = recruitment.available_dates.filter(
     date => !date.is_booked
   ).length;
-  const supportsChatConsultation = recruitment.allow_chat_consultation;
+  const flexibleScheduleText = recruitment.flexible_schedule_text?.trim();
+  const hasFlexibleSchedule = !!flexibleScheduleText;
   const hasAvailableSlots = availableSlotsCount > 0;
 
   return (
@@ -64,15 +65,15 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
             <span className={styles.slotCount}>
               {hasAvailableSlots
                 ? `${availableSlotsCount}件`
-                : supportsChatConsultation
-                  ? 'チャット相談可'
+                : hasFlexibleSchedule
+                  ? flexibleScheduleText
                   : 'なし'}
             </span>
           </div>
 
-          {hasAvailableSlots || supportsChatConsultation ? (
+          {hasAvailableSlots || hasFlexibleSchedule ? (
             <span className={styles.statusActive}>
-              {supportsChatConsultation && !hasAvailableSlots ? 'チャット相談可' : '予約可能'}
+              {hasFlexibleSchedule && !hasAvailableSlots ? '調整可能' : '予約可能'}
             </span>
           ) : (
             <span className={styles.statusClosed}>予約不可</span>

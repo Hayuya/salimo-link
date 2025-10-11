@@ -560,6 +560,23 @@
   flex-wrap: wrap;
 }
 
+.flexibleNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background: rgba(124, 93, 247, 0.08);
+  border: 1px solid rgba(124, 93, 247, 0.18);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.flexibleNote strong {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
 .chatInputField {
   display: flex;
   flex-direction: column;

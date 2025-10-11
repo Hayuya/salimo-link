@@ -253,6 +253,52 @@
   cursor: pointer;
 }
 
+/* ========== Instructions ========== */
+.instructionBox {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.06) 0%, rgba(242, 109, 162, 0.04) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(124, 93, 247, 0.12);
+  margin-bottom: 1.5rem;
+}
+
+.instructionText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.6;
+}
+
+.instructionHint {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+/* ========== Divider ========== */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(124, 93, 247, 0.2);
+}
+
+.dividerText {
+  padding: 0 1rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+}
+
 /* ========== Date/Time Selector ========== */
 .dateTimeSelector {
   display: flex;

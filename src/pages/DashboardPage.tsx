@@ -57,7 +57,7 @@ const initialRecruitmentState = {
   has_reward: false,
   reward_details: '',
   available_dates: [] as AvailableDate[],
-  allow_chat_consultation: false,
+  flexible_schedule_text: '',
   is_fully_booked: false,
 };
 
@@ -302,8 +302,8 @@ useEffect(() => {
       return;
     }
     
-    if (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.allow_chat_consultation) {
-      alert('施術可能な日時を追加するか、「チャットで相談する」を選択してください');
+    if (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.flexible_schedule_text) {
+      alert('施術可能な日時を追加するか、文章で日時を指定してください');
       return;
     }
     
@@ -338,8 +338,8 @@ useEffect(() => {
       return;
     }
 
-    if ((!editingRecruitment.available_dates || editingRecruitment.available_dates.length === 0) && !editingRecruitment.allow_chat_consultation) {
-      alert('施術可能な日時を追加するか、「チャットで相談する」を選択してください');
+    if ((!editingRecruitment.available_dates || editingRecruitment.available_dates.length === 0) && !editingRecruitment.flexible_schedule_text) {
+      alert('施術可能な日時を追加するか、文章で日時を指定してください');
       return;
     }
     
@@ -670,12 +670,12 @@ useEffect(() => {
     const removeFunc = isEdit ? removeEditSlot : () => {};
 
     const targetRecruitment = isEdit ? editingRecruitment : newRecruitmentData;
-    const allowChat = targetRecruitment?.allow_chat_consultation ?? false;
-    const handleAllowChatChange = (checked: boolean) => {
+    const flexibleText = targetRecruitment?.flexible_schedule_text ?? '';
+    const handleFlexibleTextChange = (text: string) => {
       if (isEdit) {
-        setEditingRecruitment(prev => prev ? { ...prev, allow_chat_consultation: checked } : prev);
+        setEditingRecruitment(prev => prev ? { ...prev, flexible_schedule_text: text } : prev);
       } else {
-        setNewRecruitmentData(prev => ({ ...prev, allow_chat_consultation: checked }));
+        setNewRecruitmentData(prev => ({ ...prev, flexible_schedule_text: text }));
       }
     };
 
@@ -683,7 +683,7 @@ useEffect(() => {
       <div className={styles.inputWrapper}>
         <label className={styles.label}>
           施術可能な日時を追加
-          {!allowChat && <span className={styles.required}>*</span>}
+          <span className={styles.required}>*</span>
         </label>
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Input 
@@ -699,19 +699,6 @@ useEffect(() => {
             style={{ flex: '1 1 120px', minWidth: '120px' }}
           />
           <Button onClick={addFunc} size="sm">追加</Button>
-        </div>
-        <div className={styles.chatToggle}>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={allowChat}
-              onChange={e => handleAllowChatChange(e.target.checked)}
-            />
-            <span>日時は後からチャットで相談する</span>
-          </label>
-          <p className={styles.helperText}>
-            チャット相談を選ぶと、空き日時を追加せずに募集を公開できます。
-          </p>
         </div>
         
         {dates.length > 0 && (
@@ -756,6 +743,33 @@ useEffect(() => {
             ))}
           </div>
         )}
+
+        <div style={{ 
+          margin: 'var(--spacing-lg) 0', 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 'var(--spacing-md)'
+        }}>
+          <div style={{ flex: 1, height: '1px', background: 'rgba(124, 93, 247, 0.2)' }} />
+          <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-tertiary)', fontWeight: '500' }}>
+            または
+          </span>
+          <div style={{ flex: 1, height: '1px', background: 'rgba(124, 93, 247, 0.2)' }} />
+        </div>
+
+        <div className={styles.inputWrapper}>
+          <label className={styles.label}>文章で日時を指定</label>
+          <Input 
+            type="text" 
+            value={flexibleText}
+            onChange={e => handleFlexibleTextChange(e.target.value)}
+            placeholder="例: 毎週月曜日の18時以降"
+            fullWidth
+          />
+          <p className={styles.helperText}>
+            具体的な日時が決まっていない場合は、こちらに希望の時間帯を入力してください
+          </p>
+        </div>
       </div>
     );
   };

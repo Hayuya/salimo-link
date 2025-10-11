@@ -32,12 +32,13 @@ export const useRecruitments = () => {
         .filter(recruitment => {
           if (recruitment.status !== 'active') return false;
           if (recruitment.is_fully_booked) return false;
-          const allowChat = recruitment.allow_chat_consultation;
-          if (!Array.isArray(recruitment.available_dates)) return allowChat;
+          const flexibleText = (recruitment.flexible_schedule_text || '').trim();
+          const hasFlexibleSchedule = flexibleText.length > 0;
+          if (!Array.isArray(recruitment.available_dates)) return hasFlexibleSchedule;
           const hasAvailableSlot = (recruitment.available_dates as AvailableDate[]).some(
             (date: AvailableDate) => !date.is_booked
           );
-          return hasAvailableSlot || allowChat;
+          return hasAvailableSlot || hasFlexibleSchedule;
         })
         .map(rest => rest as RecruitmentWithDetails);
       setRecruitments(filteredRecruitments);

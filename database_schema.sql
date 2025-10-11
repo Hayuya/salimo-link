@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS recruitments (
   has_reward BOOLEAN NOT NULL DEFAULT false,
   reward_details TEXT,
   available_dates JSONB NOT NULL DEFAULT '[]'::jsonb,
-  allow_chat_consultation BOOLEAN NOT NULL DEFAULT false,
+  flexible_schedule_text TEXT,
   is_fully_booked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -292,14 +292,14 @@ RETURNS UUID AS $$
 DECLARE
   v_reservation_id UUID;
   v_available_dates JSONB;
-  v_allow_chat BOOLEAN := FALSE;
+  v_flexible_text TEXT;
   v_date_found BOOLEAN := FALSE;
   v_updated_dates JSONB := '[]'::jsonb;
   v_date_obj JSONB;
 BEGIN
   -- Get current available_dates and chat setting
-  SELECT available_dates, allow_chat_consultation
-  INTO v_available_dates, v_allow_chat
+  SELECT available_dates, flexible_schedule_text
+  INTO v_available_dates, v_flexible_text
   FROM recruitments
   WHERE id = p_recruitment_id AND status = 'active';
   
@@ -307,7 +307,7 @@ BEGIN
     RAISE EXCEPTION 'Recruitment not found or closed';
   END IF;
 
-  IF p_is_chat_consultation AND NOT v_allow_chat THEN
+  IF p_is_chat_consultation AND (v_flexible_text IS NULL OR btrim(v_flexible_text) = '') THEN
     RAISE EXCEPTION 'Chat consultation not allowed for this recruitment';
   END IF;
 
@@ -382,7 +382,8 @@ DECLARE
   v_active_reservations INTEGER;
   v_has_open_slot BOOLEAN := FALSE;
   v_is_chat_consultation BOOLEAN := FALSE;
-  v_allow_chat BOOLEAN := FALSE;
+  v_flexible_text TEXT;
+  v_has_flexible BOOLEAN := FALSE;
 BEGIN
   -- Get reservation details
   SELECT recruitment_id, reservation_datetime, is_chat_consultation
@@ -395,10 +396,12 @@ BEGIN
   END IF;
   
   -- Get current available_dates
-  SELECT available_dates, allow_chat_consultation
-  INTO v_available_dates, v_allow_chat
+  SELECT available_dates, flexible_schedule_text
+  INTO v_available_dates, v_flexible_text
   FROM recruitments
   WHERE id = v_recruitment_id;
+  
+  v_has_flexible := v_flexible_text IS NOT NULL AND btrim(v_flexible_text) <> '';
   
   IF v_is_chat_consultation THEN
     v_updated_dates := COALESCE(v_available_dates, '[]'::jsonb);
@@ -434,8 +437,8 @@ BEGIN
   UPDATE recruitments
   SET available_dates = v_updated_dates,
       status = CASE
-        WHEN v_active_reservations = 0 AND (v_has_open_slot OR v_allow_chat) THEN 'active'
-        WHEN v_active_reservations = 0 AND NOT (v_has_open_slot OR v_allow_chat) THEN 'closed'
+        WHEN v_active_reservations = 0 AND (v_has_open_slot OR v_has_flexible) THEN 'active'
+        WHEN v_active_reservations = 0 AND NOT (v_has_open_slot OR v_has_flexible) THEN 'closed'
         ELSE 'closed'
       END
   WHERE id = v_recruitment_id;

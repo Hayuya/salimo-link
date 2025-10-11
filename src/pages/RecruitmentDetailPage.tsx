@@ -30,6 +30,11 @@ export const RecruitmentDetailPage = () => {
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const isStudentUser = user?.userType === 'student';
+  const flexibleScheduleText = useMemo(
+    () => (recruitment?.flexible_schedule_text || '').trim(),
+    [recruitment]
+  );
+  const supportsFlexibleSchedule = flexibleScheduleText.length > 0;
 
   const ensureStudentUser = () => {
     if (!user) {
@@ -54,7 +59,7 @@ export const RecruitmentDetailPage = () => {
   }, [id, fetchRecruitmentById]);
 
   const handleChatConsultation = () => {
-    if (!recruitment || !recruitment.allow_chat_consultation) return;
+    if (!recruitment || !supportsFlexibleSchedule) return;
     if (!ensureStudentUser()) return;
     if (!chatDate || !chatTime) {
       alert('希望する日付と時間を入力してください');
@@ -348,20 +353,31 @@ export const RecruitmentDetailPage = () => {
                   </Button>
                 </div>
               </div>
+            ) : supportsFlexibleSchedule ? (
+              <div className={styles.closedMessage}>
+                <p style={{ margin: 0 }}>
+                  現在、具体的な空き枠は公開されていません。
+                </p>
+                <p style={{ margin: 'var(--spacing-xs) 0 0 0', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  {flexibleScheduleText}
+                </p>
+              </div>
             ) : (
               <p className={styles.closedMessage}>
-                {recruitment.allow_chat_consultation
-                  ? 'カレンダー上の空きはありませんが、チャットで日時を相談できます。'
-                  : '現在予約可能な日時がありません'}
+                現在予約可能な日時がありません
               </p>
             )}
 
-            {recruitment.allow_chat_consultation && (
+            {supportsFlexibleSchedule && (
               <div className={styles.chatConsultationBlock}>
-                <h4 className={styles.chatTitle}>チャットで日時を相談する</h4>
+                <h4 className={styles.chatTitle}>柔軟に日時を相談する</h4>
                 <p className={styles.chatDescription}>
-                  希望日時が決まっていない場合でも募集に申し込めます。希望する日付と時間を入力し、チャットで最終調整を行ってください。
+                  希望日時が決まっていない場合でも募集に申し込めます。下記の希望日時を入力すると、サロンに仮予約リクエストを送信できます。
                 </p>
+                <div className={styles.flexibleNote}>
+                  <strong>サロンからの案内:</strong>
+                  <span>{flexibleScheduleText}</span>
+                </div>
                 <div className={styles.chatInputs}>
                   <label className={styles.chatInputField}>
                     <span>希望日</span>
@@ -385,7 +401,7 @@ export const RecruitmentDetailPage = () => {
                   onClick={handleChatConsultation}
                   disabled={!chatDate || !chatTime || (!!user && !isStudentUser)}
                 >
-                  チャットで相談する
+                  相談リクエストを送信する
                 </Button>
               </div>
             )}

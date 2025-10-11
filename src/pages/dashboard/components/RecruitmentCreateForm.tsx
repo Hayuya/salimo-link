@@ -35,7 +35,7 @@ interface RecruitmentData {
   has_reward: boolean;
   reward_details: string;
   available_dates: AvailableDate[];
-  allow_chat_consultation: boolean;
+  flexible_schedule_text: string;
   is_fully_booked: boolean;
 }
 
@@ -111,7 +111,7 @@ export const RecruitmentCreateForm = ({
       case 0:
         return data.title && data.menus?.length > 0;
       case 1:
-        return (data.available_dates?.length > 0) || data.allow_chat_consultation;
+        return (data.available_dates?.length > 0) || (data.flexible_schedule_text && data.flexible_schedule_text.trim() !== '');
       default:
         return true;
     }
@@ -327,6 +327,15 @@ export const RecruitmentCreateForm = ({
           <div className={styles.stepContent}>
             <h3 className={styles.stepTitle}>施術可能な日時を設定</h3>
             
+            <div className={styles.instructionBox}>
+              <p className={styles.instructionText}>
+                施術可能な日時を選択して<strong>追加ボタン</strong>を押してください。
+              </p>
+              <p className={styles.instructionHint}>
+                💡 複数の選択肢があることで成約率がグッと高まります
+              </p>
+            </div>
+
             <div className={styles.dateTimeSelector}>
               <input
                 type="date"
@@ -349,21 +358,6 @@ export const RecruitmentCreateForm = ({
               </button>
             </div>
 
-            <div className={styles.chatToggleBox}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={data.allow_chat_consultation || false}
-                  onChange={(e) => onUpdate({ ...data, allow_chat_consultation: e.target.checked })}
-                  className={styles.checkbox}
-                />
-                <span>日時は後からチャットで相談する</span>
-              </label>
-              <p className={styles.helperText}>
-                チャット相談を選ぶと、空き日時を追加せずに募集を公開できます。
-              </p>
-            </div>
-
             {data.available_dates?.length > 0 && (
               <div className={styles.datesList}>
                 <p className={styles.datesLabel}>追加された日時:</p>
@@ -382,6 +376,24 @@ export const RecruitmentCreateForm = ({
               </div>
             )}
 
+            <div className={styles.divider}>
+              <span className={styles.dividerText}>または</span>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>文章で日時を指定</label>
+              <input
+                type="text"
+                value={data.flexible_schedule_text || ''}
+                onChange={(e) => onUpdate({ ...data, flexible_schedule_text: e.target.value })}
+                placeholder="例: 毎週月曜日の18時以降"
+                className={styles.input}
+              />
+              <p className={styles.helperText}>
+                具体的な日時が決まっていない場合は、こちらに希望の時間帯を入力してください
+              </p>
+            </div>
+
             <div className={styles.summaryBox}>
               <h4 className={styles.summaryTitle}>📋 募集内容の確認</h4>
               <div className={styles.summaryItem}>
@@ -392,7 +404,7 @@ export const RecruitmentCreateForm = ({
               </div>
               <div className={styles.summaryItem}>
                 <strong>日時:</strong> {data.available_dates?.length || 0}件
-                {data.allow_chat_consultation && ' (チャット相談あり)'}
+                {data.flexible_schedule_text && ` + ${data.flexible_schedule_text}`}
               </div>
               <div className={styles.summaryItem}>
                 <strong>謝礼:</strong> {data.has_reward ? (data.reward_details || 'あり') : 'なし'}

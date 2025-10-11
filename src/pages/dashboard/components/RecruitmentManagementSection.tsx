@@ -38,7 +38,8 @@ export const RecruitmentManagementSection = ({
           {recruitments.map(recruitment => {
             const availableSlots = getAvailableSlotCount(recruitment);
             const isActive = recruitment.status === 'active';
-            const allowsChat = recruitment.allow_chat_consultation;
+            const flexibleText = recruitment.flexible_schedule_text?.trim();
+            const hasFlexible = !!flexibleText;
             return (
               <div key={recruitment.id} className={styles.card}>
                 <div className={styles.cardHeader}>
@@ -54,8 +55,13 @@ export const RecruitmentManagementSection = ({
                 </p>
                 <p className={styles.meta}>
                   空き枠: <strong>{availableSlots}</strong>件
-                  {allowsChat && <span> / チャット相談可</span>}
+                  {hasFlexible && <span> / 調整メモあり</span>}
                 </p>
+                {hasFlexible && (
+                  <p className={styles.meta}>
+                    調整メモ: {flexibleText}
+                  </p>
+                )}
                 <div className={styles.actions}>
                   <Button variant="outline" size="sm" onClick={() => onEditClick(recruitment)}>
                     編集
