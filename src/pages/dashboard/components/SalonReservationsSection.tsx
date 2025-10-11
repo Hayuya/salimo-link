@@ -70,13 +70,12 @@ export const SalonReservationsSection = ({
                 )}
               </h4>
               <Link to={`/recruitment/${reservation.recruitment_id}`} className={styles.titleLink}>
-                📋 {reservation.recruitment.title}
+                {reservation.recruitment.title}
               </Link>
             </div>
 
             {/* 予約日時を強調 */}
             <div className={styles.datetimeHighlight}>
-              <span className={styles.datetimeIcon}>📅</span>
               <p className={styles.datetimeText}>{formatDateTime(reservation.reservation_datetime)}</p>
             </div>
           </div>
@@ -96,7 +95,7 @@ export const SalonReservationsSection = ({
                   .join(' ')}
                 onClick={() => onOpenChat(reservation)}
               >
-                <span>💬 チャット</span>
+                <span>チャット</span>
                 {hasUnreadMessage(reservation.id) && <span className={styles.chatBadge}>!</span>}
               </Button>
             )}
@@ -124,14 +123,14 @@ export const SalonReservationsSection = ({
           <div className={styles.cardBody}>
             <div className={styles.contactList}>
               <p className={styles.contact}>
-                <strong>📧 メール:</strong>{' '}
+                <strong>メール:</strong>{' '}
                 <a className={styles.link} href={`mailto:${reservation.student.email}`}>
                   {reservation.student.email}
                 </a>
               </p>
               {reservation.student.instagram_url && (
                 <p className={styles.contact}>
-                  <strong>📱 Instagram:</strong>{' '}
+                  <strong>Instagram:</strong>{' '}
                   <a
                     className={styles.link}
                     href={reservation.student.instagram_url}
@@ -150,22 +149,22 @@ export const SalonReservationsSection = ({
 
             {reservation.message && (
               <p className={styles.meta}>
-                <strong>💬 メッセージ:</strong> {reservation.message}
+                <strong>メッセージ:</strong> {reservation.message}
               </p>
             )}
 
             <RecruitmentDetails recruitment={reservation.recruitment} />
-          </div>
-        )}
 
-        {reservation.status === 'pending' && (
-          <div className={styles.actionRow}>
-            <Button size="sm" variant="primary" onClick={() => onUpdateStatus(reservation.id, 'confirmed')}>
-              ✓ 承認する
-            </Button>
-            <Button size="sm" variant="danger" onClick={() => onUpdateStatus(reservation.id, 'cancelled_by_salon')}>
-              ✕ キャンセルする
-            </Button>
+            {reservation.status === 'pending' && (
+              <div className={styles.actionRow}>
+                <Button size="sm" variant="primary" onClick={() => onUpdateStatus(reservation.id, 'confirmed')}>
+                  承認する
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => onUpdateStatus(reservation.id, 'cancelled_by_salon')}>
+                  キャンセルする
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -175,7 +174,7 @@ export const SalonReservationsSection = ({
   return (
     <section className={styles.wrapper}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>📋 予約管理</h2>
+        <h2 className={styles.sectionTitle}>予約管理</h2>
       </div>
       {(pendingReservations.length + confirmedReservations.length + otherReservations.length) === 0 ? (
         <p className={styles.emptyText}>現在、予約はありません</p>
@@ -183,21 +182,21 @@ export const SalonReservationsSection = ({
         <div className={styles.sectionContent}>
           {pendingReservations.length > 0 && (
             <div className={styles.subSection}>
-              <h3 className={styles.subSectionTitle}>⏳ 承認待ち</h3>
+              <h3 className={styles.subSectionTitle}>承認待ち</h3>
               <div className={styles.list}>{pendingReservations.map(renderReservationCard)}</div>
             </div>
           )}
 
           {confirmedReservations.length > 0 && (
             <div className={styles.subSection}>
-              <h3 className={styles.subSectionTitle}>✓ 確定済み</h3>
+              <h3 className={styles.subSectionTitle}>確定済み</h3>
               <div className={styles.list}>{confirmedReservations.map(renderReservationCard)}</div>
             </div>
           )}
 
           {otherReservations.length > 0 && (
             <div className={styles.subSection}>
-              <h3 className={styles.subSectionTitle}>📁 キャンセル・その他</h3>
+              <h3 className={styles.subSectionTitle}>キャンセル・その他</h3>
               <div className={styles.list}>{otherReservations.map(renderReservationCard)}</div>
             </div>
           )}
