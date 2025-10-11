@@ -55,11 +55,14 @@ export const Header = () => {
         <nav className={styles.nav}>
           {user ? (
             <>
+              <Link to="/about" className={styles.navLink}>
+                cutmoとは？
+              </Link>
+              <Link to="/" className={styles.navLink}>
+                募集一覧
+              </Link>
               <Link to="/dashboard" className={styles.navLink}>
                 マイページ
-              </Link>
-              <Link to="/how-to-use" className={styles.navLink}>
-                つかいかた
               </Link>
               <div className={styles.dropdown} ref={dropdownRef}>
                  <button 
@@ -83,8 +86,12 @@ export const Header = () => {
               <Link to="/about" className={styles.navLink}>
                 cutmoとは？
               </Link>
-              <Link to="/how-to-use" className={styles.navLink}>
-                使い方
+              <Link
+                to="/"
+                className={styles.navLink}
+                state={{ scrollTo: 'recruitments' }}
+              >
+                募集一覧
               </Link>
               <Link to="/login" className={styles.navLink}>
                 ログイン

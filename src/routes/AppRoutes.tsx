@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { TopPage } from '@/pages/TopPage';
 import { AboutPage } from '@/pages/AboutPage';
-import { HowToUsePage } from '@/pages/HowToUsePage';
 import { TermsPage } from '@/pages/TermsPage';
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
 import { LoginPage } from '@/pages/LoginPage';
@@ -23,7 +22,6 @@ export const AppRoutes = () => {
         {/* 公開ルート */}
         <Route path="/" element={<TopPage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/how-to-use" element={<HowToUsePage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/login" element={<LoginPage />} />

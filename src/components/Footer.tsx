@@ -18,7 +18,7 @@ export const Footer = () => {
             <div className={styles.linkGroup}>
               <h4 className={styles.linkTitle}>サービス</h4>
               <Link to="/about" className={styles.link}>cutmoとは？</Link>
-              <Link to="/how-to-use" className={styles.link}>使い方</Link>
+              <Link to="/about#usage" className={styles.link}>使い方ガイド</Link>
               <Link to="/faq" className={styles.link}>よくある質問</Link>
             </div>
             <div className={styles.linkGroup}>

@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecruitments } from '@/recruitment';
 import { useAuth } from '@/auth';
 import { RecruitmentCard } from '@/components/RecruitmentCard';
@@ -9,11 +10,27 @@ import type { MenuType } from '@/types'; // 正しいMenuTypeをインポート
 export const TopPage = () => {
   const { recruitments, loading, error } = useRecruitments();
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   
   // フィルター状態
   const [selectedMenu, setSelectedMenu] = useState<string>('all');
   const [selectedGender, setSelectedGender] = useState<string>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+
+  useEffect(() => {
+    if (user) return;
+    const scrollTo = (location.state as { scrollTo?: string } | null)?.scrollTo;
+    if (scrollTo === 'recruitments') {
+      const section = document.getElementById('recruitments');
+      if (section) {
+        requestAnimationFrame(() => {
+          section.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [user, location, navigate]);
 
   // フィルター適用
   const filteredRecruitments = useMemo(() => {
@@ -123,7 +140,7 @@ export const TopPage = () => {
         </div>
       )}
 
-      <section className={styles.section}>
+      <section id="recruitments" className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>募集一覧</h2>
           <p className={styles.sectionSubtitle}>

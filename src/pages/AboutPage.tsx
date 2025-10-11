@@ -1,9 +1,106 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import styles from './AboutPage.module.css';
 
+type UsageTabKey = 'student' | 'salon';
+
+type UsageContent = {
+  label: string;
+  description: string;
+  highlight: string;
+  steps: Array<{ title: string; description: string }>;
+  tipsTitle: string;
+  tips: string[];
+  primaryCtaLabel: string;
+  primaryCtaTo: string;
+  secondaryCtaLabel: string;
+  secondaryCtaTo: string;
+};
+
+const USAGE_CONTENT: Record<UsageTabKey, UsageContent> = {
+  student: {
+    label: '学生の方',
+    description:
+      '学校メールアドレスで登録して、気になるサロンの募集に応募。予約から当日の流れまで、シンプルなステップで完結します。',
+    highlight: '学生は全機能を無料でご利用いただけます',
+    steps: [
+      {
+        title: '学校メールで新規登録',
+        description: '.ac.jp で終わる学校メールアドレスがあればOK。プロフィールを整えて準備しましょう。',
+      },
+      {
+        title: '募集をチェック',
+        description: 'メニューや希望条件で募集を検索。気になるサロンの詳細を確認して応募先を決めます。',
+      },
+      {
+        title: '希望日時で予約申請',
+        description: '募集に表示されている日程から希望日時を選択。メッセージを添えて仮予約を送ります。',
+      },
+      {
+        title: 'チャットで最終調整',
+        description: 'サロンから承認されたらチャットで詳細を確認。事前に当日の流れを押さえて安心。',
+      },
+      {
+        title: '当日はサロンへ',
+        description: '予約日時にサロンへ向かいましょう。施術後は感想や写真をシェアすると喜ばれます。',
+      },
+    ],
+    tipsTitle: '活用のコツ',
+    tips: [
+      'プロフィールに希望スタイルやSNSリンクを載せるとマッチング率が上がります。',
+      '予約状況はダッシュボードの「予約一覧」からいつでも確認できます。',
+      '初めてのサロンには、事前にアクセスや所要時間をチェックしておきましょう。',
+    ],
+    primaryCtaLabel: '無料で登録する',
+    primaryCtaTo: '/signup',
+    secondaryCtaLabel: '募集を探す',
+    secondaryCtaTo: '/',
+  },
+  salon: {
+    label: 'サロンの方',
+    description:
+      'アシスタントやスタイリストの練習機会を確保するために、募集作成から応募管理までをオンラインで完結できます。',
+    highlight: '募集の作成から応募管理まで、管理画面で一元管理',
+    steps: [
+      {
+        title: 'サロン向けアカウントを作成',
+        description: 'サロン情報と担当者の連絡先を登録。スタッフごとに募集を作成できます。',
+      },
+      {
+        title: '募集内容を投稿',
+        description: '希望メニュー、募集人数、対応可能な日時を入力。柔軟なスケジュールも登録可能です。',
+      },
+      {
+        title: '応募内容をチェック',
+        description: '学生からの応募が届いたらプロフィールを確認。条件が合えばワンクリックで承認できます。',
+      },
+      {
+        title: 'チャットでヒアリング',
+        description: '予約確定後はチャットでカウンセリング。コンディションや希望スタイルを事前に確認しましょう。',
+      },
+      {
+        title: '施術履歴を管理',
+        description: '当日の施術が完了したらダッシュボードで履歴を管理。次回募集に活かせます。',
+      },
+    ],
+    tipsTitle: 'スムーズに進めるために',
+    tips: [
+      '募集テンプレートを活用すると毎回の登録がスムーズです。',
+      '学生からの質問には早めに返信するとキャンセルを防げます。',
+      '施術後のフィードバックを記録するとリピートが促しやすくなります。',
+    ],
+    primaryCtaLabel: 'サロン登録をする',
+    primaryCtaTo: '/signup',
+    secondaryCtaLabel: '機能紹介を見る',
+    secondaryCtaTo: '/about',
+  },
+};
+
 export const AboutPage = () => {
   const navigate = useNavigate();
+  const [activeUsageTab, setActiveUsageTab] = useState<UsageTabKey>('student');
+  const activeUsageContent = USAGE_CONTENT[activeUsageTab];
 
   return (
     <div className={styles.container}>
@@ -27,7 +124,7 @@ export const AboutPage = () => {
       </section>
 
       {/* サービス概要 */}
-      <section className={styles.section}>
+      <section id="usage" className={styles.section}>
         <div className={styles.sectionContent}>
           <div className={styles.featureGrid}>
             <div className={styles.featureCard}>
@@ -66,38 +163,87 @@ export const AboutPage = () => {
       {/* 使い方セクション */}
       <section className={styles.section}>
         <div className={styles.sectionContent}>
-          <h2 className={styles.sectionTitle}>使い方</h2>
-          
-          <div className={styles.usageSteps}>
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>1</div>
-              <div className={styles.stepContent}>
-                <h3>学校メールで登録</h3>
-                <p>学校発行のメールアドレス（.ac.jp）で新規登録。簡単な本人確認で安全にスタート。</p>
-              </div>
+          <h2 className={styles.sectionTitle}>使い方ガイド</h2>
+          <p className={styles.usageIntroduction}>
+            学生とサロン、それぞれの立場から見たcutmoの活用方法をご紹介します。タブを切り替えて、該当するガイドをご覧ください。
+          </p>
+
+          <div className={styles.usageTabs} role="tablist" aria-label="使い方ガイド対象">
+            {Object.keys(USAGE_CONTENT).map((key) => {
+              const tabKey = key as UsageTabKey;
+              const isActive = tabKey === activeUsageTab;
+              return (
+                <button
+                  key={tabKey}
+                  type="button"
+                  role="tab"
+                  id={`usage-tab-${tabKey}`}
+                  aria-selected={isActive}
+                  aria-controls={`usage-panel-${tabKey}`}
+                  className={[
+                    styles.usageTabButton,
+                    isActive ? styles.usageTabButtonActive : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => setActiveUsageTab(tabKey)}
+                >
+                  {USAGE_CONTENT[tabKey].label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            id={`usage-panel-${activeUsageTab}`}
+            role="tabpanel"
+            aria-labelledby={`usage-tab-${activeUsageTab}`}
+            className={styles.usagePanel}
+          >
+            <div className={styles.usagePanelHeader}>
+              <p className={styles.usageHighlight}>{activeUsageContent.highlight}</p>
+              <h3>{`${activeUsageContent.label}の基本ステップ`}</h3>
+              <p>{activeUsageContent.description}</p>
             </div>
 
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>2</div>
-              <div className={styles.stepContent}>
-                <h3>募集を探す</h3>
-                <p>トップページから気になる募集を探しましょう。メニューや条件で絞り込みも可能です。</p>
-              </div>
-            </div>
+            <ol className={styles.usageStepList}>
+              {activeUsageContent.steps.map((step, index) => (
+                <li key={step.title} className={styles.usageStepItem}>
+                  <span className={styles.usageStepNumber}>{index + 1}</span>
+                  <div>
+                    <h4>{step.title}</h4>
+                    <p>{step.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
 
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>3</div>
-              <div className={styles.stepContent}>
-                <h3>日時を選んで予約</h3>
-                <p>予約可能な日時から希望の時間を選択。条件を確認して仮予約を完了します。</p>
+            <div className={styles.usageFooter}>
+              <div className={styles.usageTips}>
+                <h4>{activeUsageContent.tipsTitle}</h4>
+                <ul>
+                  {activeUsageContent.tips.map((tip) => (
+                    <li key={tip}>{tip}</li>
+                  ))}
+                </ul>
               </div>
-            </div>
-
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>4</div>
-              <div className={styles.stepContent}>
-                <h3>サロンで施術</h3>
-                <p>サロンから承認されたら、当日サロンへ。プロの技術を体験しましょう！</p>
+              <div className={styles.usageActions}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className={styles.usagePrimaryAction}
+                  onClick={() => navigate(activeUsageContent.primaryCtaTo)}
+                >
+                  {activeUsageContent.primaryCtaLabel}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className={styles.usageSecondaryAction}
+                  onClick={() => navigate(activeUsageContent.secondaryCtaTo)}
+                >
+                  {activeUsageContent.secondaryCtaLabel}
+                </Button>
               </div>
             </div>
           </div>
