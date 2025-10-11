@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
-import { formatDateTime } from '@/utils/date';
+import { formatDateTime, getHoursBefore, isBeforeHoursBefore, isFutureDate, isPastCutoffButBeforeEvent } from '@/utils/date';
 import { ReservationStatus, ReservationWithDetails } from '@/types';
 import { RecruitmentDetails } from './RecruitmentDetails';
 import styles from './StudentReservationsSection.module.css';
@@ -14,6 +14,7 @@ interface StudentReservationsSectionProps {
   expandedReservations: Record<string, boolean>;
   onToggleDetails: (id: string) => void;
   onOpenChat: (reservation: ReservationWithDetails) => void;
+  onRequestCancel: (reservation: ReservationWithDetails) => void;
   hasUnreadMessage: (reservationId: string) => boolean;
   getReservationStatusLabel: (status: ReservationStatus) => StatusLabel;
 }
@@ -25,12 +26,21 @@ export const StudentReservationsSection = ({
   expandedReservations,
   onToggleDetails,
   onOpenChat,
+  onRequestCancel,
   hasUnreadMessage,
   getReservationStatusLabel,
 }: StudentReservationsSectionProps) => {
   const renderReservationCard = (reservation: ReservationWithDetails) => {
     const isExpanded = !!expandedReservations[reservation.id];
     const statusLabel = getReservationStatusLabel(reservation.status);
+    const isFuture = isFutureDate(reservation.reservation_datetime);
+    const cancellationDeadline = getHoursBefore(reservation.reservation_datetime, 48).toISOString();
+    const isCancelableStatus = reservation.status === 'pending' || reservation.status === 'confirmed';
+    const canCancel =
+      isCancelableStatus && isFuture && isBeforeHoursBefore(reservation.reservation_datetime, 48);
+    const isPastCancelCutoff =
+      isCancelableStatus && isPastCutoffButBeforeEvent(reservation.reservation_datetime, 48);
+    const salonPhone = reservation.recruitment.salon.phone_number || '';
 
     return (
       <div
@@ -61,6 +71,14 @@ export const StudentReservationsSection = ({
                   {formatDateTime(reservation.reservation_datetime)}
                 </span>
               </div>
+              {isCancelableStatus && isFuture && (
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>キャンセル期限</span>
+                  <span className={styles.metaValue}>
+                    {formatDateTime(cancellationDeadline)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -80,6 +98,16 @@ export const StudentReservationsSection = ({
               >
                 <span>チャット</span>
                 {hasUnreadMessage(reservation.id) && <span className={styles.chatBadge}>!</span>}
+              </Button>
+            )}
+            {canCancel && (
+              <Button
+                size="sm"
+                variant="danger"
+                className={styles.cancelButton}
+                onClick={() => onRequestCancel(reservation)}
+              >
+                キャンセルする
               </Button>
             )}
             <button
@@ -168,6 +196,23 @@ export const StudentReservationsSection = ({
               <div className={styles.infoBanner}>
                 <p className={styles.infoBannerTitle}>予約が確定しました</p>
                 <p className={styles.infoBannerText}>サロンからの追加連絡を確認してください。</p>
+              </div>
+            )}
+
+            {isPastCancelCutoff && (
+              <div className={styles.deadlineNotice}>
+                <p className={styles.deadlineNoticeTitle}>キャンセル期限を過ぎています</p>
+                <p className={styles.deadlineNoticeText}>
+                  予約当日の48時間前を過ぎています。{salonPhone ? `サロン（${salonPhone}）に直接電話する` : 'サロンに直接電話する'}か、
+                  {reservation.status === 'confirmed' ? 'チャットで相談してください。' : 'サロンへ直接ご連絡ください。'}
+                </p>
+              </div>
+            )}
+
+            {reservation.cancellation_reason && (reservation.status === 'cancelled_by_student' || reservation.status === 'cancelled_by_salon') && (
+              <div className={styles.cancellationBox}>
+                <p className={styles.cancellationLabel}>キャンセル理由</p>
+                <p className={styles.cancellationText}>{reservation.cancellation_reason}</p>
               </div>
             )}
 

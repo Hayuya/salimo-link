@@ -189,6 +189,10 @@
   font-weight: var(--font-weight-bold);
 }
 
+.cancelButton {
+  align-self: stretch;
+}
+
 .toggleButton {
   display: inline-flex;
   align-items: center;
@@ -342,6 +346,57 @@
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+}
+
+.deadlineNotice {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: rgba(252, 110, 81, 0.08);
+  border: 1px solid rgba(252, 110, 81, 0.24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.deadlineNoticeTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-danger);
+}
+
+.deadlineNoticeText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.cancellationBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: rgba(124, 93, 247, 0.08);
+  border: 1px solid rgba(124, 93, 247, 0.18);
+}
+
+.cancellationLabel {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-form-helper);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.cancellationText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
 }
 
 .messageBox {

@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS reservations (
   status TEXT NOT NULL DEFAULT 'pending',
   message TEXT,
   is_chat_consultation BOOLEAN NOT NULL DEFAULT false,
+  cancellation_reason TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -314,6 +315,10 @@ BEGIN
   IF p_is_chat_consultation THEN
     v_updated_dates := COALESCE(v_available_dates, '[]'::jsonb);
   ELSE
+    IF p_reservation_datetime - INTERVAL '48 hours' <= NOW() THEN
+      RAISE EXCEPTION 'Reservation deadline has passed';
+    END IF;
+
     -- Check if the datetime exists and is not booked
     FOR v_date_obj IN SELECT * FROM jsonb_array_elements(COALESCE(v_available_dates, '[]'::jsonb))
     LOOP

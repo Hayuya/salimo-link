@@ -178,6 +178,13 @@ export const SalonReservationsSection = ({
               </div>
             )}
 
+            {reservation.cancellation_reason && (reservation.status === 'cancelled_by_student' || reservation.status === 'cancelled_by_salon') && (
+              <div className={styles.cancellationBox}>
+                <p className={styles.cancellationLabel}>キャンセル理由</p>
+                <p className={styles.cancellationText}>{reservation.cancellation_reason}</p>
+              </div>
+            )}
+
             <div className={styles.recruitmentDetails}>
               <RecruitmentDetails recruitment={reservation.recruitment} />
             </div>

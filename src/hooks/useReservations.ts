@@ -91,6 +91,8 @@ export const useReservations = () => {
           errorMessage = '選択された日時は予約できません';
         } else if (errorMessage.includes('Chat consultation not allowed')) {
           errorMessage = 'この募集ではチャットでの相談はできません';
+        } else if (errorMessage.includes('Reservation deadline has passed')) {
+          errorMessage = '予約期限（予約日時の48時間前）を過ぎています';
         }
         throw new Error(errorMessage);
       }
@@ -110,15 +112,27 @@ export const useReservations = () => {
 
   const updateReservationStatus = useCallback(async (
     id: string,
-    status: ReservationUpdate['status']
+    status: ReservationUpdate['status'],
+    options: { cancellationReason?: string } = {}
   ): Promise<Reservation> => {
     setLoading(true);
     setError(null);
     try {
       // ステータスを更新
+      const updateData: ReservationUpdate & { updated_at: string } = {
+        status,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (status === 'cancelled_by_salon' || status === 'cancelled_by_student') {
+        updateData.cancellation_reason = options.cancellationReason?.trim() || null;
+      } else {
+        updateData.cancellation_reason = null;
+      }
+
       const { data: updatedReservation, error } = await supabase
         .from('reservations')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

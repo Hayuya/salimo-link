@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
 import { useReservations } from '@/hooks/useReservations';
-import { RecruitmentWithDetails } from '@/types';
-import { formatDateTime } from '@/utils/date';
+import { AvailableDate, RecruitmentWithDetails } from '@/types';
+import { formatDateTime, isBeforeHoursBefore, isFutureDate, isPastCutoffButBeforeEvent } from '@/utils/date';
 import { MENU_LABELS, GENDER_LABELS, HAIR_LENGTH_LABELS, PHOTO_SHOOT_LABELS, EXPERIENCE_LABELS } from '@/utils/recruitment';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
@@ -35,6 +35,7 @@ export const RecruitmentDetailPage = () => {
     [recruitment]
   );
   const supportsFlexibleSchedule = flexibleScheduleText.length > 0;
+  const RESERVATION_CUTOFF_HOURS = 48;
 
   const ensureStudentUser = () => {
     if (!user) {
@@ -76,6 +77,10 @@ export const RecruitmentDetailPage = () => {
   const handleReservation = async () => {
     if (!user || user.userType !== 'student' || !selectedDatetime || !recruitment) return;
     if (!allConditionsChecked) return;
+    if (!isBeforeHoursBefore(selectedDatetime, RESERVATION_CUTOFF_HOURS)) {
+      alert('予約期限（予約当日の48時間前）を過ぎているため、仮予約できません。');
+      return;
+    }
 
     try {
       await createReservation(
@@ -100,14 +105,31 @@ export const RecruitmentDetailPage = () => {
     }
   };
 
-  const availableDates = useMemo(
-    () => (recruitment ? recruitment.available_dates.filter(date => !date.is_booked) : []),
-    [recruitment]
-  );
+  const { bookableDates, expiredDates } = useMemo(() => {
+    if (!recruitment) {
+      return { bookableDates: [] as AvailableDate[], expiredDates: [] as AvailableDate[] };
+    }
+
+    const bookable: AvailableDate[] = [];
+    const expired: AvailableDate[] = [];
+
+    for (const date of recruitment.available_dates || []) {
+      if (date.is_booked) continue;
+      if (!isFutureDate(date.datetime)) continue;
+
+      if (isBeforeHoursBefore(date.datetime, RESERVATION_CUTOFF_HOURS)) {
+        bookable.push(date);
+      } else if (isPastCutoffButBeforeEvent(date.datetime, RESERVATION_CUTOFF_HOURS)) {
+        expired.push(date);
+      }
+    }
+
+    return { bookableDates: bookable, expiredDates: expired };
+  }, [recruitment]);
 
   const openReservationModal = (initialDatetime?: string) => {
     if (!ensureStudentUser() || !recruitment) return;
-    if (!availableDates.length) {
+    if (!bookableDates.length) {
       alert('現在予約可能な日時がありません');
       return;
     }
@@ -116,7 +138,7 @@ export const RecruitmentDetailPage = () => {
     setChatDate('');
     setChatTime('');
     const defaultDatetime =
-      initialDatetime ?? (availableDates.length === 1 ? availableDates[0].datetime : null);
+      initialDatetime ?? (bookableDates.length === 1 ? bookableDates[0].datetime : null);
     setSelectedDatetime(defaultDatetime);
     setIsReservationModalOpen(true);
   };
@@ -325,10 +347,10 @@ export const RecruitmentDetailPage = () => {
           {/* 予約可能な日時 */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>予約可能な日時</h3>
-            {availableDates.length > 0 ? (
+            {bookableDates.length > 0 ? (
               <div className={styles.availableDatesBlock}>
                 <div className={styles.availableDatesList}>
-                  {availableDates.map(date => (
+                  {bookableDates.map(date => (
                     <Button
                       key={date.datetime}
                       variant="outline"
@@ -351,6 +373,26 @@ export const RecruitmentDetailPage = () => {
                   >
                     仮予約する
                   </Button>
+                </div>
+              </div>
+            ) : expiredDates.length > 0 ? (
+              <div className={styles.expiredNotice}>
+                <p className={styles.expiredNoticeTitle}>予約期限を過ぎています</p>
+                <p className={styles.expiredNoticeText}>
+                  各予約枠は予約日時の48時間前で締切となります。サロンに直接お電話いただくか、チャット機能でご相談ください。
+                </p>
+                {recruitment.salon.phone_number && (
+                  <p className={styles.expiredNoticeContact}>
+                    サロン直通: {recruitment.salon.phone_number}
+                  </p>
+                )}
+                <div className={styles.expiredDatesList}>
+                  {expiredDates.map(date => (
+                    <div key={date.datetime} className={styles.expiredDateItem}>
+                      <span>{formatDateTime(date.datetime)}</span>
+                      <span className={styles.expiredDateLabel}>締切済</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : supportsFlexibleSchedule ? (
@@ -426,9 +468,9 @@ export const RecruitmentDetailPage = () => {
             {!isChatReservation && (
               <div className={styles.datetimeSelector}>
                 <p className={styles.datetimeSelectorLabel}>予約希望日時</p>
-                {availableDates.length > 0 ? (
+                {bookableDates.length > 0 ? (
                   <div className={styles.datetimeOptions}>
-                    {availableDates.map(date => {
+                    {bookableDates.map(date => {
                       const checked = selectedDatetime === date.datetime;
                       return (
                         <label
@@ -454,7 +496,7 @@ export const RecruitmentDetailPage = () => {
                   </div>
                 ) : (
                   <div className={styles.errorBox}>
-                    現在選択できる日時がありません。ページを再読み込みしてください。
+                    現在選択できる日時がありません。予約期限を過ぎているか、別の申し込みが先に確定した可能性があります。
                   </div>
                 )}
                 {!selectedDatetime && (

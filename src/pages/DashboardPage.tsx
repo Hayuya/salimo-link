@@ -18,7 +18,7 @@ import {
   ReservationMessage,
   AvailableDate,
 } from '@/types';
-import { formatDateTime } from '@/utils/date';
+import { formatDateTime, getHoursBefore, isBeforeHoursBefore } from '@/utils/date';
 import {
   MENU_OPTIONS,
   MENU_LABELS,
@@ -94,6 +94,10 @@ export const DashboardPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showProfileActions, setShowProfileActions] = useState(false);
   const profileActionsRef = useRef<HTMLDivElement | null>(null);
+  const [cancelReservationTarget, setCancelReservationTarget] = useState<ReservationWithDetails | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [cancelError, setCancelError] = useState('');
 
   // 編集用の日時入力
   const [editSlotDate, setEditSlotDate] = useState('');
@@ -416,6 +420,47 @@ useEffect(() => {
       } catch(error: any) {
         alert(error.message || `予約の${action}に失敗しました。`);
       }
+    }
+  };
+
+  const handleOpenCancelModal = (reservation: ReservationWithDetails) => {
+    setCancelReservationTarget(reservation);
+    setCancelReason('');
+    setCancelError('');
+  };
+
+  const handleCloseCancelModal = () => {
+    if (cancelSubmitting) return;
+    setCancelReservationTarget(null);
+    setCancelReason('');
+    setCancelError('');
+  };
+
+  const handleCancelReservation = async () => {
+    if (!cancelReservationTarget) return;
+    if (!cancelReason.trim()) {
+      setCancelError('キャンセル理由を入力してください');
+      return;
+    }
+    if (!isBeforeHoursBefore(cancelReservationTarget.reservation_datetime, 48)) {
+      alert('キャンセル期限を過ぎています。サロンに直接ご連絡ください。');
+      return;
+    }
+
+    setCancelSubmitting(true);
+    setCancelError('');
+    try {
+      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_student', {
+        cancellationReason: cancelReason.trim(),
+      });
+      alert('予約をキャンセルしました。');
+      setCancelReservationTarget(null);
+      setCancelReason('');
+      await loadDashboardData();
+    } catch(error: any) {
+      alert(error.message || '予約のキャンセルに失敗しました。');
+    } finally {
+      setCancelSubmitting(false);
     }
   };
 
@@ -823,6 +868,7 @@ useEffect(() => {
             expandedReservations={expandedReservations}
             onToggleDetails={toggleReservationDetails}
             onOpenChat={handleOpenChat}
+            onRequestCancel={handleOpenCancelModal}
             hasUnreadMessage={hasUnreadMessage}
             getReservationStatusLabel={getReservationStatusLabel}
           />
@@ -849,6 +895,67 @@ useEffect(() => {
           </>
         )}
       </div>
+
+      {/* 予約キャンセルモーダル */}
+      <Modal
+        isOpen={!!cancelReservationTarget}
+        onClose={handleCloseCancelModal}
+        title="予約をキャンセルする"
+        size="sm"
+      >
+        {cancelReservationTarget && (
+          <div className={styles.modalContent}>
+            <p className={styles.modalDescription}>
+              以下の予約をキャンセルします。理由を入力して送信してください。
+            </p>
+            <div className={styles.modalInfoBox}>
+              <p className={styles.modalInfoLabel}>予約日時</p>
+              <p className={styles.modalInfoValue}>
+                {formatDateTime(cancelReservationTarget.reservation_datetime)}
+              </p>
+            </div>
+            <div className={styles.modalField}>
+              <label className={styles.label} htmlFor="cancel-reason">
+                キャンセル理由
+                <span className={styles.required}>*</span>
+              </label>
+              <textarea
+                id="cancel-reason"
+                className={styles.textarea}
+                value={cancelReason}
+                onChange={e => {
+                  setCancelReason(e.target.value);
+                  if (cancelError) {
+                    setCancelError('');
+                  }
+                }}
+                rows={4}
+                required
+              />
+              {cancelError && <p className={styles.modalError}>{cancelError}</p>}
+            </div>
+            <p className={styles.cancelModalNote}>
+              キャンセル期限:{' '}
+              {formatDateTime(getHoursBefore(cancelReservationTarget.reservation_datetime, 48).toISOString())}
+            </p>
+            <p className={styles.cancelModalSubNote}>
+              期限を過ぎている場合はサロンに直接お電話いただくか、チャットでご相談ください。
+            </p>
+            <div className={styles.modalActions}>
+              <Button variant="ghost" onClick={handleCloseCancelModal} disabled={cancelSubmitting}>
+                戻る
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleCancelReservation}
+                loading={cancelSubmitting}
+              >
+                キャンセルを確定する
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* プロフィール編集モーダル */}
       <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} title="プロフィール編集" size="md">

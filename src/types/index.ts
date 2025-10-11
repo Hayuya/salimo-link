@@ -181,6 +181,7 @@ export interface Reservation {
   status: ReservationStatus;
   message?: string;
   is_chat_consultation: boolean;
+  cancellation_reason?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -211,6 +212,7 @@ export interface ReservationInsert {
 
 export interface ReservationUpdate {
   status?: ReservationStatus;
+  cancellation_reason?: string | null;
 }
 
 // ==========================================

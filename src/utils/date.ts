@@ -101,3 +101,41 @@ export const daysUntilDeadline = (deadlineDate: string): number => {
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return diffDays;
 };
+
+/**
+ * 指定した日時の指定時間前を返す
+ */
+export const getHoursBefore = (dateString: string, hours: number): Date => {
+  const target = new Date(dateString);
+  const result = new Date(target);
+  result.setHours(result.getHours() - hours);
+  return result;
+};
+
+/**
+ * 指定した日時が現在より未来かどうか
+ */
+export const isFutureDate = (dateString: string): boolean => {
+  const now = new Date();
+  const target = new Date(dateString);
+  return target.getTime() > now.getTime();
+};
+
+/**
+ * 現在が指定した時間前の締切より前かどうか
+ */
+export const isBeforeHoursBefore = (dateString: string, hours: number): boolean => {
+  const now = new Date();
+  const cutoff = getHoursBefore(dateString, hours);
+  return now.getTime() < cutoff.getTime();
+};
+
+/**
+ * 現在が締切は過ぎているがイベント自体はまだ未来かどうか
+ */
+export const isPastCutoffButBeforeEvent = (dateString: string, hours: number): boolean => {
+  const now = new Date();
+  const eventDate = new Date(dateString);
+  const cutoff = getHoursBefore(dateString, hours);
+  return now.getTime() >= cutoff.getTime() && now.getTime() < eventDate.getTime();
+};
