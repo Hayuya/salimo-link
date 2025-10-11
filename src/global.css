@@ -44,6 +44,69 @@ select {
   color: inherit;
 }
 
+input,
+textarea,
+select {
+  width: 100%;
+  padding: var(--form-control-padding);
+  min-height: var(--form-control-height);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
+  transition: var(--form-control-transition);
+  outline: none;
+  box-shadow: none;
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--color-form-field-border-hover);
+  background-color: var(--color-form-field-bg-hover);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background-color: var(--color-form-field-bg-hover);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-form-placeholder);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: var(--color-form-disabled-bg);
+  border-color: var(--color-form-disabled-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-text-tertiary) 50%),
+    linear-gradient(135deg, var(--color-text-tertiary) 50%, transparent 50%);
+  background-position: calc(100% - 1.25rem) calc(50% - 0.3rem), calc(100% - 0.95rem) calc(50% - 0.3rem);
+  background-size: 8px 8px, 8px 8px;
+  background-repeat: no-repeat;
+  padding-right: 2.75rem;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  min-height: auto;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
 ::selection {
   background: rgba(117, 102, 246, 0.2);
   color: var(--color-text-primary);

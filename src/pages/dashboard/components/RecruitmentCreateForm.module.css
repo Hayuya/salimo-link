@@ -149,39 +149,43 @@
 /* ========== Input Styles ========== */
 .input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: var(--form-control-padding);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background: white;
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-md);
+  background: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
   outline: none;
-  transition: all var(--transition-fast);
+  transition: var(--form-control-transition);
   font-family: inherit;
+  box-shadow: none;
 }
 
 .input:focus {
-  border-color: rgba(124, 93, 247, 0.5);
-  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
 }
 
 .textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: var(--form-control-padding);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background: white;
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-md);
+  background: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
   outline: none;
-  transition: all var(--transition-fast);
+  transition: var(--form-control-transition);
   font-family: inherit;
   resize: vertical;
+  box-shadow: none;
 }
 
 .textarea:focus {
-  border-color: rgba(124, 93, 247, 0.5);
-  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
 }
 
 /* ========== Menu Grid ========== */
@@ -192,20 +196,21 @@
 }
 
 .menuButton {
-  padding: 0.75rem 1rem;
+  padding: var(--form-pill-padding);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  background: white;
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-md);
+  background: var(--color-choice-bg);
+  border: 1.5px solid var(--color-choice-border);
+  border-radius: var(--form-control-radius);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: inherit;
 }
 
 .menuButton:hover {
-  border-color: rgba(124, 93, 247, 0.3);
+  border-color: var(--color-choice-border-hover);
+  color: var(--color-text-primary);
 }
 
 .menuButtonActive {
@@ -213,7 +218,7 @@
   color: white;
   border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.3);
+  box-shadow: var(--color-choice-shadow-active);
 }
 
 /* ========== Radio Buttons ========== */
@@ -227,10 +232,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1rem;
+  padding: var(--form-pill-padding);
   border-radius: var(--radius-pill);
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  background: white;
+  border: 1.5px solid var(--color-choice-border);
+  background: var(--color-choice-bg);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -238,13 +243,15 @@
 }
 
 .radioLabel:hover {
-  border-color: rgba(124, 93, 247, 0.3);
+  border-color: var(--color-choice-border-hover);
+  color: var(--color-text-primary);
 }
 
 .radioLabel:has(input:checked) {
-  background: rgba(124, 93, 247, 0.1);
+  background: var(--color-choice-bg-active);
   border-color: var(--color-primary);
   color: var(--color-primary);
+  box-shadow: var(--color-choice-shadow-active);
 }
 
 .radio {
@@ -310,39 +317,41 @@
 .dateInput {
   flex: 1 1 150px;
   min-width: 150px;
-  padding: 0.75rem 1rem;
+  padding: var(--form-control-padding);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background: white;
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-md);
+  background: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
   outline: none;
   font-family: inherit;
-  transition: all var(--transition-fast);
+  transition: var(--form-control-transition);
 }
 
 .dateInput:focus {
-  border-color: rgba(124, 93, 247, 0.5);
-  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
 }
 
 .timeInput {
   flex: 1 1 120px;
   min-width: 120px;
-  padding: 0.75rem 1rem;
+  padding: var(--form-control-padding);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background: white;
-  border: 2px solid rgba(124, 93, 247, 0.15);
-  border-radius: var(--radius-md);
+  background: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
   outline: none;
   font-family: inherit;
-  transition: all var(--transition-fast);
+  transition: var(--form-control-transition);
 }
 
 .timeInput:focus {
-  border-color: rgba(124, 93, 247, 0.5);
-  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
 }
 
 .addButton {
@@ -484,7 +493,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1.25rem;
-  border-top: 2px solid rgba(124, 93, 247, 0.1);
+  border-top: 2px solid rgba(124, 93, 247, 0.12);
 }
 
 .navButtons {
@@ -497,17 +506,18 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
-  background: white;
-  border: 2px solid rgba(114, 111, 150, 0.2);
-  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-choice-border);
+  border-radius: var(--form-control-radius);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: inherit;
 }
 
 .cancelButton:hover {
-  background: var(--color-surface-muted);
-  border-color: rgba(114, 111, 150, 0.3);
+  background: var(--color-form-field-bg-hover);
+  border-color: var(--color-choice-border-hover);
+  box-shadow: var(--shadow-xs);
 }
 
 .backButton {
@@ -515,16 +525,16 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-primary);
-  background: rgba(124, 93, 247, 0.08);
-  border: none;
-  border-radius: var(--radius-md);
+  background: var(--color-choice-bg-active);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--form-control-radius);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: inherit;
 }
 
 .backButton:hover {
-  background: rgba(124, 93, 247, 0.15);
+  background: rgba(124, 93, 247, 0.18);
 }
 
 .nextButton {
@@ -534,7 +544,7 @@
   color: white;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-gradient-end) 100%);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--form-control-radius);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: inherit;

@@ -108,21 +108,25 @@
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
+  border: 1px solid transparent;
 }
 
 .statusActive {
-  background-color: rgba(22, 191, 162, 0.14);
-  color: #0f8f78;
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+  border-color: var(--color-status-success-border);
 }
 
 .statusUrgent {
-  background-color: rgba(247, 169, 75, 0.18);
-  color: #d68124;
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning-text);
+  border-color: var(--color-status-warning-border);
 }
 
 .statusClosed {
-  background-color: rgba(114, 111, 150, 0.1);
-  color: var(--color-text-tertiary);
+  background-color: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-text);
+  border-color: var(--color-status-neutral-border);
 }
 
 @media (max-width: 768px) {

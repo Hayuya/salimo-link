@@ -52,6 +52,41 @@
   --color-border-light: rgba(114, 111, 150, 0.12);
   --color-border-medium: rgba(114, 111, 150, 0.24);
   --color-border-dark: rgba(63, 61, 88, 0.4);
+  --color-border-strong: rgba(63, 61, 88, 0.6);
+
+  /* Form Controls */
+  --color-form-field-bg: rgba(255, 255, 255, 0.96);
+  --color-form-field-bg-hover: rgba(255, 255, 255, 1);
+  --color-form-field-border: rgba(114, 111, 150, 0.18);
+  --color-form-field-border-hover: rgba(114, 111, 150, 0.32);
+  --color-form-field-border-focus: rgba(124, 93, 247, 0.58);
+  --color-form-field-shadow-focus: 0 0 0 4px rgba(124, 93, 247, 0.14);
+  --color-form-placeholder: rgba(91, 88, 113, 0.55);
+  --color-form-label: var(--color-text-secondary);
+  --color-form-helper: var(--color-text-tertiary);
+  --color-form-disabled-bg: rgba(238, 237, 247, 0.7);
+  --color-form-disabled-border: rgba(114, 111, 150, 0.1);
+  --form-control-height: 44px;
+  --form-control-radius: var(--radius-md);
+  --form-control-padding: 0.75rem 1rem;
+  --form-control-inline-gap: 0.75rem;
+  --form-control-transition: box-shadow var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
+  --form-pill-padding: 0.65rem 1.125rem;
+
+  --color-choice-border: rgba(114, 111, 150, 0.18);
+  --color-choice-border-hover: rgba(114, 111, 150, 0.3);
+  --color-choice-bg: rgba(255, 255, 255, 0.92);
+  --color-choice-bg-active: rgba(124, 93, 247, 0.1);
+  --color-choice-shadow-active: 0 8px 20px rgba(124, 93, 247, 0.22);
+
+  --color-checkbox-border: rgba(114, 111, 150, 0.28);
+  --color-checkbox-bg: var(--color-white);
+  --color-checkbox-checked: var(--color-primary);
+  --color-checkbox-focus-ring: 0 0 0 4px rgba(124, 93, 247, 0.18);
+
+  --color-toggle-track: rgba(114, 111, 150, 0.18);
+  --color-toggle-track-active: rgba(124, 93, 247, 0.45);
+  --color-toggle-thumb: var(--color-white);
 
   /* Typography */
   --font-family-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'YuGothic', 'メイリオ', sans-serif;
@@ -100,6 +135,7 @@
   --radius-card: 1.25rem;
 
   /* Shadows */
+  --shadow-xs: 0 2px 8px rgba(60, 54, 107, 0.08);
   --shadow-sm: 0 4px 12px rgba(60, 54, 107, 0.08);
   --shadow-md: 0 12px 32px rgba(60, 54, 107, 0.12);
   --shadow-lg: 0 22px 45px rgba(60, 54, 107, 0.14);
@@ -125,4 +161,25 @@
   /* Layout */
   --container-max-width: 1120px;
   --container-padding: clamp(1rem, 4vw, 2.5rem);
+
+  /* Status Tokens */
+  --color-status-info-bg: rgba(79, 143, 248, 0.14);
+  --color-status-info-border: rgba(79, 143, 248, 0.38);
+  --color-status-info-text: #3565c5;
+
+  --color-status-success-bg: rgba(22, 191, 162, 0.16);
+  --color-status-success-border: rgba(22, 191, 162, 0.35);
+  --color-status-success-text: #138c74;
+
+  --color-status-warning-bg: rgba(247, 169, 75, 0.17);
+  --color-status-warning-border: rgba(247, 169, 75, 0.32);
+  --color-status-warning-text: #b3722b;
+
+  --color-status-danger-bg: rgba(240, 98, 117, 0.16);
+  --color-status-danger-border: rgba(240, 98, 117, 0.34);
+  --color-status-danger-text: #d9344c;
+
+  --color-status-neutral-bg: rgba(114, 111, 150, 0.16);
+  --color-status-neutral-border: rgba(114, 111, 150, 0.3);
+  --color-status-neutral-text: var(--color-text-tertiary);
 }

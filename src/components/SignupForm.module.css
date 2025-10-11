@@ -13,26 +13,29 @@
 }
 
 .userTypeButton {
-  padding: var(--spacing-md);
-  background-color: var(--color-bg-secondary);
-  border: 2px solid var(--color-border-medium);
-  border-radius: var(--radius-md);
+  padding: var(--form-control-padding);
+  background-color: var(--color-choice-bg);
+  border: 1.5px solid var(--color-choice-border);
+  border-radius: var(--form-control-radius);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   transition: all var(--transition-fast);
   cursor: pointer;
+  text-align: center;
 }
 
 .userTypeButton:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-border-dark);
+  background-color: var(--color-form-field-bg-hover);
+  border-color: var(--color-choice-border-hover);
+  box-shadow: 0 8px 20px rgba(63, 61, 88, 0.08);
 }
 
 .userTypeButton.active {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-choice-bg-active);
   border-color: var(--color-primary);
   color: var(--color-primary);
   font-weight: var(--font-weight-semibold);
+  box-shadow: var(--color-choice-shadow-active);
 }
 
 .errorBox {

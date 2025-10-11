@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .sectionHeader {
@@ -12,9 +12,10 @@
 
 .sectionTitle {
   margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .sectionContent {
@@ -39,56 +40,94 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .card {
+  position: relative;
   padding: var(--spacing-lg);
-  border: 1px solid rgba(124, 93, 247, 0.08);
   border-radius: var(--radius-card);
   background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  overflow: hidden;
+  --card-accent: rgba(124, 93, 247, 0.3);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.08), rgba(242, 109, 162, 0.06));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 0;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--card-accent);
+  opacity: 0.7;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-md);
 }
 
+.card:hover::before {
+  opacity: 1;
+}
+
 .pending {
+  --card-accent: var(--color-status-info-border);
   border-color: rgba(79, 143, 248, 0.25);
-  background-color: rgba(79, 143, 248, 0.02);
-  border-left: 3px solid rgba(79, 143, 248, 0.8);
+  background: linear-gradient(180deg, rgba(79, 143, 248, 0.08), rgba(255, 255, 255, 0.95));
 }
 
 .confirmed {
+  --card-accent: var(--color-status-success-border);
   border-color: rgba(22, 191, 162, 0.25);
-  background-color: rgba(22, 191, 162, 0.02);
-  border-left: 3px solid rgba(22, 191, 162, 0.8);
+  background: linear-gradient(180deg, rgba(22, 191, 162, 0.08), rgba(255, 255, 255, 0.95));
 }
 
 .cardHeader {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-md);
-  align-items: flex-start;
-  margin-bottom: var(--spacing-md);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-lg);
+  align-items: start;
 }
 
-/* 予約者アバター */
-.avatarSection {
+.summary {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.identity {
+  display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-md);
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(124, 93, 247, 0.15), rgba(79, 143, 248, 0.15));
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.15), rgba(79, 143, 248, 0.12));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,28 +135,20 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
   border: 2px solid rgba(124, 93, 247, 0.25);
+  box-shadow: var(--shadow-xs);
 }
 
-/* メイン情報エリア */
-.mainInfo {
+.identityContent {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  flex: 1;
-  min-width: 0;
-}
-
-.studentInfo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-2xs);
 }
 
 .studentName {
+  margin: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -126,9 +157,9 @@
 .schoolBadge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
-  background-color: rgba(114, 111, 150, 0.08);
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
+  background-color: rgba(114, 111, 150, 0.12);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
@@ -136,7 +167,7 @@
 }
 
 .titleLink {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   text-decoration: none;
@@ -147,25 +178,35 @@
   text-decoration: underline;
 }
 
-/* 予約日時を強調 */
-.datetimeHighlight {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-md);
-  background: rgba(124, 93, 247, 0.06);
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-light);
 }
 
-.datetimeText {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
+.metaLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-form-helper);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.metaValue {
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  margin: 0;
+  font-weight: var(--font-weight-semibold);
 }
 
-/* アクションエリア */
 .headerActions {
   display: flex;
   flex-direction: column;
@@ -176,11 +217,9 @@
 .statusBadge {
   display: inline-flex;
   align-items: center;
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
+  justify-content: center;
+  min-height: 30px;
+  line-height: 1;
 }
 
 .chatButton {
@@ -193,16 +232,6 @@
 
 .chatButtonUnread {
   box-shadow: 0 0 0 2px var(--color-primary-light);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 2px var(--color-primary-light);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.3);
-  }
 }
 
 .chatBadge {
@@ -222,24 +251,22 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-md);
-  border: 2px solid var(--color-primary);
-  background: linear-gradient(135deg, rgba(124, 93, 247, 0.08), rgba(79, 143, 248, 0.05));
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background-color: rgba(124, 93, 247, 0.08);
   color: var(--color-primary);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: 0 2px 4px rgba(124, 93, 247, 0.1);
 }
 
 .toggleButton:hover,
 .toggleButton:focus {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.25);
-  transform: translateY(-1px);
+  background-color: rgba(124, 93, 247, 0.14);
+  border-color: rgba(124, 93, 247, 0.25);
+  box-shadow: var(--shadow-xs);
 }
 
 .toggleIcon {
@@ -256,26 +283,49 @@
 }
 
 .cardBody {
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid rgba(114, 111, 150, 0.1);
+  margin-top: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.infoLayout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.infoCard {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-xs);
+}
+
+.infoTitle {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-form-helper);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
 }
 
 .contactList {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  padding: var(--spacing-md);
-  border-left: 2px solid rgba(124, 93, 247, 0.2);
 }
 
 .contact {
+  margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  margin: 0;
+  line-height: 1.6;
 }
 
 .link {
@@ -290,30 +340,102 @@
   border-color: rgba(124, 93, 247, 0.6);
 }
 
-.metaLight {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-  margin: 0;
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
-.meta {
+.timelineItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.timelineDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.16);
+  margin-top: 4px;
+}
+
+.timelineLabel {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-form-helper);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.timelineValue {
+  margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  margin: 0;
+  font-weight: var(--font-weight-medium);
 }
 
-/* アクションボタンエリア */
-.actionRow {
-  margin-top: var(--spacing-lg);
+.infoBanner {
   display: flex;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid rgba(114, 111, 150, 0.15);
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(79, 143, 248, 0.14), rgba(124, 93, 247, 0.1));
+  border: 1px solid var(--color-status-info-border);
+  box-shadow: var(--shadow-xs);
 }
 
-.actionRow button {
-  flex: 1;
+.infoBannerTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-status-info-text);
   font-weight: var(--font-weight-semibold);
+}
+
+.infoBannerText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.messageBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-light);
+}
+
+.messageLabel {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-form-helper);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.messageText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+}
+
+.recruitmentDetails {
+  border-top: 1px dashed var(--color-border-light);
+  padding-top: var(--spacing-md);
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .emptyText {
@@ -321,42 +443,44 @@
   padding: var(--spacing-2xl);
   color: var(--color-text-secondary);
   margin: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border-light);
 }
 
 @media (max-width: 768px) {
+  .sectionTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
   .card {
     padding: var(--spacing-md);
   }
 
   .cardHeader {
-    grid-template-columns: auto 1fr;
-    gap: var(--spacing-sm);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 
-  .avatar {
-    width: 42px;
-    height: 42px;
-    font-size: var(--font-size-md);
-  }
-
-  .studentName {
-    font-size: var(--font-size-md);
+  .identity {
+    align-items: flex-start;
   }
 
   .headerActions {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    justify-content: space-between;
+    align-items: stretch;
+  }
+
+  .statusBadge,
+  .chatButton,
+  .toggleButton {
     width: 100%;
-  }
-
-  .datetimeHighlight {
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-
-  .datetimeText {
-    font-size: var(--font-size-sm);
+    justify-content: center;
   }
 
   .actionRow {
@@ -365,10 +489,5 @@
 
   .actionRow button {
     width: 100%;
-  }
-
-  .toggleButton {
-    font-size: var(--font-size-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
   }
 }

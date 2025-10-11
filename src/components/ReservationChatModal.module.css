@@ -24,8 +24,8 @@
   overflow-y: auto;
   padding: var(--spacing-sm);
   border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-secondary);
+  border-radius: var(--form-control-radius);
+  background-color: var(--color-surface-muted);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -75,14 +75,27 @@
 
 .textarea {
   flex: 1;
-  min-height: 60px;
-  max-height: 120px;
+  min-height: 68px;
+  max-height: 140px;
   resize: vertical;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-medium);
+  padding: var(--form-control-padding);
+  border-radius: var(--form-control-radius);
+  border: 1.5px solid var(--color-form-field-border);
   font-size: var(--font-size-sm);
   font-family: inherit;
+  background-color: var(--color-form-field-bg);
+  color: var(--color-text-primary);
+  transition: var(--form-control-transition);
+}
+
+.textarea:hover {
+  border-color: var(--color-form-field-border-hover);
+}
+
+.textarea:focus {
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background-color: var(--color-form-field-bg-hover);
 }
 
 .sendingIndicator {

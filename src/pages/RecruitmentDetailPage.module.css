@@ -111,7 +111,7 @@
 .addressIcon::after {
   content: '';
   position: absolute;
-  background: #f26da2;
+  background: var(--color-accent);
 }
 
 .addressIcon::before {
@@ -152,7 +152,7 @@
 }
 
 .contactLink {
-  color: #7c5df7;
+  color: var(--color-primary);
   text-decoration: none;
   transition: color 0.2s ease;
   word-break: break-all;
@@ -160,7 +160,7 @@
 }
 
 .contactLink:hover {
-  color: #5a3dd4;
+  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 
@@ -178,10 +178,10 @@
 .salonInfoCard {
   margin-top: var(--spacing-md);
   padding: var(--spacing-xl);
-  background: #ffffff;
+  background: var(--color-surface);
   border-radius: var(--radius-xl);
-  border: 1px solid #e6e7f0;
-  box-shadow: 0 12px 30px rgba(43, 37, 67, 0.08);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -215,7 +215,7 @@
 .salonInfoIcon::after {
   content: '';
   position: absolute;
-  background: #7c5df7;
+  background: var(--color-primary);
   left: 50%;
   transform: translateX(-50%);
 }
@@ -240,8 +240,8 @@
   height: 72px;
   border-radius: var(--radius-lg);
   object-fit: cover;
-  border: 1px solid #e1e4f3;
-  box-shadow: 0 6px 16px rgba(43, 37, 67, 0.08);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .salonInfoList {
@@ -294,7 +294,7 @@
 .addressMarker::after {
   content: '';
   position: absolute;
-  background: #f26da2;
+  background: var(--color-accent);
   left: 50%;
   transform: translateX(-50%);
 }
@@ -317,7 +317,7 @@
 .salonDescription {
   margin: 0;
   padding-top: var(--spacing-md);
-  border-top: 1px solid #eef0f8;
+  border-top: 1px solid var(--color-border-light);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
@@ -331,7 +331,7 @@
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid rgba(114, 111, 150, 0.14);
 }
 
 .recruitmentTitle {
@@ -349,25 +349,29 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .statusActive {
-  background: #16bfa2;
-  color: white;
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+  border-color: var(--color-status-success-border);
 }
 
 .statusClosed {
-  background: #e0e0e0;
-  color: #666;
+  background: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-text);
+  border-color: var(--color-status-neutral-border);
 }
 
 /* セクション */
 .section {
   margin-bottom: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .sectionTitle {
@@ -376,7 +380,7 @@
   color: var(--color-text-primary);
   margin: 0 0 var(--spacing-md) 0;
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(114, 111, 150, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -402,8 +406,8 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
@@ -422,10 +426,10 @@
   flex-direction: column;
   gap: var(--spacing-xs);
   padding: var(--spacing-lg);
-  background: #f7f8fb;
+  background: var(--color-surface-muted);
   border-radius: var(--radius-lg);
-  border: 1px solid #f0f1f5;
-  box-shadow: 0 2px 8px rgba(33, 48, 94, 0.04);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-xs);
 }
 
 .conditionLabel {
@@ -446,9 +450,9 @@
   flex-direction: column;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background: #fafafa;
+  background: var(--color-surface-muted);
   border-radius: var(--radius-md);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border-light);
 }
 
 .checklistTitle {
@@ -479,13 +483,13 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #7c5df7;
+  accent-color: var(--color-primary);
 }
 
 .checklistNotice {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: #f26da2;
+  color: var(--color-accent);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -493,11 +497,11 @@
 .appliedMessage {
   text-align: center;
   padding: var(--spacing-md);
-  background: #e8f5f3;
-  color: #0f8f78;
+  background: var(--color-success-light);
+  color: var(--color-status-success-text);
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
-  border: 1px solid #16bfa2;
+  border: 1px solid var(--color-success);
 }
 
 .closedMessage {
@@ -534,7 +538,8 @@
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  background: rgba(124, 93, 247, 0.08);
+  background: linear-gradient(145deg, rgba(124, 93, 247, 0.08), rgba(79, 143, 248, 0.05));
+  border: 1px solid rgba(124, 93, 247, 0.18);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -586,26 +591,28 @@
 }
 
 .chatInputField input {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(114, 111, 150, 0.3);
+  padding: var(--form-control-padding);
+  border-radius: var(--form-control-radius);
+  border: 1.5px solid var(--color-form-field-border);
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  background: white;
+  background: var(--color-form-field-bg);
+  transition: var(--form-control-transition);
 }
 
 .chatInputField input:focus {
   outline: none;
-  border-color: rgba(124, 93, 247, 0.6);
-  box-shadow: 0 0 0 3px rgba(124, 93, 247, 0.15);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
 }
 
 .error {
   text-align: center;
-  color: #f26da2;
+  color: var(--color-accent);
   margin-bottom: var(--spacing-md);
   padding: var(--spacing-md);
-  background: #fef0f4;
+  background: var(--color-accent-light);
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
 }
@@ -647,23 +654,23 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
-  border: 1px solid #e0e0e0;
-  border-radius: var(--radius-md);
-  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--form-control-radius);
+  background: var(--color-surface);
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .datetimeOption input {
   width: 16px;
   height: 16px;
-  accent-color: #7c5df7;
+  accent-color: var(--color-primary);
 }
 
 .datetimeOptionSelected {
-  border-color: #7c5df7;
-  background: rgba(124, 93, 247, 0.08);
-  box-shadow: 0 0 0 2px rgba(124, 93, 247, 0.12);
+  border-color: var(--color-primary);
+  background: var(--color-choice-bg-active);
+  box-shadow: 0 0 0 2px rgba(124, 93, 247, 0.14);
 }
 
 .datetimeSelectorNotice {
@@ -674,10 +681,10 @@
 
 .selectedDatetimeBox {
   padding: var(--spacing-md);
-  background: #fafafa;
-  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border-radius: var(--form-control-radius);
   font-weight: var(--font-weight-semibold);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border-light);
 }
 
 .inputWrapper {
@@ -688,18 +695,18 @@
 
 .label {
   font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
+  color: var(--color-form-label);
   font-weight: var(--font-weight-semibold);
 }
 
 .textarea {
-  padding: var(--spacing-md);
+  padding: var(--form-control-padding);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  background-color: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
+  transition: var(--form-control-transition);
   outline: none;
   resize: vertical;
   font-family: inherit;
@@ -708,16 +715,17 @@
 }
 
 .textarea:focus {
-  border-color: #7c5df7;
-  box-shadow: 0 0 0 3px rgba(124, 93, 247, 0.1);
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background-color: var(--color-form-field-bg-hover);
 }
 
 .errorBox {
   padding: var(--spacing-md);
-  background: #fef0f4;
-  border: 1px solid #f26da2;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-accent);
   border-radius: var(--radius-md);
-  color: #f26da2;
+  color: var(--color-accent);
   font-size: var(--font-size-sm);
   text-align: center;
   font-weight: var(--font-weight-semibold);

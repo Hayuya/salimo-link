@@ -716,7 +716,7 @@ useEffect(() => {
                   justifyContent: 'space-between', 
                   alignItems: 'center',
                   padding: 'var(--spacing-sm)',
-                  backgroundColor: date.is_booked ? 'rgba(114, 111, 150, 0.12)' : 'var(--color-surface-muted)',
+                  backgroundColor: date.is_booked ? 'var(--color-status-neutral-bg)' : 'var(--color-surface-muted)',
                   borderRadius: 'var(--radius-md)'
                 }}
               >
@@ -750,11 +750,11 @@ useEffect(() => {
           alignItems: 'center',
           gap: 'var(--spacing-md)'
         }}>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(124, 93, 247, 0.2)' }} />
+          <div style={{ flex: 1, height: '1px', background: 'var(--color-border-light)' }} />
           <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-tertiary)', fontWeight: '500' }}>
             または
           </span>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(124, 93, 247, 0.2)' }} />
+          <div style={{ flex: 1, height: '1px', background: 'var(--color-border-light)' }} />
         </div>
 
         <div className={styles.inputWrapper}>

@@ -55,34 +55,36 @@ export const SalonReservationsSection = ({
           .join(' ')}
       >
         <div className={styles.cardHeader}>
-          {/* 予約者アバター */}
-          <div className={styles.avatarSection}>
-            <div className={styles.avatar}>{getInitials(reservation.student.name)}</div>
-          </div>
-
-          {/* メイン情報 */}
-          <div className={styles.mainInfo}>
-            <div className={styles.studentInfo}>
-              <h4 className={styles.studentName}>
-                {reservation.student.name}
-                {reservation.student.school_name && (
-                  <span className={styles.schoolBadge}>{reservation.student.school_name}</span>
-                )}
-              </h4>
-              <Link to={`/recruitment/${reservation.recruitment_id}`} className={styles.titleLink}>
-                {reservation.recruitment.title}
-              </Link>
+          <div className={styles.summary}>
+            <div className={styles.identity}>
+              <div className={styles.avatar}>{getInitials(reservation.student.name)}</div>
+              <div className={styles.identityContent}>
+                <h4 className={styles.studentName}>
+                  {reservation.student.name}
+                  {reservation.student.school_name && (
+                    <span className={styles.schoolBadge}>{reservation.student.school_name}</span>
+                  )}
+                </h4>
+                <Link to={`/recruitment/${reservation.recruitment_id}`} className={styles.titleLink}>
+                  {reservation.recruitment.title}
+                </Link>
+              </div>
             </div>
 
-            {/* 予約日時を強調 */}
-            <div className={styles.datetimeHighlight}>
-              <p className={styles.datetimeText}>{formatDateTime(reservation.reservation_datetime)}</p>
+            <div className={styles.metaGrid}>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>希望日時</span>
+                <span className={styles.metaValue}>{formatDateTime(reservation.reservation_datetime)}</span>
+              </div>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>申込日時</span>
+                <span className={styles.metaValue}>{formatDateTime(reservation.created_at)}</span>
+              </div>
             </div>
           </div>
 
-          {/* アクションエリア */}
           <div className={styles.headerActions}>
-            <span className={statusLabel.className}>{statusLabel.text}</span>
+            <span className={`${styles.statusBadge} ${statusLabel.className}`}>{statusLabel.text}</span>
             {reservation.status === 'confirmed' && (
               <Button
                 size="sm"
@@ -121,39 +123,74 @@ export const SalonReservationsSection = ({
 
         {isExpanded && (
           <div className={styles.cardBody}>
-            <div className={styles.contactList}>
-              <p className={styles.contact}>
-                <strong>メール:</strong>{' '}
-                <a className={styles.link} href={`mailto:${reservation.student.email}`}>
-                  {reservation.student.email}
-                </a>
-              </p>
-              {reservation.student.instagram_url && (
-                <p className={styles.contact}>
-                  <strong>Instagram:</strong>{' '}
-                  <a
-                    className={styles.link}
-                    href={reservation.student.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {reservation.student.instagram_url}
-                  </a>
-                </p>
-              )}
+            <div className={styles.infoLayout}>
+              <div className={styles.infoCard}>
+                <p className={styles.infoTitle}>応募者連絡先</p>
+                <div className={styles.contactList}>
+                  <p className={styles.contact}>
+                    <strong>メール:</strong>{' '}
+                    <a className={styles.link} href={`mailto:${reservation.student.email}`}>
+                      {reservation.student.email}
+                    </a>
+                  </p>
+                  {reservation.student.instagram_url && (
+                    <p className={styles.contact}>
+                      <strong>Instagram:</strong>{' '}
+                      <a
+                        className={styles.link}
+                        href={reservation.student.instagram_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {reservation.student.instagram_url}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.infoCard}>
+                <p className={styles.infoTitle}>ステータス</p>
+                <div className={styles.timeline}>
+                  <div className={styles.timelineItem}>
+                    <span className={styles.timelineDot} />
+                    <div>
+                      <p className={styles.timelineLabel}>希望日時</p>
+                      <p className={styles.timelineValue}>
+                        {formatDateTime(reservation.reservation_datetime)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={styles.timelineItem}>
+                    <span className={styles.timelineDot} />
+                    <div>
+                      <p className={styles.timelineLabel}>最新ステータス</p>
+                      <p className={styles.timelineValue}>{statusLabel.text}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p className={styles.metaLight}>
-              <strong>仮予約日:</strong> {formatDateTime(reservation.created_at)}
-            </p>
-
-            {reservation.message && (
-              <p className={styles.meta}>
-                <strong>メッセージ:</strong> {reservation.message}
-              </p>
+            {reservation.status === 'pending' && (
+              <div className={styles.infoBanner}>
+                <p className={styles.infoBannerTitle}>対応が必要です</p>
+                <p className={styles.infoBannerText}>
+                  24時間以内の回答をおすすめします。承認またはキャンセルの理由を添えて返信しましょう。
+                </p>
+              </div>
             )}
 
-            <RecruitmentDetails recruitment={reservation.recruitment} />
+            {reservation.message && (
+              <div className={styles.messageBox}>
+                <p className={styles.messageLabel}>応募者メッセージ</p>
+                <p className={styles.messageText}>{reservation.message}</p>
+              </div>
+            )}
+
+            <div className={styles.recruitmentDetails}>
+              <RecruitmentDetails recruitment={reservation.recruitment} />
+            </div>
 
             {reservation.status === 'pending' && (
               <div className={styles.actionRow}>

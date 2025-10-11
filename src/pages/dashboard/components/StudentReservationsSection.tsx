@@ -45,19 +45,27 @@ export const StudentReservationsSection = ({
       >
         <div className={styles.cardHeader}>
           <div className={styles.summary}>
-            <Link to={`/recruitment/${reservation.recruitment_id}`} className={styles.titleLink}>
-              {reservation.recruitment.title}
-            </Link>
-            <p className={styles.meta}>
-              <strong>サロン:</strong> {reservation.recruitment.salon.salon_name}
-            </p>
-            <p className={styles.meta}>
-              <strong>予約日時:</strong> {formatDateTime(reservation.reservation_datetime)}
-            </p>
+            <div className={styles.titleGroup}>
+              <Link to={`/recruitment/${reservation.recruitment_id}`} className={styles.titleLink}>
+                {reservation.recruitment.title}
+              </Link>
+            </div>
+            <div className={styles.metaGrid}>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>サロン</span>
+                <span className={styles.metaValue}>{reservation.recruitment.salon.salon_name}</span>
+              </div>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>予約日時</span>
+                <span className={styles.metaValue}>
+                  {formatDateTime(reservation.reservation_datetime)}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className={styles.headerActions}>
-            <span className={statusLabel.className}>{statusLabel.text}</span>
+            <span className={`${styles.statusBadge} ${statusLabel.className}`}>{statusLabel.text}</span>
             {reservation.status === 'confirmed' && (
               <Button
                 size="sm"
@@ -96,58 +104,83 @@ export const StudentReservationsSection = ({
 
         {isExpanded && (
           <div className={styles.cardBody}>
-            <div className={styles.contactList}>
-              {reservation.recruitment.salon.address && (
-                <p className={styles.contact}>
-                  <strong>住所:</strong> {reservation.recruitment.salon.address}
-                </p>
-              )}
-              {reservation.recruitment.salon.phone_number && (
-                <p className={styles.contact}>
-                  <strong>電話:</strong> {reservation.recruitment.salon.phone_number}
-                </p>
-              )}
-              <p className={styles.contact}>
-                <strong>メール:</strong>{' '}
-                <a
-                  className={styles.link}
-                  href={`mailto:${reservation.recruitment.salon.email}`}
-                >
-                  {reservation.recruitment.salon.email}
-                </a>
-              </p>
-              {reservation.recruitment.salon.website_url && (
-                <p className={styles.contact}>
-                  <strong>WEBサイト:</strong>{' '}
-                  <a
-                    className={styles.link}
-                    href={reservation.recruitment.salon.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {reservation.recruitment.salon.website_url}
-                  </a>
-                </p>
-              )}
+            <div className={styles.infoLayout}>
+              <div className={styles.infoCard}>
+                <p className={styles.infoTitle}>サロン連絡先</p>
+                <div className={styles.contactList}>
+                  {reservation.recruitment.salon.address && (
+                    <p className={styles.contact}>
+                      <strong>住所:</strong> {reservation.recruitment.salon.address}
+                    </p>
+                  )}
+                  {reservation.recruitment.salon.phone_number && (
+                    <p className={styles.contact}>
+                      <strong>電話:</strong> {reservation.recruitment.salon.phone_number}
+                    </p>
+                  )}
+                  <p className={styles.contact}>
+                    <strong>メール:</strong>{' '}
+                    <a
+                      className={styles.link}
+                      href={`mailto:${reservation.recruitment.salon.email}`}
+                    >
+                      {reservation.recruitment.salon.email}
+                    </a>
+                  </p>
+                  {reservation.recruitment.salon.website_url && (
+                    <p className={styles.contact}>
+                      <strong>WEBサイト:</strong>{' '}
+                      <a
+                        className={styles.link}
+                        href={reservation.recruitment.salon.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {reservation.recruitment.salon.website_url}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.infoCard}>
+                <p className={styles.infoTitle}>予約タイムライン</p>
+                <div className={styles.timeline}>
+                  <div className={styles.timelineItem}>
+                    <span className={styles.timelineDot} />
+                    <div>
+                      <p className={styles.timelineLabel}>仮予約登録</p>
+                      <p className={styles.timelineValue}>{formatDateTime(reservation.created_at)}</p>
+                    </div>
+                  </div>
+                  <div className={styles.timelineItem}>
+                    <span className={styles.timelineDot} />
+                    <div>
+                      <p className={styles.timelineLabel}>ステータス</p>
+                      <p className={styles.timelineValue}>{statusLabel.text}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p className={styles.metaLight}>
-              <strong>仮予約日:</strong> {formatDateTime(reservation.created_at)}
-            </p>
-
             {reservation.status === 'confirmed' && (
-              <p className={styles.confirmedNote}>
-                予約が確定しています。サロンからの追加連絡を確認してください。
-              </p>
+              <div className={styles.infoBanner}>
+                <p className={styles.infoBannerTitle}>予約が確定しました</p>
+                <p className={styles.infoBannerText}>サロンからの追加連絡を確認してください。</p>
+              </div>
             )}
 
             {reservation.message && (
-              <p className={styles.meta}>
-                <strong>送信メッセージ:</strong> {reservation.message}
-              </p>
+              <div className={styles.messageBox}>
+                <p className={styles.messageLabel}>送信メッセージ</p>
+                <p className={styles.messageText}>{reservation.message}</p>
+              </div>
             )}
 
-            <RecruitmentDetails recruitment={reservation.recruitment} />
+            <div className={styles.recruitmentDetails}>
+              <RecruitmentDetails recruitment={reservation.recruitment} />
+            </div>
           </div>
         )}
       </div>
