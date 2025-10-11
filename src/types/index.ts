@@ -16,6 +16,7 @@ export interface Student {
   email: string;
   name: string;
   school_name?: string;
+  phone_number?: string;
   instagram_url?: string;
   avatar_url?: string;
   created_at: string;
@@ -27,6 +28,7 @@ export interface StudentInsert {
   email: string;
   name: string;
   school_name?: string;
+  phone_number?: string;
   instagram_url?: string;
   avatar_url?: string;
 }
@@ -34,6 +36,7 @@ export interface StudentInsert {
 export interface StudentUpdate {
   name?: string;
   school_name?: string;
+  phone_number?: string;
   instagram_url?: string;
   avatar_url?: string;
 }

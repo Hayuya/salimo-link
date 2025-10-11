@@ -974,6 +974,12 @@ useEffect(() => {
                 onChange={(e) => setProfileData({ ...profileData, school_name: e.target.value })} 
                 fullWidth
               />
+              <Input
+                label="電話番号"
+                value={profileData.phone_number || ''}
+                onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })}
+                fullWidth
+              />
             </>
           ) : (
             <>

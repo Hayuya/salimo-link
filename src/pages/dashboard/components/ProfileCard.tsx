@@ -18,6 +18,10 @@ export const ProfileCard = ({ user }: ProfileCardProps) => {
               label="学校名"
               value={(user.profile as Student).school_name || '未設定'}
             />
+            <ProfileRow
+              label="電話番号"
+              value={(user.profile as Student).phone_number || '未設定'}
+            />
             <ProfileRow label="メールアドレス" value={user.email} />
           </>
         ) : (

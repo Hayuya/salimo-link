@@ -135,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               email: email,
               name: authUser.user_metadata.name || 'Student User',
               school_name: authUser.user_metadata.school_name || null,
+              phone_number: authUser.user_metadata.phone_number || null,
               instagram_url: authUser.user_metadata.instagram_url || null,
               avatar_url: authUser.user_metadata.avatar_url || null,
             })
@@ -258,6 +259,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             email: authData.user.email!,
             name: studentData.name || 'Student User',
             school_name: studentData.school_name || null,
+            phone_number: studentData.phone_number || null,
             instagram_url: studentData.instagram_url || null,
             avatar_url: studentData.avatar_url || null,
           })

@@ -4,7 +4,7 @@ import { useAuth } from '@/auth';
 import { Input } from './Input';
 import { Button } from './Button';
 import { UserType } from '@/types';
-import { isValidEmail, isSchoolEmail, isValidPassword } from '@/utils/validators';
+import { isValidEmail, isSchoolEmail, isValidPassword, isValidPhoneNumber } from '@/utils/validators';
 import styles from './SignupForm.module.css';
 
 export const SignupForm = () => {
@@ -16,11 +16,13 @@ export const SignupForm = () => {
   // 学生用フィールド
   const [studentName, setStudentName] = useState('');
   const [schoolName, setSchoolName] = useState('');
+  const [studentPhone, setStudentPhone] = useState('');
   
   // サロン用フィールド
   const [salonName, setSalonName] = useState('');
   const [address, setAddress] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
+  const [salonPhone, setSalonPhone] = useState('');
   
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,11 @@ export const SignupForm = () => {
       if (!schoolName) {
         newErrors.schoolName = '学校名を入力してください';
       }
+      if (!studentPhone) {
+        newErrors.studentPhone = '電話番号を入力してください';
+      } else if (!isValidPhoneNumber(studentPhone)) {
+        newErrors.studentPhone = '有効な電話番号を入力してください（例: 09012345678）';
+      }
     }
 
     // サロン用バリデーション
@@ -67,6 +74,11 @@ export const SignupForm = () => {
       }
       if (!address) {
         newErrors.address = '住所を入力してください';
+      }
+      if (!salonPhone) {
+        newErrors.salonPhone = '電話番号を入力してください';
+      } else if (!isValidPhoneNumber(salonPhone)) {
+        newErrors.salonPhone = '有効な電話番号を入力してください（例: 0312345678）';
       }
     }
 
@@ -88,12 +100,14 @@ export const SignupForm = () => {
             email,
             name: studentName,
             school_name: schoolName,
+            phone_number: studentPhone,
           }
         : {
             id: '',
             email,
             salon_name: salonName,
             address,
+            phone_number: salonPhone,
             website_url: websiteUrl || undefined,
           };
 
@@ -187,6 +201,17 @@ export const SignupForm = () => {
             required
             fullWidth
           />
+
+          <Input
+            type="tel"
+            label="電話番号"
+            value={studentPhone}
+            onChange={(e) => setStudentPhone(e.target.value)}
+            error={errors.studentPhone}
+            placeholder="09012345678"
+            required
+            fullWidth
+          />
         </>
       )}
 
@@ -211,6 +236,17 @@ export const SignupForm = () => {
             onChange={(e) => setAddress(e.target.value)}
             error={errors.address}
             placeholder="東京都渋谷区..."
+            required
+            fullWidth
+          />
+
+          <Input
+            type="tel"
+            label="電話番号"
+            value={salonPhone}
+            onChange={(e) => setSalonPhone(e.target.value)}
+            error={errors.salonPhone}
+            placeholder="0312345678"
             required
             fullWidth
           />

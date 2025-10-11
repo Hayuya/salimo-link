@@ -5,6 +5,7 @@ import { TopPage } from '@/pages/TopPage';
 import { AboutPage } from '@/pages/AboutPage';
 import { TermsPage } from '@/pages/TermsPage';
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
+import { FAQPage } from '@/pages/FAQPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { SignupPage } from '@/pages/SignupPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -24,6 +25,7 @@ export const AppRoutes = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/faq" element={<FAQPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/recruitment/:id" element={<RecruitmentDetailPage />} />

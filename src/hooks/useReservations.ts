@@ -1,6 +1,7 @@
 // src/hooks/useReservations.ts
 import { useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import { sendReservationNotification } from '@/lib/notifications';
 import { Reservation, ReservationWithDetails, ReservationUpdate } from '@/types';
 
 export const useReservations = () => {
@@ -99,6 +100,10 @@ export const useReservations = () => {
 
       // is_fully_bookedはDBトリガーで更新される
 
+      if (data) {
+        await sendReservationNotification(data, 'reservation_pending');
+      }
+
       return data; // 予約IDを返す
     } catch (err: any) {
       const errorMessage = err.message || '予約の作成に失敗しました';
@@ -152,6 +157,16 @@ export const useReservations = () => {
         }
 
         // トリガーがis_fully_bookedを更新する
+      }
+      
+      if (updatedReservation) {
+        if (status === 'confirmed') {
+          await sendReservationNotification(updatedReservation.id, 'reservation_confirmed');
+        } else if (status === 'cancelled_by_salon') {
+          await sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_salon');
+        } else if (status === 'cancelled_by_student') {
+          await sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_student');
+        }
       }
       
       return updatedReservation;
