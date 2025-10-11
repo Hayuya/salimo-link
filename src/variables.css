@@ -47,6 +47,14 @@
   --color-bg-tertiary: #ebe9f7;
   --color-surface: var(--color-white);
   --color-surface-muted: #f8f6ff;
+  --surface-gradient-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 235, 255, 0.82) 100%);
+  --surface-gradient-strong: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(210, 202, 255, 0.72) 100%);
+  --surface-gradient-dark: linear-gradient(160deg, rgba(29, 27, 48, 0.95) 0%, rgba(46, 43, 76, 0.78) 100%);
+  --surface-highlight: rgba(255, 255, 255, 0.65);
+  --surface-border-highlight: rgba(255, 255, 255, 0.54);
+  --surface-border-shadow: rgba(57, 47, 105, 0.25);
+  --surface-border-glow: rgba(124, 93, 247, 0.26);
+  --surface-shadow-color: rgba(44, 34, 84, 0.4);
 
   /* Border Colors */
   --color-border-light: rgba(114, 111, 150, 0.12);
@@ -135,11 +143,11 @@
   --radius-card: 1.25rem;
 
   /* Shadows */
-  --shadow-xs: 0 2px 8px rgba(60, 54, 107, 0.08);
-  --shadow-sm: 0 4px 12px rgba(60, 54, 107, 0.08);
-  --shadow-md: 0 12px 32px rgba(60, 54, 107, 0.12);
-  --shadow-lg: 0 22px 45px rgba(60, 54, 107, 0.14);
-  --shadow-glow: 0 0 40px rgba(124, 93, 247, 0.25);
+  --shadow-xs: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px rgba(60, 54, 107, 0.14);
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 14px rgba(60, 54, 107, 0.18), 0 18px 26px rgba(34, 27, 74, 0.16);
+  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 12px 24px rgba(60, 54, 107, 0.18), 0 28px 42px rgba(34, 27, 74, 0.23);
+  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 18px 32px rgba(60, 54, 107, 0.2), 0 45px 65px rgba(34, 27, 74, 0.28);
+  --shadow-glow: 0 0 40px rgba(124, 93, 247, 0.28), 0 18px 36px rgba(60, 54, 107, 0.18);
 
   /* Transitions */
   --transition-fast: 150ms ease;

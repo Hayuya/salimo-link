@@ -30,15 +30,6 @@ export const SalonReservationsSection = ({
   hasUnreadMessage,
   getReservationStatusLabel,
 }: SalonReservationsSectionProps) => {
-  // 予約者のイニシャルを取得
-  const getInitials = (name: string) => {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return parts[0][0] + parts[parts.length - 1][0];
-    }
-    return name.slice(0, 2);
-  };
-
   const renderReservationCard = (reservation: ReservationWithDetails) => {
     const isExpanded = !!expandedReservations[reservation.id];
     const statusLabel = getReservationStatusLabel(reservation.status);
@@ -57,7 +48,6 @@ export const SalonReservationsSection = ({
         <div className={styles.cardHeader}>
           <div className={styles.summary}>
             <div className={styles.identity}>
-              <div className={styles.avatar}>{getInitials(reservation.student.name)}</div>
               <div className={styles.identityContent}>
                 <h4 className={styles.studentName}>
                   {reservation.student.name}
