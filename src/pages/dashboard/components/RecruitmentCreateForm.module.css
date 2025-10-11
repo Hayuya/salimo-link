@@ -1,0 +1,548 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+/* ========== Progress Steps ========== */
+.stepsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.08) 0%, rgba(242, 109, 162, 0.08) 100%);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+
+.stepActive {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.stepCompleted {
+  opacity: 0.8;
+}
+
+.stepIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.stepActive .stepIcon {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-gradient-end) 100%);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.stepCompleted .stepIcon {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.stepLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.stepConnector {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(124, 93, 247, 0.2);
+  z-index: -1;
+}
+
+/* ========== Form Content ========== */
+.formContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0.5rem;
+  min-height: 400px;
+}
+
+.stepContent {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stepTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(124, 93, 247, 0.1);
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: var(--color-danger);
+  margin-left: 0.25rem;
+}
+
+/* ========== Input Styles ========== */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: white;
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: rgba(124, 93, 247, 0.5);
+  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: white;
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea:focus {
+  border-color: rgba(124, 93, 247, 0.5);
+  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+}
+
+/* ========== Menu Grid ========== */
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.menuButton {
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: white;
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.menuButton:hover {
+  border-color: rgba(124, 93, 247, 0.3);
+}
+
+.menuButtonActive {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-gradient-end) 100%);
+  color: white;
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.3);
+}
+
+/* ========== Radio Buttons ========== */
+.radioGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.radioLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  background: white;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.radioLabel:hover {
+  border-color: rgba(124, 93, 247, 0.3);
+}
+
+.radioLabel:has(input:checked) {
+  background: rgba(124, 93, 247, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.radio {
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ========== Date/Time Selector ========== */
+.dateTimeSelector {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.dateInput {
+  flex: 1 1 150px;
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: white;
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.dateInput:focus {
+  border-color: rgba(124, 93, 247, 0.5);
+  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+}
+
+.timeInput {
+  flex: 1 1 120px;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: white;
+  border: 2px solid rgba(124, 93, 247, 0.15);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.timeInput:focus {
+  border-color: rgba(124, 93, 247, 0.5);
+  box-shadow: 0 0 0 4px rgba(124, 93, 247, 0.1);
+}
+
+.addButton {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-gradient-end) 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(124, 93, 247, 0.2);
+}
+
+.addButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.3);
+}
+
+.addButton:active {
+  transform: translateY(0);
+}
+
+/* ========== Chat Toggle ========== */
+.chatToggleBox {
+  padding: 1rem;
+  background: rgba(124, 93, 247, 0.06);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.checkbox {
+  margin: 0;
+  accent-color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.helperText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin: 0.5rem 0 0 1.625rem;
+  line-height: 1.5;
+}
+
+/* ========== Dates List ========== */
+.datesList {
+  margin-top: 1rem;
+}
+
+.datesLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.dateItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(124, 93, 247, 0.1);
+  transition: all var(--transition-fast);
+}
+
+.dateItem:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.dateText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.removeButton:hover {
+  transform: scale(1.2);
+  color: var(--color-danger-light);
+}
+
+/* ========== Summary Box ========== */
+.summaryBox {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(124, 93, 247, 0.08) 0%, rgba(242, 109, 162, 0.05) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(124, 93, 247, 0.15);
+}
+
+.summaryTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.summaryItem {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.summaryItem strong {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ========== Button Container ========== */
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.25rem;
+  border-top: 2px solid rgba(124, 93, 247, 0.1);
+}
+
+.navButtons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background: white;
+  border: 2px solid rgba(114, 111, 150, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.cancelButton:hover {
+  background: var(--color-surface-muted);
+  border-color: rgba(114, 111, 150, 0.3);
+}
+
+.backButton {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: rgba(124, 93, 247, 0.08);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.backButton:hover {
+  background: rgba(124, 93, 247, 0.15);
+}
+
+.nextButton {
+  padding: 0.75rem 2rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-gradient-end) 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(124, 93, 247, 0.3);
+}
+
+.nextButton:hover:not(.buttonDisabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(124, 93, 247, 0.4);
+}
+
+.nextButton:active:not(.buttonDisabled) {
+  transform: translateY(0);
+}
+
+.buttonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .stepsContainer {
+    padding: 1rem;
+  }
+
+  .stepIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .stepLabel {
+    font-size: 0.625rem;
+  }
+
+  .stepTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .menuGrid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .dateTimeSelector {
+    flex-direction: column;
+  }
+
+  .dateInput,
+  .timeInput {
+    width: 100%;
+  }
+
+  .addButton {
+    width: 100%;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .navButtons {
+    width: 100%;
+  }
+
+  .cancelButton,
+  .backButton,
+  .nextButton {
+    flex: 1;
+  }
+}

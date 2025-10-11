@@ -41,6 +41,7 @@ import { ProfileCard } from './dashboard/components/ProfileCard';
 import { StudentReservationsSection } from './dashboard/components/StudentReservationsSection';
 import { SalonReservationsSection } from './dashboard/components/SalonReservationsSection';
 import { RecruitmentManagementSection } from './dashboard/components/RecruitmentManagementSection';
+import { RecruitmentCreateForm } from './dashboard/components/RecruitmentCreateForm';
 import styles from './DashboardPage.module.css';
 
 const initialRecruitmentState = {
@@ -93,10 +94,6 @@ export const DashboardPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showProfileActions, setShowProfileActions] = useState(false);
   const profileActionsRef = useRef<HTMLDivElement | null>(null);
-
-  // 新規作成用の日時入力
-  const [newSlotDate, setNewSlotDate] = useState('');
-  const [newSlotTime, setNewSlotTime] = useState('');
 
   // 編集用の日時入力
   const [editSlotDate, setEditSlotDate] = useState('');
@@ -244,48 +241,8 @@ useEffect(() => {
 
   // JSTとして扱う日時作成関数
   const createJSTDateTime = (date: string, time: string): string => {
-    // ISO 8601形式でJST（+09:00）を明示
+    // ISO 8601形式でJST(+09:00)を明示
     return `${date}T${time}:00+09:00`;
-  };
-
-  // 新規作成時の日時追加
-  const addSlot = () => {
-    if (!newSlotDate || !newSlotTime) {
-      alert('日付と時刻を選択してください');
-      return;
-    }
-    
-    const jstDatetime = createJSTDateTime(newSlotDate, newSlotTime);
-    const datetime = new Date(jstDatetime).toISOString();
-    
-    // 重複チェック
-    if (newRecruitmentData.available_dates.some(d => d.datetime === datetime)) {
-      alert('同じ日時がすでに追加されています');
-      return;
-    }
-    
-    const newDate: AvailableDate = {
-      datetime,
-      is_booked: false
-    };
-    
-    setNewRecruitmentData({
-      ...newRecruitmentData,
-      available_dates: [...newRecruitmentData.available_dates, newDate].sort(
-        (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
-      )
-    });
-    
-    // 入力フィールドをクリア
-    setNewSlotDate('');
-    setNewSlotTime('');
-  };
-
-  const removeSlot = (datetime: string) => {
-    setNewRecruitmentData({
-      ...newRecruitmentData,
-      available_dates: newRecruitmentData.available_dates.filter(d => d.datetime !== datetime)
-    });
   };
 
   // 編集時の日時追加
@@ -417,7 +374,7 @@ useEffect(() => {
   
   const handleToggleRecruitmentStatus = async (id: string, status: 'active' | 'closed') => {
     const action = status === 'active' ? '公開' : '非公開';
-    if (window.confirm(`この募集を${action}にしますか？`)) {
+    if (window.confirm(`この募集を${action}にしますか?`)) {
       try {
         await updateRecruitment(id, { status });
         alert(`募集を${action}にしました`);
@@ -429,7 +386,7 @@ useEffect(() => {
   };
 
   const handleDeleteRecruitment = async (id: string) => {
-    if (window.confirm('この募集を完全に削除しますか？関連する予約もすべて削除され、この操作は元に戻せません。')) {
+    if (window.confirm('この募集を完全に削除しますか?関連する予約もすべて削除され、この操作は元に戻せません。')) {
       try {
         await deleteRecruitment(id);
         alert('募集を削除しました');
@@ -451,7 +408,7 @@ useEffect(() => {
       cancelled_by_salon: 'キャンセル',
     }[status as 'confirmed' | 'cancelled_by_salon'];
 
-    if (action && window.confirm(`この予約を${action}しますか？`)) {
+    if (action && window.confirm(`この予約を${action}しますか?`)) {
       try {
         await updateReservationStatus(id, status);
         alert(`予約を${action}しました。`);
@@ -481,7 +438,7 @@ useEffect(() => {
 
   const handleDeleteAccount = async () => {
     setShowProfileActions(false);
-    if (!window.confirm('アカウントを本当に削除しますか？この操作は取り消せません。')) {
+    if (!window.confirm('アカウントを本当に削除しますか?この操作は取り消せません。')) {
       return;
     }
 
@@ -581,7 +538,7 @@ useEffect(() => {
         
         <div className={styles.inputWrapper}>
           <label className={styles.label}>
-            メニュー（複数選択可）<span className={styles.required}>*</span>
+            メニュー(複数選択可)<span className={styles.required}>*</span>
           </label>
           <div className={styles.checkboxGrid}>
             {MENU_OPTIONS.map(menu => (
@@ -682,7 +639,7 @@ useEffect(() => {
         
         {data.has_reward && (
           <Input 
-            label="謝礼詳細（任意）" 
+            label="謝礼詳細(任意)" 
             value={data.reward_details || ''} 
             onChange={(e) => setter({ ...data, reward_details: e.target.value })} 
             placeholder="例: 交通費支給、トリートメントサービスなど" 
@@ -691,7 +648,7 @@ useEffect(() => {
         )}
         
         <Input 
-          label="施術時間（任意）" 
+          label="施術時間(任意)" 
           type="text" 
           value={data.treatment_duration || ''} 
           onChange={(e) => setter({ ...data, treatment_duration: e.target.value })} 
@@ -705,12 +662,12 @@ useEffect(() => {
   // 日時管理UIコンポーネント
   const renderDateTimeManager = (isEdit: boolean) => {
     const dates = isEdit ? (editingRecruitment?.available_dates || []) : newRecruitmentData.available_dates;
-    const dateValue = isEdit ? editSlotDate : newSlotDate;
-    const timeValue = isEdit ? editSlotTime : newSlotTime;
-    const setDateValue = isEdit ? setEditSlotDate : setNewSlotDate;
-    const setTimeValue = isEdit ? setEditSlotTime : setNewSlotTime;
-    const addFunc = isEdit ? addEditSlot : addSlot;
-    const removeFunc = isEdit ? removeEditSlot : removeSlot;
+    const dateValue = isEdit ? editSlotDate : '';
+    const timeValue = isEdit ? editSlotTime : '';
+    const setDateValue = isEdit ? setEditSlotDate : () => {};
+    const setTimeValue = isEdit ? setEditSlotTime : () => {};
+    const addFunc = isEdit ? addEditSlot : () => {};
+    const removeFunc = isEdit ? removeEditSlot : () => {};
 
     const targetRecruitment = isEdit ? editingRecruitment : newRecruitmentData;
     const allowChat = targetRecruitment?.allow_chat_consultation ?? false;
@@ -778,7 +735,7 @@ useEffect(() => {
               >
                 <span>
                   {formatDateTime(date.datetime)}
-                  {date.is_booked && <strong style={{ marginLeft: 'var(--spacing-sm)', color: 'var(--color-danger)' }}>（予約済み）</strong>}
+                  {date.is_booked && <strong style={{ marginLeft: 'var(--spacing-sm)', color: 'var(--color-danger)' }}>(予約済み)</strong>}
                 </span>
                 {!date.is_booked && (
                   <button 
@@ -942,26 +899,15 @@ useEffect(() => {
         </div>
       </Modal>
 
-      {/* 募集作成モーダル */}
+      {/* 募集作成モーダル（新デザイン） */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="新規募集作成" size="lg">
-        {renderRecruitmentForm(newRecruitmentData, setNewRecruitmentData, false)}
-        {renderDateTimeManager(false)}
-        
-        <div className={styles.modalActions}>
-          <Button variant="outline" onClick={() => setShowCreateModal(false)}>キャンセル</Button>
-          <Button 
-            variant="primary" 
-            onClick={handleCreateRecruitment} 
-            loading={createLoading}
-            disabled={
-              newRecruitmentData.menus.length === 0 || 
-              !newRecruitmentData.title || 
-              (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.allow_chat_consultation)
-            }
-          >
-            作成
-          </Button>
-        </div>
+        <RecruitmentCreateForm
+          data={newRecruitmentData}
+          onUpdate={setNewRecruitmentData}
+          onSubmit={handleCreateRecruitment}
+          loading={createLoading}
+          onCancel={() => setShowCreateModal(false)}
+        />
       </Modal>
 
       {/* 募集編集モーダル */}
