@@ -113,6 +113,24 @@
   border-bottom: 2px solid rgba(124, 93, 247, 0.1);
 }
 
+/* ========== Section Group ========== */
+.sectionGroup {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(124, 93, 247, 0.03);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(124, 93, 247, 0.08);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(124, 93, 247, 0.15);
+}
+
 .formGroup {
   margin-bottom: 1.5rem;
 }
