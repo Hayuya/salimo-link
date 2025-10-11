@@ -59,10 +59,8 @@ export const RecruitmentCreateForm = ({
   const [newSlotTime, setNewSlotTime] = useState('');
   
   const steps = [
-    { id: 'basic', label: '基本情報', icon: '1' },
-    { id: 'requirements', label: '募集条件', icon: '2' },
-    { id: 'schedule', label: '日時設定', icon: '3' },
-    { id: 'rewards', label: '謝礼・詳細', icon: '4' }
+    { id: 'info', label: '募集情報登録', icon: '1' },
+    { id: 'schedule', label: '日時設定', icon: '2' }
   ];
 
   const toggleMenu = (menu: MenuType) => {
@@ -112,7 +110,7 @@ export const RecruitmentCreateForm = ({
     switch (currentStep) {
       case 0:
         return data.title && data.menus?.length > 0;
-      case 2:
+      case 1:
         return (data.available_dates?.length > 0) || data.allow_chat_consultation;
       default:
         return true;
@@ -150,49 +148,176 @@ export const RecruitmentCreateForm = ({
       <div className={styles.formContent}>
         {currentStep === 0 && (
           <div className={styles.stepContent}>
-            <h3 className={styles.stepTitle}>基本情報を入力</h3>
+            <h3 className={styles.stepTitle}>募集情報を入力</h3>
             
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
-                募集タイトル <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                value={data.title || ''}
-                onChange={(e) => onUpdate({ ...data, title: e.target.value })}
-                placeholder="例: 春の新色カラーモデル募集"
-                className={styles.input}
-              />
+            {/* 基本情報 */}
+            <div className={styles.sectionGroup}>
+              <h4 className={styles.sectionTitle}>基本情報</h4>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  募集タイトル <span className={styles.required}>*</span>
+                </label>
+                <input
+                  type="text"
+                  value={data.title || ''}
+                  onChange={(e) => onUpdate({ ...data, title: e.target.value })}
+                  placeholder="例: 春の新色カラーモデル募集"
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>募集内容</label>
+                <textarea
+                  value={data.description || ''}
+                  onChange={(e) => onUpdate({ ...data, description: e.target.value })}
+                  placeholder="詳しい募集内容を入力してください"
+                  className={styles.textarea}
+                  rows={4}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  メニュー(複数選択可) <span className={styles.required}>*</span>
+                </label>
+                <div className={styles.menuGrid}>
+                  {MENU_OPTIONS.map(menu => (
+                    <button
+                      key={menu}
+                      type="button"
+                      onClick={() => toggleMenu(menu)}
+                      className={`${styles.menuButton} ${
+                        data.menus?.includes(menu) ? styles.menuButtonActive : ''
+                      }`}
+                    >
+                      {MENU_LABELS[menu]}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>募集内容</label>
-              <textarea
-                value={data.description || ''}
-                onChange={(e) => onUpdate({ ...data, description: e.target.value })}
-                placeholder="詳しい募集内容を入力してください"
-                className={styles.textarea}
-                rows={4}
-              />
+            {/* 募集条件 */}
+            <div className={styles.sectionGroup}>
+              <h4 className={styles.sectionTitle}>募集条件</h4>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.label}>性別</label>
+                <div className={styles.radioGroup}>
+                  {GENDER_OPTIONS.map(gender => (
+                    <label key={gender} className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="gender"
+                        value={gender}
+                        checked={data.gender_requirement === gender}
+                        onChange={(e) => onUpdate({ ...data, gender_requirement: e.target.value as GenderRequirement })}
+                        className={styles.radio}
+                      />
+                      <span>{GENDER_LABELS[gender]}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>髪の長さ</label>
+                <div className={styles.radioGroup}>
+                  {HAIR_LENGTH_OPTIONS.map(length => (
+                    <label key={length} className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="hairLength"
+                        value={length}
+                        checked={data.hair_length_requirement === length}
+                        onChange={(e) => onUpdate({ ...data, hair_length_requirement: e.target.value as HairLengthRequirement })}
+                        className={styles.radio}
+                      />
+                      <span>{HAIR_LENGTH_LABELS[length]}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>モデル経験</label>
+                <div className={styles.radioGroup}>
+                  {EXPERIENCE_OPTIONS.map(exp => (
+                    <label key={exp} className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="experience"
+                        value={exp}
+                        checked={data.model_experience_requirement === exp}
+                        onChange={(e) => onUpdate({ ...data, model_experience_requirement: e.target.value as ModelExperienceRequirement })}
+                        className={styles.radio}
+                      />
+                      <span>{EXPERIENCE_LABELS[exp]}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>撮影</label>
+                <div className={styles.radioGroup}>
+                  {PHOTO_SHOOT_OPTIONS.map(photo => (
+                    <label key={photo} className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="photoShoot"
+                        value={photo}
+                        checked={data.photo_shoot_requirement === photo}
+                        onChange={(e) => onUpdate({ ...data, photo_shoot_requirement: e.target.value as PhotoShootRequirement })}
+                        className={styles.radio}
+                      />
+                      <span>{PHOTO_SHOOT_LABELS[photo]}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
-                メニュー(複数選択可) <span className={styles.required}>*</span>
-              </label>
-              <div className={styles.menuGrid}>
-                {MENU_OPTIONS.map(menu => (
-                  <button
-                    key={menu}
-                    type="button"
-                    onClick={() => toggleMenu(menu)}
-                    className={`${styles.menuButton} ${
-                      data.menus?.includes(menu) ? styles.menuButtonActive : ''
-                    }`}
-                  >
-                    {MENU_LABELS[menu]}
-                  </button>
-                ))}
+            {/* 謝礼・詳細 */}
+            <div className={styles.sectionGroup}>
+              <h4 className={styles.sectionTitle}>謝礼・詳細</h4>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={data.has_reward || false}
+                    onChange={(e) => onUpdate({ ...data, has_reward: e.target.checked })}
+                    className={styles.checkbox}
+                  />
+                  <span>謝礼あり</span>
+                </label>
+              </div>
+
+              {data.has_reward && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>謝礼詳細(任意)</label>
+                  <input
+                    type="text"
+                    value={data.reward_details || ''}
+                    onChange={(e) => onUpdate({ ...data, reward_details: e.target.value })}
+                    placeholder="例: 交通費支給、トリートメントサービスなど"
+                    className={styles.input}
+                  />
+                </div>
+              )}
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>施術時間(任意)</label>
+                <input
+                  type="text"
+                  value={data.treatment_duration || ''}
+                  onChange={(e) => onUpdate({ ...data, treatment_duration: e.target.value })}
+                  placeholder="例: 2〜3時間"
+                  className={styles.input}
+                />
               </div>
             </div>
           </div>
@@ -200,89 +325,7 @@ export const RecruitmentCreateForm = ({
 
         {currentStep === 1 && (
           <div className={styles.stepContent}>
-            <h3 className={styles.stepTitle}>募集条件を設定</h3>
-            
-            <div className={styles.formGroup}>
-              <label className={styles.label}>性別</label>
-              <div className={styles.radioGroup}>
-                {GENDER_OPTIONS.map(gender => (
-                  <label key={gender} className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value={gender}
-                      checked={data.gender_requirement === gender}
-                      onChange={(e) => onUpdate({ ...data, gender_requirement: e.target.value as GenderRequirement })}
-                      className={styles.radio}
-                    />
-                    <span>{GENDER_LABELS[gender]}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>髪の長さ</label>
-              <div className={styles.radioGroup}>
-                {HAIR_LENGTH_OPTIONS.map(length => (
-                  <label key={length} className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="hairLength"
-                      value={length}
-                      checked={data.hair_length_requirement === length}
-                      onChange={(e) => onUpdate({ ...data, hair_length_requirement: e.target.value as HairLengthRequirement })}
-                      className={styles.radio}
-                    />
-                    <span>{HAIR_LENGTH_LABELS[length]}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>モデル経験</label>
-              <div className={styles.radioGroup}>
-                {EXPERIENCE_OPTIONS.map(exp => (
-                  <label key={exp} className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="experience"
-                      value={exp}
-                      checked={data.model_experience_requirement === exp}
-                      onChange={(e) => onUpdate({ ...data, model_experience_requirement: e.target.value as ModelExperienceRequirement })}
-                      className={styles.radio}
-                    />
-                    <span>{EXPERIENCE_LABELS[exp]}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>撮影</label>
-              <div className={styles.radioGroup}>
-                {PHOTO_SHOOT_OPTIONS.map(photo => (
-                  <label key={photo} className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="photoShoot"
-                      value={photo}
-                      checked={data.photo_shoot_requirement === photo}
-                      onChange={(e) => onUpdate({ ...data, photo_shoot_requirement: e.target.value as PhotoShootRequirement })}
-                      className={styles.radio}
-                    />
-                    <span>{PHOTO_SHOOT_LABELS[photo]}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 2 && (
-          <div className={styles.stepContent}>
-            <h3 className={styles.stepTitle}>施術可能な日時を追加</h3>
+            <h3 className={styles.stepTitle}>施術可能な日時を設定</h3>
             
             <div className={styles.dateTimeSelector}>
               <input
@@ -338,48 +381,6 @@ export const RecruitmentCreateForm = ({
                 ))}
               </div>
             )}
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className={styles.stepContent}>
-            <h3 className={styles.stepTitle}>謝礼・詳細情報</h3>
-            
-            <div className={styles.formGroup}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={data.has_reward || false}
-                  onChange={(e) => onUpdate({ ...data, has_reward: e.target.checked })}
-                  className={styles.checkbox}
-                />
-                <span>謝礼あり</span>
-              </label>
-            </div>
-
-            {data.has_reward && (
-              <div className={styles.formGroup}>
-                <label className={styles.label}>謝礼詳細(任意)</label>
-                <input
-                  type="text"
-                  value={data.reward_details || ''}
-                  onChange={(e) => onUpdate({ ...data, reward_details: e.target.value })}
-                  placeholder="例: 交通費支給、トリートメントサービスなど"
-                  className={styles.input}
-                />
-              </div>
-            )}
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>施術時間(任意)</label>
-              <input
-                type="text"
-                value={data.treatment_duration || ''}
-                onChange={(e) => onUpdate({ ...data, treatment_duration: e.target.value })}
-                placeholder="例: 2〜3時間"
-                className={styles.input}
-              />
-            </div>
 
             <div className={styles.summaryBox}>
               <h4 className={styles.summaryTitle}>📋 募集内容の確認</h4>
@@ -392,6 +393,9 @@ export const RecruitmentCreateForm = ({
               <div className={styles.summaryItem}>
                 <strong>日時:</strong> {data.available_dates?.length || 0}件
                 {data.allow_chat_consultation && ' (チャット相談あり)'}
+              </div>
+              <div className={styles.summaryItem}>
+                <strong>謝礼:</strong> {data.has_reward ? (data.reward_details || 'あり') : 'なし'}
               </div>
             </div>
           </div>
