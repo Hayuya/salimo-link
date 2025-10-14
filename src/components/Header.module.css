@@ -18,17 +18,35 @@
   justify-content: space-between;
 }
 
-.logo h1 {
+.logoTitle {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
   margin: 0;
   letter-spacing: var(--letter-spacing-tight);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.logo:hover h1 {
+.logo:hover .logoTitle {
   color: var(--color-primary-hover);
   transition: color var(--transition-fast);
+}
+
+.betaBadge {
+  font-size: var(--font-size-2xs);
+  letter-spacing: var(--letter-spacing-wide);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-status-warning-text);
+  background: rgba(247, 169, 75, 0.16);
+  border: 1px solid rgba(247, 169, 75, 0.35);
+  border-radius: var(--radius-pill);
+  padding: calc(var(--spacing-2xs) * 1.5) var(--spacing-sm);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav {
@@ -134,7 +152,7 @@
     padding: var(--spacing-sm) var(--container-padding);
   }
 
-  .logo h1 {
+  .logoTitle {
     font-size: var(--font-size-xl);
   }
 
