@@ -26,9 +26,12 @@ export const RecruitmentManagementSection = ({
     <section className={styles.wrapper}>
       <div className={styles.header}>
         <h2 className={styles.title}>募集管理</h2>
-        <Button variant="primary" onClick={onCreateClick}>
-          新規募集作成
-        </Button>
+        <button type="button" className={styles.createButton} onClick={onCreateClick}>
+          <span className={styles.createIcon} aria-hidden="true">
+            +
+          </span>
+          <span className={styles.createLabel}>新規募集作成</span>
+        </button>
       </div>
 
       {recruitments.length === 0 ? (
