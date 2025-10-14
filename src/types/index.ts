@@ -89,6 +89,7 @@ export type MenuType =
   | 'head_spa' 
   | 'hair_straightening' 
   | 'extensions' 
+  | 'choose_from_list'
   | 'other';
 export type PhotoShootRequirement = 'required' | 'optional' | 'none';
 export type ModelExperienceRequirement = 'any' | 'experienced' | 'beginner';

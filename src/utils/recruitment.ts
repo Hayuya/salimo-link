@@ -14,6 +14,7 @@ export const MENU_LABELS: Record<MenuType, string> = {
   head_spa: 'ヘッドスパ',
   hair_straightening: '縮毛矯正',
   extensions: 'エクステ',
+  choose_from_list: 'の中から選択可能！',
   other: 'その他',
 };
 
@@ -68,6 +69,7 @@ export const MENU_OPTIONS: MenuType[] = [
   'head_spa', 
   'hair_straightening', 
   'extensions', 
+  'choose_from_list',
   'other'
 ];
 

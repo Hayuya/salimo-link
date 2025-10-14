@@ -29,7 +29,7 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
   const hasFlexibleSchedule = !!recruitment.flexible_schedule_text?.trim();
 
   const slotDisplay = hasBookableSlots
-    ? `受付日時${bookableSlotsCount}件`
+    ? `受付 ${bookableSlotsCount} 件`
     : hasConsultableSlots
       ? '相談可'
       : hasFlexibleSchedule
