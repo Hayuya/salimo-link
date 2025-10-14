@@ -88,8 +88,11 @@ export const TopPage = () => {
                 カットモデルで繋ぐ
               </h1>
               <p className={styles.heroSubtitle}>
-                安全で洗練された出会いをサポート。<br />
-                美容とファッションに寄り添ったマッチングプラットフォームです。
+                学生は無料、サロンもベータ期間中は無料で募集を掲載可能。<br />
+                施術メニューや料金が一目でわかり、仮予約の承認・キャンセルもスムーズです。
+              </p>
+              <p className={styles.heroSubtitle}>
+                チャットで柔軟に日時を相談し、直感的な操作でカットモデル募集を管理しましょう。
               </p>
 
               <div className={styles.heroCtas}>
@@ -110,36 +113,60 @@ export const TopPage = () => {
                 <div className={styles.featureItem}>
                   <div className={styles.featureIcon}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
                   <div className={styles.featureText}>
-                    <h3>学校メール認証</h3>
-                    <p>安全な本人確認</p>
+                    <h3>無料ではじめられる</h3>
+                    <p>学生はずっと無料、サロンもベータ期間中は利用料ゼロで導入できます。</p>
                   </div>
                 </div>
 
                 <div className={styles.featureItem}>
                   <div className={styles.featureIcon}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path d="M3 5h18M3 10h18M3 15h10M3 20h6" />
                     </svg>
                   </div>
                   <div className={styles.featureText}>
-                    <h3>簡単予約</h3>
-                    <p>日時を選んで即座に予約</p>
+                    <h3>直感的な募集管理</h3>
+                    <p>施術メニューや料金、募集条件をわかりやすく掲載して学生にアピールできます。</p>
                   </div>
                 </div>
 
                 <div className={styles.featureItem}>
                   <div className={styles.featureIcon}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      <path d="M4 7h16M4 12h10m-6 5h-4" />
                     </svg>
                   </div>
                   <div className={styles.featureText}>
-                    <h3>信頼の出会い</h3>
-                    <p>学生とサロンを繋ぐ</p>
+                    <h3>柔軟なスケジュール登録</h3>
+                    <p>複数の日時指定も、文章で施術可能なタイミングを記載することも自由自在です。</p>
+                  </div>
+                </div>
+
+                <div className={styles.featureItem}>
+                  <div className={styles.featureIcon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className={styles.featureText}>
+                    <h3>仮予約の承認・キャンセル</h3>
+                    <p>学生からの仮予約は状況に応じて承認、やむを得ない場合のキャンセルも簡単に行えます。</p>
+                  </div>
+                </div>
+
+                <div className={styles.featureItem}>
+                  <div className={styles.featureIcon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15a2 2 0 01-2 2H8l-4 4V5a2 2 0 012-2h13a2 2 0 012 2v10z" />
+                    </svg>
+                  </div>
+                  <div className={styles.featureText}>
+                    <h3>チャットで相談</h3>
+                    <p>学生とサロンがチャットでコミュニケーションし、施術内容や持ち物を事前に確認できます。</p>
                   </div>
                 </div>
               </div>
