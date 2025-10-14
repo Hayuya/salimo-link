@@ -351,6 +351,16 @@ export const useDashboard = () => {
       if (action && window.confirm(`この予約を${action}しますか?`)) {
         try {
           await updateReservationStatus(id, status);
+          if (status === 'cancelled_by_salon') {
+            const targetReservation = reservations.find(res => res.id === id);
+            if (targetReservation) {
+              try {
+                await updateRecruitment(targetReservation.recruitment_id, { status: 'closed' });
+              } catch (recruitmentError: any) {
+                console.error('募集の非公開化に失敗しました:', recruitmentError);
+              }
+            }
+          }
           alert(`予約を${action}しました。`);
           await loadDashboardData();
         } catch (error: any) {
@@ -358,7 +368,7 @@ export const useDashboard = () => {
         }
       }
     },
-    [loadDashboardData, updateReservationStatus],
+    [loadDashboardData, reservations, updateRecruitment, updateReservationStatus],
   );
 
   const handleOpenCancelModal = useCallback((reservation: ReservationWithDetails) => {
@@ -405,15 +415,10 @@ export const useDashboard = () => {
     setCancelSubmitting(true);
     setCancelError('');
     try {
-      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_salon', {
+      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_student', {
         cancellationReason: cancelReason.trim(),
       });
-      try {
-        await updateRecruitment(cancelReservationTarget.recruitment_id, { status: 'closed' });
-      } catch (recruitmentError: any) {
-        console.error('募集の非公開化に失敗しました:', recruitmentError);
-      }
-      alert('予約をキャンセルしました。募集を一時的に非公開にしました。');
+      alert('予約をキャンセルしました。');
       setCancelReservationTarget(null);
       setCancelReason('');
       setSelectedCancelPreset('');

@@ -141,7 +141,7 @@ export const DashboardPage = () => {
       case 'cancelled_by_salon':
         return { text: 'サロン都合キャンセル', className: styles.statusRejected };
       case 'cancelled_by_student':
-        return { text: '本人キャンセル', className: styles.statusWithdrawn };
+        return { text: '学生都合キャンセル', className: styles.statusWithdrawn };
       default:
         return { text: status, className: '' };
     }
