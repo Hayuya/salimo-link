@@ -65,11 +65,6 @@ export const RecruitmentManagementSection = ({
                   空き枠: <strong>{availableSlots}</strong>件
                   {hasFlexible && <span> / 調整メモあり</span>}
                 </p>
-                {hasFlexible && (
-                  <p className={styles.meta}>
-                    調整メモ: {flexibleText}
-                  </p>
-                )}
                 <div className={styles.scheduleBlock}>
                   <p className={styles.scheduleTitle}>募集中の日時</p>
                   {visibleUpcomingDates.length > 0 ? (
@@ -82,6 +77,9 @@ export const RecruitmentManagementSection = ({
                     <p className={styles.noSchedule}>
                       現在公開中の日時はありません。必要に応じて募集内容を更新してください。
                     </p>
+                  )}
+                  {hasFlexible && (
+                    <p className={styles.scheduleDescription}>{flexibleText}</p>
                   )}
                   {hasMoreUpcomingDates && (
                     <p className={styles.scheduleNote}>
