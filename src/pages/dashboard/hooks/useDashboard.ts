@@ -72,6 +72,7 @@ export const useDashboard = () => {
   const [selectedCancelPreset, setSelectedCancelPreset] = useState('');
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState('');
+  const [cancelContext, setCancelContext] = useState<'student' | 'salon' | null>(null);
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
@@ -371,7 +372,8 @@ export const useDashboard = () => {
     [loadDashboardData, reservations, updateRecruitment, updateReservationStatus],
   );
 
-  const handleOpenCancelModal = useCallback((reservation: ReservationWithDetails) => {
+  const handleOpenCancelModal = useCallback((reservation: ReservationWithDetails, context: 'student' | 'salon') => {
+    setCancelContext(context);
     setCancelReservationTarget(reservation);
     setCancelReason('');
     setSelectedCancelPreset('');
@@ -380,6 +382,7 @@ export const useDashboard = () => {
 
   const handleCloseCancelModal = useCallback(() => {
     if (cancelSubmitting) return;
+    setCancelContext(null);
     setCancelReservationTarget(null);
     setCancelReason('');
     setSelectedCancelPreset('');
@@ -390,6 +393,11 @@ export const useDashboard = () => {
     setSelectedCancelPreset(preset);
     if (preset === '') {
       setCancelReason('');
+      return;
+    }
+    if (preset === 'その他') {
+      setCancelReason('');
+      setCancelError('');
       return;
     }
     setCancelReason(prev => {
@@ -407,7 +415,7 @@ export const useDashboard = () => {
       setCancelError('キャンセル理由を入力してください');
       return;
     }
-    if (!isBeforeHoursBefore(cancelReservationTarget.reservation_datetime, 48)) {
+    if (cancelContext !== 'salon' && !isBeforeHoursBefore(cancelReservationTarget.reservation_datetime, 48)) {
       alert('キャンセル期限を過ぎています。サロンに直接ご連絡ください。');
       return;
     }
@@ -415,10 +423,21 @@ export const useDashboard = () => {
     setCancelSubmitting(true);
     setCancelError('');
     try {
-      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_student', {
+      const isSalonCancellation = cancelContext === 'salon';
+      await updateReservationStatus(cancelReservationTarget.id, isSalonCancellation ? 'cancelled_by_salon' : 'cancelled_by_student', {
         cancellationReason: cancelReason.trim(),
       });
-      alert('予約をキャンセルしました。');
+      if (isSalonCancellation) {
+        try {
+          await updateRecruitment(cancelReservationTarget.recruitment_id, { status: 'closed' });
+        } catch (recruitmentError: any) {
+          console.error('募集の非公開化に失敗しました:', recruitmentError);
+        }
+        alert('予約をキャンセルしました。募集を一時的に非公開にしました。');
+      } else {
+        alert('予約をキャンセルしました。');
+      }
+      setCancelContext(null);
       setCancelReservationTarget(null);
       setCancelReason('');
       setSelectedCancelPreset('');
@@ -428,7 +447,7 @@ export const useDashboard = () => {
     } finally {
       setCancelSubmitting(false);
     }
-  }, [cancelReason, cancelReservationTarget, loadDashboardData, updateReservationStatus]);
+  }, [cancelContext, cancelReason, cancelReservationTarget, loadDashboardData, updateRecruitment, updateReservationStatus]);
 
   const toggleReservationDetails = useCallback((id: string) => {
     setExpandedReservations(prev => ({
@@ -559,6 +578,7 @@ export const useDashboard = () => {
     handleOpenCancelModal,
     handleCloseCancelModal,
     handleCancelReservation,
+    cancelContext,
   };
 };
 

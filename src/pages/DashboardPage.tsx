@@ -15,6 +15,22 @@ import { RecruitmentManagementSection } from './dashboard/components/Recruitment
 import { RecruitmentForm, RecruitmentFormData } from './dashboard/components/RecruitmentForm';
 import styles from './DashboardPage.module.css';
 
+const SALON_CANCEL_PRESETS = [
+  'システム障害',
+  'スタッフ体調不良',
+  'ダブルブッキング',
+  '設備トラブル',
+  'その他',
+];
+
+const STUDENT_CANCEL_PRESETS = [
+  'スケジュールが合わなくなった',
+  '体調不良・体調面の不安',
+  'アクセスの都合がつかない',
+  '別の予約が確定した',
+  'その他',
+];
+
 const cloneRecruitmentFormData = (data: RecruitmentFormData): RecruitmentFormData => ({
   ...data,
   menus: [...(data.menus ?? [])],
@@ -98,6 +114,7 @@ export const DashboardPage = () => {
     handleOpenCancelModal,
     handleCloseCancelModal,
     handleCancelReservation,
+    cancelContext,
   } = useDashboard();
 
   const location = useLocation();
@@ -191,7 +208,7 @@ export const DashboardPage = () => {
               expandedReservations={expandedReservations}
               onToggleDetails={toggleReservationDetails}
               onOpenChat={handleOpenChat}
-              onRequestCancel={handleOpenCancelModal}
+              onRequestCancel={reservation => handleOpenCancelModal(reservation, 'student')}
               hasUnreadMessage={hasUnreadMessage}
               getReservationStatusLabel={getReservationStatusLabel}
             />
@@ -206,6 +223,7 @@ export const DashboardPage = () => {
               onToggleDetails={toggleReservationDetails}
               onUpdateStatus={handleUpdateReservation}
               onOpenChat={handleOpenChat}
+              onRequestCancel={reservation => handleOpenCancelModal(reservation, 'salon')}
               hasUnreadMessage={hasUnreadMessage}
               getReservationStatusLabel={getReservationStatusLabel}
             />
@@ -224,13 +242,16 @@ export const DashboardPage = () => {
       <Modal
         isOpen={!!cancelReservationTarget}
         onClose={handleCloseCancelModal}
-        title="予約をキャンセルする"
+        title={cancelContext === 'salon' ? '予約をキャンセルする（サロン）' : '予約をキャンセルする'}
         size="sm"
       >
         {cancelReservationTarget && (
+          <>
           <div className={styles.modalContent}>
             <p className={styles.modalDescription}>
-              以下の予約をキャンセルします。理由を入力して送信してください。
+              {cancelContext === 'salon'
+                ? '以下の予約をキャンセルします。理由を入力して送信してください。'
+                : '以下の予約をキャンセルします。該当する理由を選択して送信してください。'}
             </p>
             <div className={styles.modalInfoBox}>
               <p className={styles.modalInfoLabel}>予約日時</p>
@@ -250,36 +271,47 @@ export const DashboardPage = () => {
                   onChange={e => handleSelectCancelPreset(e.target.value)}
                 >
                   <option value="">理由を選択してください</option>
-                  <option value="システム障害">システム障害</option>
-                  <option value="スタッフ体調不良">スタッフ体調不良</option>
-                  <option value="ダブルブッキング">ダブルブッキング</option>
-                  <option value="設備トラブル">設備トラブル</option>
-                  <option value="その他">その他</option>
+                  {(cancelContext === 'salon' ? SALON_CANCEL_PRESETS : STUDENT_CANCEL_PRESETS).map(option => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <textarea
-                id="cancel-reason"
-                className={styles.textarea}
-                placeholder="詳細を入力してください"
-                value={cancelReason}
-                onChange={e => {
-                  setCancelReason(e.target.value);
-                  if (cancelError) {
-                    setCancelError('');
-                  }
-                }}
-                rows={4}
-                required
-              />
+              {(cancelContext === 'salon' || selectedCancelPreset === 'その他') && (
+                <textarea
+                  id="cancel-reason"
+                  className={styles.textarea}
+                  placeholder={cancelContext === 'salon' ? '詳細を入力してください' : '必要に応じて詳細を入力してください'}
+                  value={cancelReason}
+                  onChange={e => {
+                    setCancelReason(e.target.value);
+                    if (cancelError) {
+                      setCancelError('');
+                    }
+                  }}
+                  rows={4}
+                  required={cancelContext === 'salon' || selectedCancelPreset === 'その他'}
+                />
+              )}
               {cancelError && <p className={styles.modalError}>{cancelError}</p>}
             </div>
-            <p className={styles.cancelModalNote}>
-              キャンセル期限:{' '}
-              {formatDateTime(getHoursBefore(cancelReservationTarget.reservation_datetime, 48).toISOString())}
-            </p>
-            <p className={styles.cancelModalSubNote}>
-              期限を過ぎている場合はサロンに直接お電話いただくか、チャットでご相談ください。
-            </p>
+            {cancelContext !== 'salon' && (
+              <>
+                <p className={styles.cancelModalNote}>
+                  キャンセル期限:{' '}
+                  {formatDateTime(getHoursBefore(cancelReservationTarget.reservation_datetime, 48).toISOString())}
+                </p>
+                <p className={styles.cancelModalSubNote}>
+                  期限を過ぎている場合はサロンに直接お電話いただくか、チャットでご相談ください。
+                </p>
+              </>
+            )}
+            {cancelContext === 'salon' && (
+              <p className={styles.cancelModalSubNote}>
+                キャンセル後はチャットで学生へ理由を共有し、別日時のご提案があればお伝えください。
+              </p>
+            )}
             <div className={styles.modalActions}>
               <Button variant="ghost" onClick={handleCloseCancelModal} disabled={cancelSubmitting}>
                 戻る
@@ -293,6 +325,7 @@ export const DashboardPage = () => {
               </Button>
             </div>
           </div>
+          </>
         )}
       </Modal>
 

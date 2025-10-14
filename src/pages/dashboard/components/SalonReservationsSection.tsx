@@ -14,6 +14,7 @@ interface SalonReservationsSectionProps {
   expandedReservations: Record<string, boolean>;
   onToggleDetails: (id: string) => void;
   onUpdateStatus: (id: string, status: ReservationStatus) => void;
+  onRequestCancel?: (reservation: ReservationWithDetails) => void;
   onOpenChat: (reservation: ReservationWithDetails) => void;
   hasUnreadMessage: (reservationId: string) => boolean;
   getReservationStatusLabel: (status: ReservationStatus) => StatusLabel;
@@ -26,6 +27,7 @@ export const SalonReservationsSection = ({
   expandedReservations,
   onToggleDetails,
   onUpdateStatus,
+  onRequestCancel,
   onOpenChat,
   hasUnreadMessage,
   getReservationStatusLabel,
@@ -194,7 +196,15 @@ export const SalonReservationsSection = ({
                 <Button size="sm" variant="primary" onClick={() => onUpdateStatus(reservation.id, 'confirmed')}>
                   承認する
                 </Button>
-                <Button size="sm" variant="danger" onClick={() => onUpdateStatus(reservation.id, 'cancelled_by_salon')}>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() =>
+                    onRequestCancel
+                      ? onRequestCancel(reservation)
+                      : onUpdateStatus(reservation.id, 'cancelled_by_salon')
+                  }
+                >
                   キャンセルする
                 </Button>
               </div>
