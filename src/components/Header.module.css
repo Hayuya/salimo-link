@@ -56,6 +56,56 @@
   gap: var(--spacing-lg);
 }
 
+.navOpen {
+  display: flex;
+}
+
+.menuToggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px solid rgba(124, 93, 247, 0.2);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--transition-fast), border var(--transition-fast);
+}
+
+.menuToggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  margin: 0 auto;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.menuToggle[aria-expanded='true'] span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menuToggle[aria-expanded='true'] span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuToggle[aria-expanded='true'] span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.menuToggle:focus-visible {
+  outline: 3px solid rgba(124, 93, 247, 0.3);
+  outline-offset: 2px;
+}
+
+.navOverlay {
+  display: none;
+}
+
 .navLink {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
@@ -157,11 +207,44 @@
     font-size: var(--font-size-xl);
   }
 
+  .menuToggle {
+    display: inline-flex;
+  }
+
   .nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
     gap: var(--spacing-sm);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(124, 93, 247, 0.12);
+    backdrop-filter: blur(12px);
+    transform: translateY(16px);
+    display: none;
+    min-width: 220px;
+    z-index: var(--z-index-dropdown);
+  }
+
+  .navOpen {
+    display: flex;
   }
 
   .navLink {
     font-size: var(--font-size-sm);
+    width: 100%;
+  }
+
+  .navOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(2px);
+    display: block;
+    z-index: calc(var(--z-index-dropdown) - 1);
   }
 }
