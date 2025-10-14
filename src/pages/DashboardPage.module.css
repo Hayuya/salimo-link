@@ -164,6 +164,31 @@
   gap: var(--spacing-xs);
 }
 
+.presetReasonRow {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.select {
+  width: 100%;
+  padding: var(--form-control-padding);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-form-field-bg);
+  border: 1.5px solid var(--color-form-field-border);
+  border-radius: var(--form-control-radius);
+  outline: none;
+  transition: var(--form-control-transition);
+  font-family: inherit;
+  box-shadow: none;
+}
+
+.select:focus {
+  border-color: var(--color-form-field-border-focus);
+  box-shadow: var(--color-form-field-shadow-focus);
+  background: var(--color-form-field-bg-hover);
+}
+
 .modalError {
   margin: 0;
   font-size: var(--font-size-xs);

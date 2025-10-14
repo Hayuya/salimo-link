@@ -224,9 +224,24 @@ export const DashboardPage = () => {
                 キャンセル理由
                 <span className={styles.required}>*</span>
               </label>
+              <div className={styles.presetReasonRow}>
+                <select
+                  className={styles.select}
+                  value={selectedCancelPreset}
+                  onChange={e => handleSelectCancelPreset(e.target.value)}
+                >
+                  <option value="">理由を選択してください</option>
+                  <option value="システム障害">システム障害</option>
+                  <option value="スタッフ体調不良">スタッフ体調不良</option>
+                  <option value="ダブルブッキング">ダブルブッキング</option>
+                  <option value="設備トラブル">設備トラブル</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
               <textarea
                 id="cancel-reason"
                 className={styles.textarea}
+                placeholder="詳細を入力してください"
                 value={cancelReason}
                 onChange={e => {
                   setCancelReason(e.target.value);

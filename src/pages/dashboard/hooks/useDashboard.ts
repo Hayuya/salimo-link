@@ -68,6 +68,7 @@ export const useDashboard = () => {
   const profileActionsRef = useRef<HTMLDivElement | null>(null);
   const [cancelReservationTarget, setCancelReservationTarget] = useState<ReservationWithDetails | null>(null);
   const [cancelReason, setCancelReason] = useState('');
+  const [selectedCancelPreset, setSelectedCancelPreset] = useState('');
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState('');
 
@@ -362,6 +363,7 @@ export const useDashboard = () => {
   const handleOpenCancelModal = useCallback((reservation: ReservationWithDetails) => {
     setCancelReservationTarget(reservation);
     setCancelReason('');
+    setSelectedCancelPreset('');
     setCancelError('');
   }, []);
 
@@ -369,8 +371,24 @@ export const useDashboard = () => {
     if (cancelSubmitting) return;
     setCancelReservationTarget(null);
     setCancelReason('');
+    setSelectedCancelPreset('');
     setCancelError('');
   }, [cancelSubmitting]);
+
+  const handleSelectCancelPreset = useCallback((preset: string) => {
+    setSelectedCancelPreset(preset);
+    if (preset === '') {
+      setCancelReason('');
+      return;
+    }
+    setCancelReason(prev => {
+      if (!prev.trim() || prev === selectedCancelPreset) {
+        return preset;
+      }
+      return prev.includes(preset) ? prev : `${preset} ${prev}`.trim();
+    });
+    setCancelError('');
+  }, [selectedCancelPreset]);
 
   const handleCancelReservation = useCallback(async () => {
     if (!cancelReservationTarget) return;
@@ -386,12 +404,13 @@ export const useDashboard = () => {
     setCancelSubmitting(true);
     setCancelError('');
     try {
-      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_student', {
+      await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_salon', {
         cancellationReason: cancelReason.trim(),
       });
       alert('予約をキャンセルしました。');
       setCancelReservationTarget(null);
       setCancelReason('');
+      setSelectedCancelPreset('');
       await loadDashboardData();
     } catch (error: any) {
       alert(error?.message || '予約のキャンセルに失敗しました。');
@@ -521,6 +540,8 @@ export const useDashboard = () => {
     cancelReservationTarget,
     cancelReason,
     setCancelReason,
+    selectedCancelPreset,
+    handleSelectCancelPreset,
     cancelError,
     setCancelError,
     cancelSubmitting,
