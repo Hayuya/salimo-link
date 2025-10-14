@@ -317,16 +317,19 @@ export const useDashboard = () => {
           'この募集を完全に削除しますか?関連する予約もすべて削除され、この操作は元に戻せません。',
         )
       ) {
+        const previousRecruitments = recruitments;
+        setRecruitments(prev => prev.filter(recruitment => recruitment.id !== id));
         try {
           await deleteRecruitment(id);
           alert('募集を削除しました');
           await loadDashboardData();
         } catch (error: any) {
+          setRecruitments(previousRecruitments);
           alert(error?.message || '募集の削除に失敗しました');
         }
       }
     },
-    [deleteRecruitment, loadDashboardData],
+    [deleteRecruitment, loadDashboardData, recruitments],
   );
 
   const handleOpenEditModal = useCallback((recruitment: Recruitment) => {
