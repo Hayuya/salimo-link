@@ -94,6 +94,8 @@ export const useReservations = () => {
           errorMessage = 'この募集ではチャットでの相談はできません';
         } else if (errorMessage.includes('Reservation deadline has passed')) {
           errorMessage = '予約期限（予約日時の48時間前）を過ぎています';
+        } else if (errorMessage.includes('pending or confirmed reservation')) {
+          errorMessage = '承認待ちまたは確定済みの予約があるため、新しい募集には応募できません。既存の予約が処理されるまでお待ちください。';
         }
         throw new Error(errorMessage);
       }
@@ -180,6 +182,29 @@ export const useReservations = () => {
     }
   }, []);
 
+  const checkStudentHasActiveReservation = useCallback(async (studentId: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select('id')
+        .eq('student_id', studentId)
+        .in('status', ['pending', 'confirmed'])
+        .limit(1);
+
+      if (error) throw new Error(error.message);
+      return (data?.length || 0) > 0;
+    } catch (err: any) {
+      const errorMessage = err.message || '予約状況の確認に失敗しました';
+      setError(errorMessage);
+      console.error('checkStudentHasActiveReservation error:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return useMemo(() => ({
     loading,
     error,
@@ -187,6 +212,7 @@ export const useReservations = () => {
     fetchReservationsBySalon,
     createReservation,
     updateReservationStatus,
+    checkStudentHasActiveReservation,
   }), [
     loading,
     error,
@@ -194,5 +220,6 @@ export const useReservations = () => {
     fetchReservationsBySalon,
     createReservation,
     updateReservationStatus,
+    checkStudentHasActiveReservation,
   ]);
 };

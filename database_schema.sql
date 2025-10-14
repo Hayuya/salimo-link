@@ -303,13 +303,23 @@ BEGIN
   INTO v_available_dates, v_flexible_text
   FROM recruitments
   WHERE id = p_recruitment_id AND status = 'active';
-  
+
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Recruitment not found or closed';
   END IF;
 
   IF p_is_chat_consultation AND (v_flexible_text IS NULL OR btrim(v_flexible_text) = '') THEN
     RAISE EXCEPTION 'Chat consultation not allowed for this recruitment';
+  END IF;
+
+  -- Prevent multiple active reservations per student
+  PERFORM 1
+  FROM reservations
+  WHERE student_id = p_student_id
+    AND status IN ('pending', 'confirmed');
+
+  IF FOUND THEN
+    RAISE EXCEPTION 'Student already has a pending or confirmed reservation';
   END IF;
 
   IF p_is_chat_consultation THEN

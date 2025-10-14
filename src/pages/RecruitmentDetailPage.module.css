@@ -534,6 +534,13 @@
   margin-top: var(--spacing-sm);
 }
 
+.reservationRestriction {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  line-height: var(--line-height-normal);
+}
+
 .expiredNotice {
   display: flex;
   flex-direction: column;

@@ -18,7 +18,11 @@ export const RecruitmentDetailPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { fetchRecruitmentById } = useRecruitments();
-  const { createReservation, loading: reservationLoading } = useReservations();
+  const {
+    createReservation,
+    loading: reservationLoading,
+    checkStudentHasActiveReservation,
+  } = useReservations();
 
   const [recruitment, setRecruitment] = useState<RecruitmentWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +33,8 @@ export const RecruitmentDetailPage = () => {
   const [message, setMessage] = useState('');
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [hasBlockingReservation, setHasBlockingReservation] = useState(false);
+  const [checkingBlockingReservation, setCheckingBlockingReservation] = useState(false);
   const isStudentUser = user?.userType === 'student';
   const flexibleScheduleText = useMemo(
     () => (recruitment?.flexible_schedule_text || '').trim(),
@@ -36,6 +42,19 @@ export const RecruitmentDetailPage = () => {
   );
   const supportsFlexibleSchedule = flexibleScheduleText.length > 0;
   const RESERVATION_CUTOFF_HOURS = 48;
+  const reservationDisabledReason = useMemo(() => {
+    if (checkingBlockingReservation) {
+      return '予約状況を確認しています。少し待ってから再度お試しください。';
+    }
+    if (hasBlockingReservation) {
+      return '承認待ちまたは確定済みの予約があるため、新しい募集には応募できません。既存の予約の処理をお待ちください。';
+    }
+    if (user && !isStudentUser) {
+      return '仮予約は学生ユーザーのみ利用できます';
+    }
+    return undefined;
+  }, [checkingBlockingReservation, hasBlockingReservation, user, isStudentUser]);
+  const isReservationActionDisabled = !!reservationDisabledReason;
 
   const ensureStudentUser = () => {
     if (!user) {
@@ -44,6 +63,14 @@ export const RecruitmentDetailPage = () => {
     }
     if (user.userType !== 'student') {
       alert('仮予約は学生ユーザーのみが利用できます');
+      return false;
+    }
+    if (checkingBlockingReservation) {
+      alert('予約状況を確認しています。少し待ってから再度お試しください。');
+      return false;
+    }
+    if (hasBlockingReservation) {
+      alert('承認待ちまたは確定済みの予約があるため、新しい募集には応募できません。既存の予約が処理されるまでお待ちください。');
       return false;
     }
     return true;
@@ -58,6 +85,38 @@ export const RecruitmentDetailPage = () => {
         .finally(() => setLoading(false));
     }
   }, [id, fetchRecruitmentById]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (user?.userType === 'student') {
+      setCheckingBlockingReservation(true);
+      checkStudentHasActiveReservation(user.id)
+        .then(hasActive => {
+          if (isMounted) {
+            setHasBlockingReservation(hasActive);
+          }
+        })
+        .catch(err => {
+          console.error('既存予約の確認に失敗しました:', err);
+          if (isMounted) {
+            setHasBlockingReservation(false);
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setCheckingBlockingReservation(false);
+          }
+        });
+    } else {
+      setHasBlockingReservation(false);
+      setCheckingBlockingReservation(false);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, checkStudentHasActiveReservation]);
 
   const handleChatConsultation = () => {
     if (!recruitment || !supportsFlexibleSchedule) return;
@@ -96,6 +155,7 @@ export const RecruitmentDetailPage = () => {
           ? 'チャット相談のリクエストを送信しました。サロンからの連絡をお待ちください。'
           : '仮予約が完了しました。サロンからの承認をお待ちください。'
       );
+      setHasBlockingReservation(true);
       handleModalClose({ resetChatInputs: true });
       // 予約後は募集情報を再取得
       const updated = await fetchRecruitmentById(recruitment.id);
@@ -356,8 +416,8 @@ export const RecruitmentDetailPage = () => {
                       variant="outline"
                       onClick={() => handleSelectDatetime(date.datetime)}
                       className={styles.availableDateButton}
-                      disabled={!!user && !isStudentUser}
-                      title={user && !isStudentUser ? '仮予約は学生ユーザーのみ利用できます' : undefined}
+                      disabled={isReservationActionDisabled}
+                      title={reservationDisabledReason}
                     >
                       {formatDateTime(date.datetime)}
                     </Button>
@@ -368,11 +428,14 @@ export const RecruitmentDetailPage = () => {
                     variant="primary"
                     fullWidth
                     onClick={() => openReservationModal()}
-                    disabled={!!user && !isStudentUser}
-                    title={user && !isStudentUser ? '仮予約は学生ユーザーのみ利用できます' : undefined}
+                    disabled={isReservationActionDisabled}
+                    title={reservationDisabledReason}
                   >
                     仮予約する
                   </Button>
+                  {reservationDisabledReason && (
+                    <p className={styles.reservationRestriction}>{reservationDisabledReason}</p>
+                  )}
                 </div>
               </div>
             ) : expiredDates.length > 0 ? (
@@ -441,7 +504,8 @@ export const RecruitmentDetailPage = () => {
                 <Button
                   variant="secondary"
                   onClick={handleChatConsultation}
-                  disabled={!chatDate || !chatTime || (!!user && !isStudentUser)}
+                  disabled={!chatDate || !chatTime || isReservationActionDisabled}
+                  title={!chatDate || !chatTime ? undefined : reservationDisabledReason}
                 >
                   相談リクエストを送信する
                 </Button>
@@ -563,7 +627,11 @@ export const RecruitmentDetailPage = () => {
                 variant="primary" 
                 onClick={handleReservation} 
                 loading={reservationLoading}
-                disabled={!allConditionsChecked || (!selectedDatetime && !isChatReservation)}
+                disabled={
+                  !allConditionsChecked ||
+                  (!selectedDatetime && !isChatReservation) ||
+                  hasBlockingReservation
+                }
               >
                 {isChatReservation ? 'チャットを開始する' : '仮予約を確定する'}
               </Button>
