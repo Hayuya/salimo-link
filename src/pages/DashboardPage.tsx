@@ -89,6 +89,8 @@ export const DashboardPage = () => {
     cancelReservationTarget,
     cancelReason,
     setCancelReason,
+    selectedCancelPreset,
+    handleSelectCancelPreset,
     cancelError,
     setCancelError,
     cancelSubmitting,
