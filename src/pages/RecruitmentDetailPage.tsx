@@ -370,7 +370,6 @@ export const RecruitmentDetailPage = () => {
                   <div className={styles.salonInfoItem}>
                     <dt className={styles.infoLabel}>住所</dt>
                     <dd className={[styles.infoValue, styles.addressValue].join(' ')}>
-                      <span className={styles.addressMarker} aria-hidden="true" />
                       <span>{recruitment.salon.address}</span>
                     </dd>
                   </div>
