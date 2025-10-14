@@ -40,6 +40,8 @@ export const RecruitmentDetailPage = () => {
   const [message, setMessage] = useState('');
   const [conditionChecks, setConditionChecks] = useState<Record<string, boolean>>({});
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [showReservationSuccessModal, setShowReservationSuccessModal] = useState(false);
+  const [reservationWasChatRequest, setReservationWasChatRequest] = useState(false);
   const [hasBlockingReservation, setHasBlockingReservation] = useState(false);
   const [checkingBlockingReservation, setCheckingBlockingReservation] = useState(false);
   const isStudentUser = user?.userType === 'student';
@@ -174,16 +176,16 @@ export const RecruitmentDetailPage = () => {
         message,
         isChatReservation
       );
-      alert(
-        isChatReservation
-          ? 'チャット相談のリクエストを送信しました。サロンからの連絡をお待ちください。'
-          : '仮予約が完了しました。サロンからの承認をお待ちください。'
-      );
+      setReservationWasChatRequest(isChatReservation);
       setHasBlockingReservation(true);
       handleModalClose({ resetChatInputs: true });
-      // 予約後は募集情報を再取得
-      const updated = await fetchRecruitmentById(recruitment.id);
-      setRecruitment(updated);
+      try {
+        const updated = await fetchRecruitmentById(recruitment.id);
+        setRecruitment(updated);
+      } catch (refreshError) {
+        console.error('最新の募集情報の取得に失敗しました:', refreshError);
+      }
+      setShowReservationSuccessModal(true);
     } catch (error: any) {
       alert(error.message || '予約に失敗しました');
     }
@@ -687,12 +689,41 @@ export const RecruitmentDetailPage = () => {
                   hasBlockingReservation
                 }
               >
-                {isChatReservation ? 'チャットを開始する' : '仮予約を確定する'}
+                仮予約を送信
               </Button>
             </div>
           </div>
         </Modal>
       )}
+
+      <Modal
+        isOpen={showReservationSuccessModal}
+        onClose={() => {
+          setShowReservationSuccessModal(false);
+          navigate('/dashboard', { state: { focus: 'student-pending' } });
+        }}
+        title="仮予約が完了しました"
+        size="sm"
+      >
+        <div className={styles.modalContent}>
+          <p className={styles.modalDescription}>
+            {reservationWasChatRequest
+              ? 'チャット相談のリクエストを送信しました。サロンからの返答をマイページで確認できます。'
+              : 'サロンへの仮予約を送信しました。承認状況はマイページで確認してください。'}
+          </p>
+          <div className={styles.modalActions}>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setShowReservationSuccessModal(false);
+                navigate('/dashboard', { state: { focus: 'student-pending' } });
+              }}
+            >
+              マイページで確認する
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

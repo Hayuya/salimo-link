@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDashboard, dashboardInitialRecruitmentState } from './dashboard/hooks/useDashboard';
 import type { Recruitment, ReservationStatus } from '@/types';
 import { formatDateTime, getHoursBefore } from '@/utils/date';
@@ -100,6 +100,10 @@ export const DashboardPage = () => {
     handleCancelReservation,
   } = useDashboard();
 
+  const location = useLocation();
+  const navigateTo = useNavigate();
+  const pendingSectionRef = useRef<HTMLDivElement | null>(null);
+
   const createFormInitialData = useMemo(
     () => cloneRecruitmentFormData(dashboardInitialRecruitmentState),
     [showCreateModal],
@@ -109,6 +113,16 @@ export const DashboardPage = () => {
     if (!editingRecruitment) return null;
     return recruitmentToFormData(editingRecruitment);
   }, [editingRecruitment]);
+
+  useEffect(() => {
+    const focusState = (location.state as { focus?: string } | null)?.focus;
+    if (!loading && user?.userType === 'student' && focusState === 'student-pending') {
+      if (pendingSectionRef.current) {
+        pendingSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      navigateTo(location.pathname, { replace: true, state: null });
+    }
+  }, [loading, location, navigateTo, user]);
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
@@ -169,17 +183,19 @@ export const DashboardPage = () => {
         </div>
 
         {user.userType === 'student' ? (
-          <StudentReservationsSection
-            pendingReservations={pendingReservations}
-            confirmedReservations={confirmedReservations}
-            otherReservations={otherReservations}
-            expandedReservations={expandedReservations}
-            onToggleDetails={toggleReservationDetails}
-            onOpenChat={handleOpenChat}
-            onRequestCancel={handleOpenCancelModal}
-            hasUnreadMessage={hasUnreadMessage}
-            getReservationStatusLabel={getReservationStatusLabel}
-          />
+          <div ref={pendingSectionRef} id="student-pending">
+            <StudentReservationsSection
+              pendingReservations={pendingReservations}
+              confirmedReservations={confirmedReservations}
+              otherReservations={otherReservations}
+              expandedReservations={expandedReservations}
+              onToggleDetails={toggleReservationDetails}
+              onOpenChat={handleOpenChat}
+              onRequestCancel={handleOpenCancelModal}
+              hasUnreadMessage={hasUnreadMessage}
+              getReservationStatusLabel={getReservationStatusLabel}
+            />
+          </div>
         ) : (
           <>
             <SalonReservationsSection
