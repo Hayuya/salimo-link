@@ -347,7 +347,6 @@ export const RecruitmentDetailPage = () => {
 
           {/* サロン情報 */}
           <div className={[styles.section, styles.sectionNoCard].join(' ')}>
-            <h3 className={styles.sectionTitle}>サロン情報</h3>
             <div className={styles.salonInfoCard}>
               <div className={styles.salonInfoHeader}>
                 <div className={styles.salonInfoTitle}>
