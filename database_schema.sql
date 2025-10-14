@@ -113,9 +113,11 @@ DECLARE
   v_date_obj JSONB;
   v_has_future_open BOOLEAN := FALSE;
   v_should_be_active BOOLEAN := FALSE;
+  v_current_status TEXT;
+  v_target_status TEXT;
 BEGIN
-  SELECT available_dates, flexible_schedule_text
-  INTO v_available_dates, v_flexible_text
+  SELECT available_dates, flexible_schedule_text, status
+  INTO v_available_dates, v_flexible_text, v_current_status
   FROM recruitments
   WHERE id = p_recruitment_id;
 
@@ -142,17 +144,23 @@ BEGIN
   END LOOP;
 
   v_should_be_active := v_has_future_open OR (v_flexible_text IS NOT NULL AND btrim(v_flexible_text) <> '');
+  v_target_status := CASE
+    WHEN v_should_be_active THEN 'active'
+    ELSE 'closed'
+  END;
+
+  -- Respect manual closures
+  IF v_current_status = 'closed' AND v_target_status = 'active' THEN
+    v_target_status := 'closed';
+  END IF;
 
   UPDATE recruitments
   SET available_dates = v_updated_dates,
-      status = CASE
-        WHEN v_should_be_active THEN 'active'
-        ELSE 'closed'
-      END
+      status = v_target_status
   WHERE id = p_recruitment_id
     AND (
       available_dates IS DISTINCT FROM v_updated_dates
-      OR status <> CASE WHEN v_should_be_active THEN 'active' ELSE 'closed' END
+      OR status <> v_target_status
     );
 
   PERFORM refresh_recruitment_booking_state(p_recruitment_id);

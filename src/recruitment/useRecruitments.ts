@@ -138,11 +138,18 @@ export const useRecruitments = () => {
 
       if (error) throw error;
 
-      const { error: normalizeError } = await supabase.rpc('normalize_recruitment_schedule', {
-        p_recruitment_id: id,
-      });
-      if (normalizeError) {
-        console.error('normalize_recruitment_schedule error:', normalizeError);
+      const shouldNormalize =
+        typeof data.available_dates !== 'undefined' ||
+        typeof data.flexible_schedule_text !== 'undefined' ||
+        data.status === 'active';
+
+      if (shouldNormalize) {
+        const { error: normalizeError } = await supabase.rpc('normalize_recruitment_schedule', {
+          p_recruitment_id: id,
+        });
+        if (normalizeError) {
+          console.error('normalize_recruitment_schedule error:', normalizeError);
+        }
       }
 
       return updatedRecruitment;
