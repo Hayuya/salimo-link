@@ -546,6 +546,15 @@ export const RecruitmentDetailPage = () => {
             )}
           </div>
           )}
+          {!user && (
+            <div className={styles.authCallout}>
+              <h4>学生として登録すると予約が可能になります</h4>
+              <p>無料で学生アカウントを作成し、気になる募集に申込みましょう。</p>
+              <Link to="/signup?role=student" className={styles.authCalloutButton}>
+                <Button variant="primary">学生として登録する</Button>
+              </Link>
+            </div>
+          )}
         </Card>
       </div>
 
