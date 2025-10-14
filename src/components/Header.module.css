@@ -35,18 +35,19 @@
 }
 
 .betaBadge {
-  font-size: var(--font-size-2xs);
+  font-size: 0.625rem;
   letter-spacing: var(--letter-spacing-wide);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-status-warning-text);
   background: rgba(247, 169, 75, 0.16);
   border: 1px solid rgba(247, 169, 75, 0.35);
   border-radius: var(--radius-pill);
-  padding: calc(var(--spacing-2xs) * 1.5) var(--spacing-sm);
+  padding: calc(var(--spacing-2xs) * 1.25) var(--spacing-xs);
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .nav {
