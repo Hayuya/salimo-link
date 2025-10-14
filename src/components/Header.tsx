@@ -49,14 +49,14 @@ export const Header = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
-          <h1>cutmo</h1>
+          <h1>SaloMo Link</h1>
         </Link>
 
         <nav className={styles.nav}>
           {user ? (
             <>
               <Link to="/about" className={styles.navLink}>
-                cutmoとは？
+                SaloMo Linkとは？
               </Link>
               <Link to="/" className={styles.navLink}>
                 募集一覧
@@ -84,7 +84,7 @@ export const Header = () => {
           ) : (
             <>
               <Link to="/about" className={styles.navLink}>
-                cutmoとは？
+                SaloMo Linkとは？
               </Link>
               <Link
                 to="/"

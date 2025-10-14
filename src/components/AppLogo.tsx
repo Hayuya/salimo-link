@@ -7,7 +7,7 @@ interface AppLogoProps {
 export const AppLogo = ({ size = 'md' }: AppLogoProps) => {
   return (
     <div className={`${styles.logo} ${styles[size]}`}>
-      <span className={styles.logoText}>cutmo</span>
+      <span className={styles.logoText}>SaloMo Link</span>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-# Cutmo Application Specification (React Native Rebuild)
+# SaloMo Link Application Specification (React Native Rebuild)
 
-This document captures the full scope of the existing Cutmo web application so it can be rebuilt with React Native (Expo). It consolidates application behavior, data contracts, user flows, and platform dependencies extracted from the current codebase.
+This document captures the full scope of the existing SaloMo Link web application so it can be rebuilt with React Native (Expo). It consolidates application behavior, data contracts, user flows, and platform dependencies extracted from the current codebase.
 
 ---
 
@@ -198,7 +198,7 @@ Additional configuration implied by code:
 ## 7. Screen & Feature Specifications
 
 ### 7.1 Global Layout
-- `Header`: Displays brand, navigation links (`cutmoとは？`, `募集一覧`, Auth-related links). Logged-in users see `マイページ` and a profile dropdown with logout.
+- `Header`: Displays brand, navigation links (`SaloMo Linkとは？`, `募集一覧`, Auth-related links). Logged-in users see `マイページ` and a profile dropdown with logout.
 - `Footer`: Shows logo, service links (About, FAQ, Terms, Privacy, Contact placeholder), and copyright.
 - `ScrollToTop` component resets scroll position on route changes.
 
@@ -411,4 +411,4 @@ Additional configuration implied by code:
 
 ---
 
-This specification should serve as the authoritative guide for recreating Cutmo in React Native while preserving all current behaviors and addressing known issues where possible.
+This specification should serve as the authoritative guide for recreating SaloMo Link in React Native while preserving all current behaviors and addressing known issues where possible.

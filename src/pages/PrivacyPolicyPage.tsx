@@ -9,7 +9,7 @@ const SECTIONS: Section[] = [
   {
     title: '1. 基本方針',
     contents: [
-      'cutmo（以下「当サービス」といいます）は、個人情報の重要性を認識し、関係法令およびガイドラインを遵守するとともに、適切な保護と管理を行います。',
+      'SaloMo Link（以下「当サービス」といいます）は、個人情報の重要性を認識し、関係法令およびガイドラインを遵守するとともに、適切な保護と管理を行います。',
       '本プライバシーポリシーは、当サービスが取得する個人情報の取り扱いについて定めるものです。',
     ],
   },
@@ -77,7 +77,7 @@ const SECTIONS: Section[] = [
     title: '10. お問い合わせ窓口',
     contents: [
       '本ポリシーに関するお問い合わせは、以下の窓口までお願いいたします。',
-      'メールアドレス：privacy@cutmo.jp',
+      'メールアドレス：privacy@salomolink.jp',
       '受付時間：平日10:00〜18:00（年末年始を除く）',
     ],
   },
@@ -91,7 +91,7 @@ export const PrivacyPolicyPage = () => {
           <p className={styles.heroBadge}>PRIVACY POLICY</p>
           <h1 className={styles.heroTitle}>プライバシーポリシー</h1>
           <p className={styles.heroSubtitle}>
-            cutmoでは、ユーザーの皆さまの個人情報を適切に保護するため、以下の方針に基づいて運用しています。
+            SaloMo Linkでは、ユーザーの皆さまの個人情報を適切に保護するため、以下の方針に基づいて運用しています。
           </p>
           <p className={styles.heroUpdated}>最終更新日：2024年4月1日</p>
         </div>
@@ -115,8 +115,8 @@ export const PrivacyPolicyPage = () => {
 
         <aside className={styles.notice}>
           <h3>個人情報保護管理責任者</h3>
-          <p>cutmo運営事務局　個人情報保護管理責任者</p>
-          <p>メール：privacy@cutmo.jp / 電話：03-0000-0000</p>
+          <p>SaloMo Link運営事務局　個人情報保護管理責任者</p>
+          <p>メール：privacy@salomolink.jp / 電話：03-0000-0000</p>
         </aside>
       </section>
     </div>

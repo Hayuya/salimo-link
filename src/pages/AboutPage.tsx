@@ -114,7 +114,7 @@ export const AboutPage = () => {
         
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>
-            cutmo<span className={styles.titleAccent}>とは？</span>
+            SaloMo Link<span className={styles.titleAccent}>とは？</span>
           </h1>
           <p className={styles.heroSubtitle}>
             学生とカットモデルを探す美容室アシスタントを<br />
@@ -165,7 +165,7 @@ export const AboutPage = () => {
         <div className={styles.sectionContent}>
           <h2 className={styles.sectionTitle}>使い方ガイド</h2>
           <p className={styles.usageIntroduction}>
-            学生とサロン、それぞれの立場から見たcutmoの活用方法をご紹介します。タブを切り替えて、該当するガイドをご覧ください。
+            学生とサロン、それぞれの立場から見たSaloMo Linkの活用方法をご紹介します。タブを切り替えて、該当するガイドをご覧ください。
           </p>
 
           <div className={styles.usageTabs} role="tablist" aria-label="使い方ガイド対象">

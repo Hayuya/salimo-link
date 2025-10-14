@@ -1,5 +1,5 @@
 -- ==========================================
--- cutmo Database Schema
+-- SaloMo Link Database Schema
 -- ==========================================
 
 -- Enable UUID extension

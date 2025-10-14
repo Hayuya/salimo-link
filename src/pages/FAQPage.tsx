@@ -81,7 +81,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       {
         question: '不審なユーザーを見つけた場合はどうすればよいですか？',
         answer:
-          'マイページのお問い合わせフォーム、または support@cutmo.jp までご連絡ください。運営が状況を確認し、適切な対応を行います。',
+          'マイページのお問い合わせフォーム、または support@salomolink.jp までご連絡ください。運営が状況を確認し、適切な対応を行います。',
       },
       {
         question: '退会したい場合の手続きを教えてください。',
@@ -115,7 +115,7 @@ export const FAQPage = () => {
           <p className={styles.heroBadge}>FAQ</p>
           <h1 className={styles.heroTitle}>よくある質問</h1>
           <p className={styles.heroSubtitle}>
-            cutmoをご利用いただく際に寄せられるお問い合わせをまとめました。カテゴリ別に回答をご覧いただけます。
+            SaloMo Linkをご利用いただく際に寄せられるお問い合わせをまとめました。カテゴリ別に回答をご覧いただけます。
           </p>
           <p className={styles.heroHelp}>
             お探しの回答が見つからない場合は、ページ下部のお問い合わせ窓口からお気軽にご連絡ください。
@@ -188,11 +188,11 @@ export const FAQPage = () => {
         <div className={styles.contactInner}>
           <h2>解決しない場合はお問い合わせください</h2>
           <p>
-            cutmoカスタマーサポートが24時間以内（平日）に折り返しご連絡します。
+            SaloMo Linkカスタマーサポートが24時間以内（平日）に折り返しご連絡します。
             トラブル報告や機能のご要望もこちらから受け付けています。
           </p>
-          <a className={styles.contactButton} href="mailto:support@cutmo.jp">
-            support@cutmo.jp にメールする
+          <a className={styles.contactButton} href="mailto:support@salomolink.jp">
+            support@salomolink.jp にメールする
           </a>
         </div>
       </section>

@@ -17,7 +17,7 @@ export const Footer = () => {
           <div className={styles.links}>
             <div className={styles.linkGroup}>
               <h4 className={styles.linkTitle}>サービス</h4>
-              <Link to="/about" className={styles.link}>cutmoとは？</Link>
+              <Link to="/about" className={styles.link}>SaloMo Linkとは？</Link>
               <Link to="/about#usage" className={styles.link}>使い方ガイド</Link>
               <Link to="/faq" className={styles.link}>よくある質問</Link>
             </div>
@@ -30,7 +30,7 @@ export const Footer = () => {
           </div>
         </div>
         <div className={styles.copyright}>
-          <p>© {new Date().getFullYear()} cutmo. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SaloMo Link. All rights reserved.</p>
         </div>
       </div>
     </footer>

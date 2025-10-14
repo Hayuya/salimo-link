@@ -9,7 +9,7 @@ const SECTIONS: Section[] = [
   {
     title: '第1条（適用）',
     contents: [
-      '本規約は、cutmo（以下「当サービス」といいます）が提供するサービスの利用条件を定めるものです。',
+      '本規約は、SaloMo Link（以下「当サービス」といいます）が提供するサービスの利用条件を定めるものです。',
       '当サービスを利用する全てのユーザー（学生会員・サロン会員を含みます）は、本規約に同意したものとみなします。',
       '本規約のほか、当サービス上で掲載する各種ガイドライン・ご案内等は、本規約の一部を構成します。',
     ],
@@ -110,7 +110,7 @@ export const TermsPage = () => {
           <p className={styles.heroBadge}>TERMS OF SERVICE</p>
           <h1 className={styles.heroTitle}>利用規約</h1>
           <p className={styles.heroSubtitle}>
-            cutmoをご利用いただく際のルールとお願いをまとめています。サービスのご利用前に必ずご確認ください。
+            SaloMo Linkをご利用いただく際のルールとお願いをまとめています。サービスのご利用前に必ずご確認ください。
           </p>
           <p className={styles.heroUpdated}>
             最終更新日：2024年4月1日
@@ -138,7 +138,7 @@ export const TermsPage = () => {
           <h3>お問い合わせ</h3>
           <p>
             本規約に関するご質問は、マイページのお問い合わせフォームまたは
-            <span className={styles.noticeHighlight}> support@cutmo.jp </span>
+            <span className={styles.noticeHighlight}> support@salomolink.jp </span>
             までご連絡ください。
           </p>
         </aside>
