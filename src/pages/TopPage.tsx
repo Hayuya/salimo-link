@@ -6,6 +6,7 @@ import { RecruitmentCard } from '@/components/RecruitmentCard';
 import { Spinner } from '@/components/Spinner';
 import styles from './TopPage.module.css';
 import type { MenuType } from '@/types'; // 正しいMenuTypeをインポート
+import { isBeforeHoursBefore, isFutureDate } from '@/utils/date';
 
 export const TopPage = () => {
   const { recruitments, loading, error } = useRecruitments();
@@ -17,6 +18,7 @@ export const TopPage = () => {
   const [selectedMenu, setSelectedMenu] = useState<string>('all');
   const [selectedGender, setSelectedGender] = useState<string>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const RESERVATION_CUTOFF_HOURS = 48;
 
   useEffect(() => {
     if (user) return;
@@ -47,9 +49,14 @@ export const TopPage = () => {
       
       // 予約可能のみ表示
       if (showAvailableOnly) {
-        const hasAvailable = recruitment.available_dates.some(date => !date.is_booked);
+        const hasBookable = recruitment.available_dates.some(
+          date =>
+            !date.is_booked &&
+            isFutureDate(date.datetime) &&
+            isBeforeHoursBefore(date.datetime, RESERVATION_CUTOFF_HOURS)
+        );
         const hasFlexible = !!recruitment.flexible_schedule_text?.trim();
-        if (!hasAvailable && !hasFlexible) return false;
+        if (!hasBookable && !hasFlexible) return false;
       }
       
       return true;

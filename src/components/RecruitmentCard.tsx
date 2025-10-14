@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { RecruitmentWithDetails } from '@/types';
 import { MENU_LABELS } from '@/utils/recruitment';
+import { isBeforeHoursBefore, isPastCutoffButBeforeEvent, isFutureDate } from '@/utils/date';
 import { Card } from './Card';
 import styles from './RecruitmentCard.module.css';
 
@@ -9,13 +10,32 @@ interface RecruitmentCardProps {
 }
 
 export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
-  // ★ 変更: available_dates配列から予約可能な日時をカウント
-  const availableSlotsCount = recruitment.available_dates.filter(
-    date => !date.is_booked
-  ).length;
+  const RESERVATION_CUTOFF_HOURS = 48;
+
+  const upcomingDates = (recruitment.available_dates || []).filter(
+    date => !date.is_booked && isFutureDate(date.datetime)
+  );
+  const bookableDates = upcomingDates.filter(date =>
+    isBeforeHoursBefore(date.datetime, RESERVATION_CUTOFF_HOURS)
+  );
+  const consultableDates = upcomingDates.filter(date =>
+    isPastCutoffButBeforeEvent(date.datetime, RESERVATION_CUTOFF_HOURS)
+  );
+
+  const bookableSlotsCount = bookableDates.length;
+  const hasBookableSlots = bookableSlotsCount > 0;
+  const hasConsultableSlots = consultableDates.length > 0;
+
   const flexibleScheduleText = recruitment.flexible_schedule_text?.trim();
   const hasFlexibleSchedule = !!flexibleScheduleText;
-  const hasAvailableSlots = availableSlotsCount > 0;
+
+  const slotDisplay = hasBookableSlots
+    ? `${bookableSlotsCount}件`
+    : hasConsultableSlots
+      ? '相談可'
+      : hasFlexibleSchedule
+        ? flexibleScheduleText
+        : 'なし';
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>
@@ -62,19 +82,15 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
         <div className={styles.footer}>
           <div className={styles.slotInfo}>
             <span className={styles.slotLabel}>空き枠:</span>
-            <span className={styles.slotCount}>
-              {hasAvailableSlots
-                ? `${availableSlotsCount}件`
-                : hasFlexibleSchedule
-                  ? flexibleScheduleText
-                  : 'なし'}
-            </span>
+            <span className={styles.slotCount}>{slotDisplay}</span>
           </div>
 
-          {hasAvailableSlots || hasFlexibleSchedule ? (
-            <span className={styles.statusActive}>
-              {hasFlexibleSchedule && !hasAvailableSlots ? '調整可能' : '予約可能'}
-            </span>
+          {hasBookableSlots ? (
+            <span className={styles.statusActive}>予約可能</span>
+          ) : hasConsultableSlots ? (
+            <span className={styles.statusUrgent}>相談可</span>
+          ) : hasFlexibleSchedule ? (
+            <span className={styles.statusActive}>調整可能</span>
           ) : (
             <span className={styles.statusClosed}>予約不可</span>
           )}
