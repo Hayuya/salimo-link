@@ -5,11 +5,11 @@ import { useReservations } from '@/hooks/useReservations';
 import { useRecruitments } from '@/recruitment';
 import { supabase } from '@/lib/supabase';
 import { isBeforeHoursBefore } from '@/utils/date';
+import type { RecruitmentFormData } from '../components/RecruitmentForm';
 import type {
   Recruitment,
   Student,
   Salon,
-  MenuType,
   GenderRequirement,
   HairLengthRequirement,
   PhotoShootRequirement,
@@ -18,13 +18,12 @@ import type {
   ReservationWithDetails,
   ReservationStatus,
   ReservationMessage,
-  AvailableDate,
 } from '@/types';
 
-const initialRecruitmentState = {
+const initialRecruitmentState: RecruitmentFormData = {
   title: '',
   description: '',
-  menus: [] as MenuType[],
+  menus: [],
   gender_requirement: 'any' as GenderRequirement,
   hair_length_requirement: 'any' as HairLengthRequirement,
   treatment_duration: '',
@@ -33,7 +32,7 @@ const initialRecruitmentState = {
   model_experience_requirement: 'any' as ModelExperienceRequirement,
   has_reward: false,
   reward_details: '',
-  available_dates: [] as AvailableDate[],
+  available_dates: [],
   flexible_schedule_text: '',
   is_fully_booked: false,
 };
@@ -53,8 +52,7 @@ export const useDashboard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const [profileData, setProfileData] = useState<Partial<Student & Salon>>({});
-  const [newRecruitmentData, setNewRecruitmentData] = useState(initialRecruitmentState);
-  const [editingRecruitment, setEditingRecruitment] = useState<(RecruitmentUpdate & { id: string }) | null>(null);
+  const [editingRecruitment, setEditingRecruitment] = useState<Recruitment | null>(null);
 
   const [profileLoading, setProfileLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
@@ -70,9 +68,6 @@ export const useDashboard = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState('');
-
-  const [editSlotDate, setEditSlotDate] = useState('');
-  const [editSlotTime, setEditSlotTime] = useState('');
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
@@ -211,114 +206,72 @@ export const useDashboard = () => {
     }
   }, [profileData, updateProfile]);
 
-  const createJSTDateTime = useCallback((date: string, time: string) => {
-    return `${date}T${time}:00+09:00`;
-  }, []);
+  const handleCreateRecruitment = useCallback(
+    async (formData: RecruitmentFormData) => {
+      if (!user) return;
 
-  const addEditSlot = useCallback(() => {
-    if (!editSlotDate || !editSlotTime || !editingRecruitment) {
-      alert('日付と時刻を選択してください');
-      return;
-    }
+      if (!formData.menus || formData.menus.length === 0) {
+        alert('メニューを1つ以上選択してください');
+        return;
+      }
 
-    const jstDatetime = createJSTDateTime(editSlotDate, editSlotTime);
-    const datetime = new Date(jstDatetime).toISOString();
+      if (!formData.title) {
+        alert('タイトルを入力してください');
+        return;
+      }
 
-    if (editingRecruitment.available_dates?.some(d => d.datetime === datetime)) {
-      alert('同じ日時がすでに追加されています');
-      return;
-    }
+      if (
+        (formData.available_dates?.length ?? 0) === 0 &&
+        !formData.flexible_schedule_text
+      ) {
+        alert('施術可能な日時を追加するか、文章で日時を指定してください');
+        return;
+      }
 
-    const newDate: AvailableDate = {
-      datetime,
-      is_booked: false,
-    };
-
-    const updatedDates = [...(editingRecruitment.available_dates || []), newDate].sort(
-      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
-    );
-
-    setEditingRecruitment({
-      ...editingRecruitment,
-      available_dates: updatedDates,
-    });
-
-    setEditSlotDate('');
-    setEditSlotTime('');
-  }, [editSlotDate, editSlotTime, editingRecruitment, createJSTDateTime]);
-
-  const removeEditSlot = useCallback(
-    (datetime: string) => {
-      if (!editingRecruitment) return;
-      setEditingRecruitment({
-        ...editingRecruitment,
-        available_dates: editingRecruitment.available_dates?.filter(d => d.datetime !== datetime),
-      });
+      setCreateLoading(true);
+      try {
+        await createRecruitment({
+          ...formData,
+          salon_id: user.id,
+        });
+        alert('募集を作成しました');
+        setShowCreateModal(false);
+        await loadDashboardData();
+      } catch (error: any) {
+        alert(error?.message || '募集作成に失敗しました');
+      } finally {
+        setCreateLoading(false);
+      }
     },
-    [editingRecruitment],
+    [createRecruitment, loadDashboardData, user],
   );
 
-  const handleCreateRecruitment = useCallback(async () => {
-    if (!user) return;
+  const handleUpdateRecruitment = useCallback(async (id: string, formData: RecruitmentFormData) => {
+    if (!id) return;
 
-    if (newRecruitmentData.menus.length === 0) {
-      alert('メニューを1つ以上選択してください');
-      return;
-    }
-
-    if (!newRecruitmentData.title) {
+    if (!formData.title) {
       alert('タイトルを入力してください');
       return;
     }
 
-    if (newRecruitmentData.available_dates.length === 0 && !newRecruitmentData.flexible_schedule_text) {
-      alert('施術可能な日時を追加するか、文章で日時を指定してください');
-      return;
-    }
-
-    setCreateLoading(true);
-    try {
-      await createRecruitment({
-        ...newRecruitmentData,
-        salon_id: user.id,
-      });
-      alert('募集を作成しました');
-      setShowCreateModal(false);
-      setNewRecruitmentData(initialRecruitmentState);
-      await loadDashboardData();
-    } catch (error: any) {
-      alert(error?.message || '募集作成に失敗しました');
-    } finally {
-      setCreateLoading(false);
-    }
-  }, [createRecruitment, loadDashboardData, newRecruitmentData, user]);
-
-  const handleUpdateRecruitment = useCallback(async () => {
-    if (!editingRecruitment) return;
-
-    if (!editingRecruitment.title) {
-      alert('タイトルを入力してください');
-      return;
-    }
-
-    if (!editingRecruitment.menus || editingRecruitment.menus.length === 0) {
+    if (!formData.menus || formData.menus.length === 0) {
       alert('メニューを1つ以上選択してください');
       return;
     }
 
     if (
-      (!editingRecruitment.available_dates || editingRecruitment.available_dates.length === 0) &&
-      !editingRecruitment.flexible_schedule_text
+      (formData.available_dates?.length ?? 0) === 0 &&
+      !formData.flexible_schedule_text
     ) {
       alert('施術可能な日時を追加するか、文章で日時を指定してください');
       return;
     }
 
-    const originalRecruitment = recruitments.find(r => r.id === editingRecruitment.id);
+    const originalRecruitment = recruitments.find(r => r.id === id);
     if (originalRecruitment) {
       const bookedDates = originalRecruitment.available_dates.filter(d => d.is_booked);
       const hasAllBookedDates = bookedDates.every(bookedDate =>
-        editingRecruitment.available_dates?.some(d => d.datetime === bookedDate.datetime),
+        formData.available_dates?.some(d => d.datetime === bookedDate.datetime),
       );
 
       if (!hasAllBookedDates) {
@@ -329,8 +282,7 @@ export const useDashboard = () => {
 
     setEditLoading(true);
     try {
-      const { id, ...updateData } = editingRecruitment;
-      await updateRecruitment(id, updateData);
+      await updateRecruitment(id, formData as RecruitmentUpdate);
       alert('募集を更新しました');
       setShowEditModal(false);
       setEditingRecruitment(null);
@@ -340,7 +292,7 @@ export const useDashboard = () => {
     } finally {
       setEditLoading(false);
     }
-  }, [editingRecruitment, recruitments, updateRecruitment, loadDashboardData]);
+  }, [loadDashboardData, recruitments, updateRecruitment]);
 
   const handleToggleRecruitmentStatus = useCallback(
     async (id: string, status: 'active' | 'closed') => {
@@ -489,20 +441,6 @@ export const useDashboard = () => {
     [chatReservation],
   );
 
-  const toggleMenu = useCallback(
-    (menu: MenuType, isEdit = false) => {
-      const target = isEdit ? editingRecruitment : newRecruitmentData;
-      const setter = isEdit ? setEditingRecruitment : setNewRecruitmentData;
-      if (!target) return;
-      const currentMenus = target.menus || [];
-      const newMenus = currentMenus.includes(menu)
-        ? currentMenus.filter(m => m !== menu)
-        : [...currentMenus, menu];
-      setter({ ...target, menus: newMenus } as any);
-    },
-    [editingRecruitment, newRecruitmentData],
-  );
-
   const hasUnreadMessage = useCallback(
     (reservationId: string) => {
       if (!user) return false;
@@ -540,8 +478,6 @@ export const useDashboard = () => {
     recruitments,
     profileData,
     setProfileData,
-    newRecruitmentData,
-    setNewRecruitmentData,
     editingRecruitment,
     setEditingRecruitment,
     showProfileModal,
@@ -586,14 +522,6 @@ export const useDashboard = () => {
     handleOpenCancelModal,
     handleCloseCancelModal,
     handleCancelReservation,
-    latestMessages,
-    editSlotDate,
-    setEditSlotDate,
-    editSlotTime,
-    setEditSlotTime,
-    addEditSlot,
-    removeEditSlot,
-    toggleMenu,
   };
 };
 
