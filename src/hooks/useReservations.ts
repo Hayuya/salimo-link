@@ -103,7 +103,7 @@ export const useReservations = () => {
       // is_fully_bookedはDBトリガーで更新される
 
       if (data) {
-        await sendReservationNotification(data, 'reservation_pending');
+        sendReservationNotification(data, 'reservation_pending');
       }
 
       return data; // 予約IDを返す
@@ -163,11 +163,11 @@ export const useReservations = () => {
       
       if (updatedReservation) {
         if (status === 'confirmed') {
-          await sendReservationNotification(updatedReservation.id, 'reservation_confirmed');
+          sendReservationNotification(updatedReservation.id, 'reservation_confirmed');
         } else if (status === 'cancelled_by_salon') {
-          await sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_salon');
+          sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_salon');
         } else if (status === 'cancelled_by_student') {
-          await sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_student');
+          sendReservationNotification(updatedReservation.id, 'reservation_cancelled_by_student');
         }
       }
       

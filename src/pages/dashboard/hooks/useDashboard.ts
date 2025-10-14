@@ -408,7 +408,12 @@ export const useDashboard = () => {
       await updateReservationStatus(cancelReservationTarget.id, 'cancelled_by_salon', {
         cancellationReason: cancelReason.trim(),
       });
-      alert('予約をキャンセルしました。');
+      try {
+        await updateRecruitment(cancelReservationTarget.recruitment_id, { status: 'closed' });
+      } catch (recruitmentError: any) {
+        console.error('募集の非公開化に失敗しました:', recruitmentError);
+      }
+      alert('予約をキャンセルしました。募集を一時的に非公開にしました。');
       setCancelReservationTarget(null);
       setCancelReason('');
       setSelectedCancelPreset('');
