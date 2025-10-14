@@ -1,5 +1,6 @@
 // src/utils/recruitment.ts
 import { MenuType, GenderRequirement, HairLengthRequirement, PhotoShootRequirement, ModelExperienceRequirement } from '@/types';
+import type { MenuSelectionType } from '@/types';
 
 /**
  * メニューの日本語ラベル
@@ -14,7 +15,6 @@ export const MENU_LABELS: Record<MenuType, string> = {
   head_spa: 'ヘッドスパ',
   hair_straightening: '縮毛矯正',
   extensions: 'エクステ',
-  choose_from_list: 'の中から選択可能！',
   other: 'その他',
 };
 
@@ -68,10 +68,14 @@ export const MENU_OPTIONS: MenuType[] = [
   'hair_set', 
   'head_spa', 
   'hair_straightening', 
-  'extensions', 
-  'choose_from_list',
+  'extensions',
   'other'
 ];
+
+export const MENU_SELECTION_LABELS: Record<MenuSelectionType, string> = {
+  fixed: '選択したメニューで固定',
+  selectable: '掲載メニューから選択可',
+};
 
 /**
  * 性別の選択肢

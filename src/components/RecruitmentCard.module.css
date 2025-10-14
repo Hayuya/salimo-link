@@ -67,6 +67,12 @@
   letter-spacing: var(--letter-spacing-wide);
 }
 
+.menuSelectionNote {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
 .description {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);

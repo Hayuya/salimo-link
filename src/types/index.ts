@@ -79,21 +79,21 @@ export interface SalonUpdate {
 // ==========================================
 export type GenderRequirement = 'male' | 'female' | 'any';
 export type HairLengthRequirement = 'short' | 'bob' | 'medium' | 'long' | 'any';
-export type MenuType = 
-  | 'cut' 
-  | 'color' 
-  | 'perm' 
-  | 'treatment' 
-  | 'straight' 
-  | 'hair_set' 
-  | 'head_spa' 
-  | 'hair_straightening' 
-  | 'extensions' 
-  | 'choose_from_list'
+export type MenuType =
+  | 'cut'
+  | 'color'
+  | 'perm'
+  | 'treatment'
+  | 'straight'
+  | 'hair_set'
+  | 'head_spa'
+  | 'hair_straightening'
+  | 'extensions'
   | 'other';
 export type PhotoShootRequirement = 'required' | 'optional' | 'none';
 export type ModelExperienceRequirement = 'any' | 'experienced' | 'beginner';
 export type PaymentType = 'free' | 'paid';
+export type MenuSelectionType = 'fixed' | 'selectable';
 
 // ==========================================
 // Available Date Type (JSONB内の構造)
@@ -122,6 +122,7 @@ export interface Recruitment {
   payment_amount?: number | null;
   has_reward: boolean;
   reward_details?: string;
+  menu_selection_type?: MenuSelectionType | null;
   
   // ★ 変更: JSONB配列で管理
   available_dates: AvailableDate[];
@@ -151,6 +152,7 @@ export interface RecruitmentInsert {
   payment_amount?: number | null;
   has_reward: boolean;
   reward_details?: string;
+  menu_selection_type?: MenuSelectionType | null;
   
   // ★ 変更: JSONB配列で管理
   available_dates: AvailableDate[];
@@ -172,6 +174,7 @@ export interface RecruitmentUpdate {
   payment_amount?: number | null;
   has_reward?: boolean;
   reward_details?: string;
+  menu_selection_type?: MenuSelectionType | null;
   available_dates?: AvailableDate[];
   flexible_schedule_text?: string;
   is_fully_booked?: boolean;

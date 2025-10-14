@@ -4,8 +4,9 @@ import {
   HAIR_LENGTH_LABELS,
   EXPERIENCE_LABELS,
   PHOTO_SHOOT_LABELS,
+  MENU_SELECTION_LABELS,
 } from '@/utils/recruitment';
-import { ReservationWithDetails } from '@/types';
+import { ReservationWithDetails, MenuSelectionType } from '@/types';
 import styles from './RecruitmentDetails.module.css';
 
 type RecruitmentDetailsProps = {
@@ -86,6 +87,12 @@ export const RecruitmentDetails = ({ recruitment }: RecruitmentDetailsProps) => 
             {recruitment.has_reward
               ? recruitment.reward_details || 'あり'
               : 'なし'}
+          </span>
+        </div>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>メニュー提供</span>
+          <span className={styles.detailValue}>
+            {MENU_SELECTION_LABELS[(recruitment.menu_selection_type ?? 'fixed') as MenuSelectionType]}
           </span>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { formatDateTime, isFutureDate } from '@/utils/date';
-import { Recruitment } from '@/types';
+import { Recruitment, MenuSelectionType } from '@/types';
+import { MENU_SELECTION_LABELS } from '@/utils/recruitment';
 import styles from './RecruitmentManagementSection.module.css';
 
 interface RecruitmentManagementSectionProps {
@@ -53,6 +54,7 @@ export const RecruitmentManagementSection = ({
             const isActive = recruitment.status === 'active';
             const flexibleText = recruitment.flexible_schedule_text?.trim();
             const hasFlexible = !!flexibleText;
+            const menuSelectionType = (recruitment.menu_selection_type ?? 'fixed') as MenuSelectionType;
             const upcomingDates = (recruitment.available_dates || []).filter(
               date => !date.is_booked && isFutureDate(date.datetime)
             );
@@ -74,6 +76,9 @@ export const RecruitmentManagementSection = ({
                 <p className={styles.meta}>
                   空き枠: <strong>{availableSlots}</strong>件
                   {hasFlexible && <span> / 調整メモあり</span>}
+                </p>
+                <p className={styles.meta}>
+                  メニュー提供: <strong>{MENU_SELECTION_LABELS[menuSelectionType]}</strong>
                 </p>
                 <p className={styles.meta}>料金: <strong>{formatPayment(recruitment)}</strong></p>
                 <div className={styles.scheduleBlock}>

@@ -5,6 +5,7 @@ import {
   HairLengthRequirement,
   PhotoShootRequirement,
   ModelExperienceRequirement,
+  MenuSelectionType,
   AvailableDate,
 } from '@/types';
 import {
@@ -18,6 +19,7 @@ import {
   PHOTO_SHOOT_LABELS,
   EXPERIENCE_OPTIONS,
   EXPERIENCE_LABELS,
+  MENU_SELECTION_LABELS,
 } from '@/utils/recruitment';
 import { formatDateTime } from '@/utils/date';
 import styles from './RecruitmentForm.module.css';
@@ -26,6 +28,7 @@ export interface RecruitmentFormData {
   title: string;
   description: string;
   menus: MenuType[];
+  menu_selection_type: MenuSelectionType;
   gender_requirement: GenderRequirement;
   hair_length_requirement: HairLengthRequirement;
   treatment_duration: string;
@@ -59,10 +62,16 @@ export const RecruitmentForm = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [newSlotDate, setNewSlotDate] = useState('');
   const [newSlotTime, setNewSlotTime] = useState('');
-  const [formData, setFormData] = useState<RecruitmentFormData>(initialData);
+  const [formData, setFormData] = useState<RecruitmentFormData>({
+    ...initialData,
+    menu_selection_type: initialData.menu_selection_type ?? 'fixed',
+  });
 
   useEffect(() => {
-    setFormData(initialData);
+    setFormData({
+      ...initialData,
+      menu_selection_type: initialData.menu_selection_type ?? 'fixed',
+    });
     setCurrentStep(0);
     setNewSlotDate('');
     setNewSlotTime('');
@@ -123,6 +132,8 @@ export const RecruitmentForm = ({
       available_dates: prev.available_dates.filter(d => d.datetime !== datetime),
     }));
   };
+
+  const menuSelectionType: MenuSelectionType = formData.menu_selection_type ?? 'fixed';
 
   const canProceed = useMemo(() => {
     switch (currentStep) {
@@ -226,6 +237,35 @@ export const RecruitmentForm = ({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>メニューの提供方法</label>
+                <div className={styles.radioGroup}>
+                  {(Object.keys(MENU_SELECTION_LABELS) as MenuSelectionType[]).map(option => (
+                    <label key={option} className={styles.radioLabel}>
+                      <input
+                        type='radio'
+                        name='menuSelection'
+                        value={option}
+                        checked={menuSelectionType === option}
+                        onChange={e =>
+                          updateForm(prev => ({
+                            ...prev,
+                            menu_selection_type: e.target.value as MenuSelectionType,
+                          }))
+                        }
+                        className={styles.radio}
+                      />
+                      <span>{MENU_SELECTION_LABELS[option]}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className={styles.helperText}>
+                  {menuSelectionType === 'fixed'
+                    ? '学生はこの募集で指定したメニューのみ受けられます。'
+                    : '学生は申し込み時に掲載したメニューの中から希望の施術を選べます。'}
+                </p>
               </div>
             </div>
 
@@ -548,7 +588,10 @@ export const RecruitmentForm = ({
                 <strong>タイトル:</strong> {formData.title || '未設定'}
               </div>
               <div className={styles.summaryItem}>
-                <strong>メニュー:</strong> {formData.menus?.map(m => MENU_LABELS[m]).join(', ') || '未選択'}
+                <strong>メニュー:</strong> {formData.menus?.map(m => MENU_LABELS[m] ?? m).join(', ') || '未選択'}
+              </div>
+              <div className={styles.summaryItem}>
+                <strong>提供方法:</strong> {MENU_SELECTION_LABELS[menuSelectionType]}
               </div>
               <div className={styles.summaryItem}>
                 <strong>料金:</strong>{' '}

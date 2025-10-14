@@ -24,6 +24,7 @@ const initialRecruitmentState: RecruitmentFormData = {
   title: '',
   description: '',
   menus: [],
+  menu_selection_type: 'fixed',
   gender_requirement: 'any' as GenderRequirement,
   hair_length_requirement: 'any' as HairLengthRequirement,
   treatment_duration: '',

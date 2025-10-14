@@ -26,6 +26,7 @@ const recruitmentToFormData = (recruitment: Recruitment): RecruitmentFormData =>
     title: recruitment.title || '',
     description: recruitment.description || '',
     menus: recruitment.menus ? [...recruitment.menus] : [],
+    menu_selection_type: recruitment.menu_selection_type ?? 'fixed',
     gender_requirement: recruitment.gender_requirement,
     hair_length_requirement: recruitment.hair_length_requirement,
     treatment_duration: recruitment.treatment_duration || '',

@@ -93,8 +93,8 @@ const USAGE_CONTENT: Record<UsageTabKey, UsageContent> = {
     ],
     primaryCtaLabel: 'サロン登録をする',
     primaryCtaTo: '/signup',
-    secondaryCtaLabel: '機能紹介を見る',
-    secondaryCtaTo: '/about',
+    secondaryCtaLabel: 'よくある質問を見る',
+    secondaryCtaTo: '/faq',
   },
 };
 

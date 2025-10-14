@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { RecruitmentWithDetails } from '@/types';
-import { MENU_LABELS } from '@/utils/recruitment';
+import type { RecruitmentWithDetails, MenuSelectionType } from '@/types';
+import { MENU_LABELS, MENU_SELECTION_LABELS } from '@/utils/recruitment';
 import { isBeforeHoursBefore, isPastCutoffButBeforeEvent, isFutureDate } from '@/utils/date';
 import { Card } from './Card';
 import styles from './RecruitmentCard.module.css';
@@ -41,6 +41,8 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
     : recruitment.payment_amount
     ? `¥${new Intl.NumberFormat('ja-JP').format(recruitment.payment_amount)}`
     : '料金未設定';
+  const menuSelectionType = (recruitment.menu_selection_type ?? 'fixed') as MenuSelectionType;
+  const menuSelectionLabel = MENU_SELECTION_LABELS[menuSelectionType];
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>
@@ -64,16 +66,19 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
         <h4 className={styles.title}>{recruitment.title}</h4>
 
         {recruitment.menus && recruitment.menus.length > 0 && (
-          <div className={styles.menuTags}>
-            {recruitment.menus.slice(0, 3).map(menu => (
-              <span key={menu} className={styles.menuTag}>
-                {MENU_LABELS[menu]}
-              </span>
-            ))}
-            {recruitment.menus.length > 3 && (
-              <span className={styles.menuTag}>+{recruitment.menus.length - 3}</span>
-            )}
-          </div>
+          <>
+            <div className={styles.menuTags}>
+              {recruitment.menus.slice(0, 3).map(menu => (
+                <span key={menu} className={styles.menuTag}>
+                  {MENU_LABELS[menu] ?? menu}
+                </span>
+              ))}
+              {recruitment.menus.length > 3 && (
+                <span className={styles.menuTag}>+{recruitment.menus.length - 3}</span>
+              )}
+            </div>
+            <p className={styles.menuSelectionNote}>{menuSelectionLabel}</p>
+          </>
         )}
 
         {recruitment.description && (

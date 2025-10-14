@@ -4,9 +4,16 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
 import { useReservations } from '@/hooks/useReservations';
-import { AvailableDate, RecruitmentWithDetails } from '@/types';
+import { AvailableDate, RecruitmentWithDetails, MenuSelectionType } from '@/types';
 import { formatDateTime, isBeforeHoursBefore, isFutureDate, isPastCutoffButBeforeEvent } from '@/utils/date';
-import { MENU_LABELS, GENDER_LABELS, HAIR_LENGTH_LABELS, PHOTO_SHOOT_LABELS, EXPERIENCE_LABELS } from '@/utils/recruitment';
+import {
+  MENU_LABELS,
+  GENDER_LABELS,
+  HAIR_LENGTH_LABELS,
+  PHOTO_SHOOT_LABELS,
+  EXPERIENCE_LABELS,
+  MENU_SELECTION_LABELS,
+} from '@/utils/recruitment';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
@@ -291,6 +298,7 @@ export const RecruitmentDetailPage = () => {
 
   if (loading) return <Spinner fullScreen />;
   if (!recruitment) return <div className={styles.error}>募集情報が見つかりませんでした</div>;
+  const menuSelectionType = (recruitment.menu_selection_type ?? 'fixed') as MenuSelectionType;
 
   return (
     <div className={styles.container}>
@@ -318,10 +326,11 @@ export const RecruitmentDetailPage = () => {
               <div className={styles.menusContainer}>
                 {recruitment.menus.map(menu => (
                   <span key={menu} className={styles.menuTag}>
-                    {MENU_LABELS[menu]}
+                    {MENU_LABELS[menu] ?? menu}
                   </span>
                 ))}
               </div>
+              <p className={styles.menuSelectionNote}>{MENU_SELECTION_LABELS[menuSelectionType]}</p>
             </div>
           )}
 
@@ -358,6 +367,10 @@ export const RecruitmentDetailPage = () => {
               <div className={styles.conditionItem}>
                 <span className={styles.conditionLabel}>謝礼</span>
                 <span className={styles.conditionValue}>{rewardLabel}</span>
+              </div>
+              <div className={styles.conditionItem}>
+                <span className={styles.conditionLabel}>メニュー提供</span>
+                <span className={styles.conditionValue}>{MENU_SELECTION_LABELS[menuSelectionType]}</span>
               </div>
             </div>
           </div>

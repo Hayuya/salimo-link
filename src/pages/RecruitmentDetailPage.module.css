@@ -464,6 +464,12 @@
   gap: var(--spacing-xs);
 }
 
+.menuSelectionNote {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
 .menuTag {
   display: inline-flex;
   align-items: center;
