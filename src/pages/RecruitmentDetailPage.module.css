@@ -374,6 +374,13 @@
   box-shadow: var(--shadow-sm);
 }
 
+.sectionNoCard {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 .sectionTitle {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-bold);
