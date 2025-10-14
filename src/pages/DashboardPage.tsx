@@ -137,34 +137,28 @@ export const DashboardPage = () => {
                 variant="outline"
                 onClick={() => setShowProfileActions(prev => !prev)}
               >
-                アカウント設定
+                {showProfileActions ? 'プロフィールを隠す' : 'プロフィールを表示'}
               </Button>
               {showProfileActions && (
-                <div className={styles.actionDropdown}>
-                  <button
-                    type="button"
-                    className={styles.actionItem}
-                    onClick={handleOpenProfileModal}
-                  >
-                    プロフィール編集
-                  </button>
-                  <button
-                    type="button"
-                    className={[styles.actionItem, styles.actionDanger].join(' ')}
-                    onClick={handleDeleteAccount}
-                    disabled={deleteLoading}
-                  >
-                    {deleteLoading ? '削除中…' : 'アカウント削除'}
-                  </button>
+                <div className={[styles.actionDropdown, styles.profileDropdown].join(' ')}>
+                  <ProfileCard user={user} />
+                  <div className={styles.profileDropdownActions}>
+                    <Button variant="primary" onClick={handleOpenProfileModal}>
+                      プロフィール編集
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteLoading}
+                    >
+                      {deleteLoading ? '削除中…' : 'アカウント削除'}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
-
-        <ProfileCard
-          user={user}
-        />
 
         {user.userType === 'student' ? (
           <StudentReservationsSection

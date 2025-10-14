@@ -89,6 +89,22 @@
   color: #d9344c;
 }
 
+.profileDropdown {
+  width: min(360px, 90vw);
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+.profileDropdownActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.profileDropdownActions > * {
+  width: 100%;
+}
+
 .title {
   margin: 0;
   font-size: var(--font-size-3xl);
