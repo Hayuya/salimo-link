@@ -49,7 +49,10 @@ export const Header = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
-          <h1>SaloMo Link</h1>
+          <h1 className={styles.logoTitle}>
+            SaloMo Link
+            <span className={styles.betaBadge}>BETA</span>
+          </h1>
         </Link>
 
         <nav className={styles.nav}>
