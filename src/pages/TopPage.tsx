@@ -98,7 +98,7 @@ export const TopPage = () => {
                     学生として登録する
                   </Button>
                 </Link>
-                <Link to="/signup?role=salon" className={styles.heroCtaLink}>
+                <Link to="/signup?role=salon#:~:text=%E3%82%B5%E3%83%AD%E3%83%B3-,%E3%81%A8%E3%81%97%E3%81%A6,-%E7%99%BB%E9%8C%B2" className={styles.heroCtaLink}>
                   <Button variant="outline" size="lg" fullWidth>
                     サロンとして登録する
                   </Button>

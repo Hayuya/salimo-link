@@ -363,60 +363,63 @@ export const RecruitmentDetailPage = () => {
           </div>
 
           {/* サロン情報 */}
-          <div className={[styles.section, styles.sectionNoCard].join(' ')}>
-            <div className={styles.salonInfoCard}>
-              <div className={styles.salonInfoHeader}>
-                <div className={styles.salonInfoTitle}>
-                  <span className={styles.salonInfoIcon} aria-hidden="true" />
-                  <p>サロン情報</p>
-                </div>
-                {recruitment.salon.photo_url && (
-                  <img
-                    src={recruitment.salon.photo_url}
-                    alt={recruitment.salon.salon_name}
-                    className={styles.salonThumbnail}
-                  />
-                )}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>
+              <span className={styles.sectionTitleIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <path d="M12 21s-6-4.35-6-10a6 6 0 1112 0c0 5.65-6 10-6 10z" />
+                  <circle cx="12" cy="11" r="2.5" />
+                </svg>
+              </span>
+              サロン情報
+            </h3>
+            <div className={styles.conditionsList}>
+              <div className={styles.conditionItem}>
+                <span className={styles.conditionLabel}>サロン名</span>
+                <span className={styles.conditionValue}>{recruitment.salon.salon_name}</span>
               </div>
-              <dl className={styles.salonInfoList}>
-                <div className={styles.salonInfoItem}>
-                  <dt className={styles.infoLabel}>サロン名</dt>
-                  <dd className={styles.infoValue}>{recruitment.salon.salon_name}</dd>
+              {recruitment.salon.address && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>住所</span>
+                  <span className={styles.conditionValue}>
+                    {recruitment.salon.address}
+                  </span>
                 </div>
-                {recruitment.salon.address && (
-                  <div className={styles.salonInfoItem}>
-                    <dt className={styles.infoLabel}>住所</dt>
-                    <dd className={[styles.infoValue, styles.addressValue].join(' ')}>
-                      <span>{recruitment.salon.address}</span>
-                    </dd>
-                  </div>
-                )}
-                {recruitment.salon.phone_number && (
-                  <div className={styles.salonInfoItem}>
-                    <dt className={styles.infoLabel}>電話</dt>
-                    <dd className={styles.infoValue}>{recruitment.salon.phone_number}</dd>
-                  </div>
-                )}
-                {recruitment.salon.website_url && (
-                  <div className={styles.salonInfoItem}>
-                    <dt className={styles.infoLabel}>WEBサイト</dt>
-                    <dd className={styles.infoValue}>
-                      <a
-                        href={recruitment.salon.website_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.contactLink}
-                      >
-                        {recruitment.salon.website_url}
-                      </a>
-                    </dd>
-                  </div>
-                )}
-              </dl>
-              {recruitment.salon.description && (
-                <p className={styles.salonDescription}>{recruitment.salon.description}</p>
+              )}
+              {recruitment.salon.phone_number && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>電話</span>
+                  <span className={styles.conditionValue}>{recruitment.salon.phone_number}</span>
+                </div>
+              )}
+              {recruitment.salon.website_url && (
+                <div className={styles.conditionItem}>
+                  <span className={styles.conditionLabel}>WEBサイト</span>
+                  <span className={styles.conditionValue}>
+                    <a
+                      href={recruitment.salon.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.contactLink}
+                    >
+                      {recruitment.salon.website_url}
+                    </a>
+                  </span>
+                </div>
               )}
             </div>
+            {recruitment.salon.photo_url && (
+              <div className={styles.salonVisual}>
+                <img
+                  src={recruitment.salon.photo_url}
+                  alt={recruitment.salon.salon_name}
+                  className={styles.salonThumbnail}
+                />
+              </div>
+            )}
+            {recruitment.salon.description && (
+              <p className={styles.salonDescription}>{recruitment.salon.description}</p>
+            )}
           </div>
 
           {/* 予約可能な日時 */}
