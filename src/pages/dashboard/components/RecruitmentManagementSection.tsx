@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
-import { formatDateTime } from '@/utils/date';
+import { formatDateTime, isFutureDate } from '@/utils/date';
 import { Recruitment } from '@/types';
 import styles from './RecruitmentManagementSection.module.css';
 
@@ -43,6 +43,11 @@ export const RecruitmentManagementSection = ({
             const isActive = recruitment.status === 'active';
             const flexibleText = recruitment.flexible_schedule_text?.trim();
             const hasFlexible = !!flexibleText;
+            const upcomingDates = (recruitment.available_dates || []).filter(
+              date => !date.is_booked && isFutureDate(date.datetime)
+            );
+            const visibleUpcomingDates = upcomingDates.slice(0, 3);
+            const hasMoreUpcomingDates = upcomingDates.length > visibleUpcomingDates.length;
             return (
               <div key={recruitment.id} className={styles.card}>
                 <div className={styles.cardHeader}>
@@ -65,6 +70,25 @@ export const RecruitmentManagementSection = ({
                     調整メモ: {flexibleText}
                   </p>
                 )}
+                <div className={styles.scheduleBlock}>
+                  <p className={styles.scheduleTitle}>募集中の日時</p>
+                  {visibleUpcomingDates.length > 0 ? (
+                    <ul className={styles.scheduleList}>
+                      {visibleUpcomingDates.map(date => (
+                        <li key={date.datetime}>{formatDateTime(date.datetime)}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.noSchedule}>
+                      現在公開中の日時はありません。必要に応じて募集内容を更新してください。
+                    </p>
+                  )}
+                  {hasMoreUpcomingDates && (
+                    <p className={styles.scheduleNote}>
+                      ほか {upcomingDates.length - visibleUpcomingDates.length} 件の日時があります
+                    </p>
+                  )}
+                </div>
                 <div className={styles.actions}>
                   <Button variant="outline" size="sm" onClick={() => onEditClick(recruitment)}>
                     編集

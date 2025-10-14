@@ -142,6 +142,47 @@
   color: var(--color-text-secondary);
 }
 
+.scheduleBlock {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background: rgba(124, 93, 247, 0.08);
+  border: 1px solid rgba(124, 93, 247, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scheduleTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.scheduleList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.noSchedule {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.scheduleNote {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
 .actions {
   display: flex;
   gap: var(--spacing-sm);
