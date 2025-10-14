@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useRecruitments } from '@/recruitment';
 import { useAuth } from '@/auth';
 import { RecruitmentCard } from '@/components/RecruitmentCard';
 import { Spinner } from '@/components/Spinner';
+import { Button } from '@/components/Button';
 import styles from './TopPage.module.css';
 import type { MenuType } from '@/types'; // 正しいMenuTypeをインポート
 import { isBeforeHoursBefore, isFutureDate } from '@/utils/date';
@@ -90,6 +91,19 @@ export const TopPage = () => {
                 安全で洗練された出会いをサポート。<br />
                 美容とファッションに寄り添ったマッチングプラットフォームです。
               </p>
+
+              <div className={styles.heroCtas}>
+                <Link to="/signup?role=student" className={styles.heroCtaLink}>
+                  <Button variant="primary" size="lg" fullWidth>
+                    学生として登録する
+                  </Button>
+                </Link>
+                <Link to="/signup?role=salon" className={styles.heroCtaLink}>
+                  <Button variant="outline" size="lg" fullWidth>
+                    サロンとして登録する
+                  </Button>
+                </Link>
+              </div>
 
               {/* 特徴セクション */}
               <div className={styles.heroFeatures}>

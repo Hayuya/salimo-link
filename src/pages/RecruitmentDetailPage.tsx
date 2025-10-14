@@ -420,6 +420,7 @@ export const RecruitmentDetailPage = () => {
           </div>
 
           {/* 予約可能な日時 */}
+          {user && (
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>予約可能な日時</h3>
             {bookableDates.length > 0 ? (
@@ -541,6 +542,7 @@ export const RecruitmentDetailPage = () => {
               </div>
             )}
           </div>
+          )}
         </Card>
       </div>
 

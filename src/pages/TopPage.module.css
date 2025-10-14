@@ -171,6 +171,16 @@
   line-height: var(--line-height-relaxed);
 }
 
+.heroCtas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.heroCtaLink {
+  text-decoration: none;
+}
+
 /* 特徴セクション */
 .heroFeatures {
   display: flex;
@@ -449,6 +459,11 @@
     padding: var(--spacing-3xl) var(--container-padding) var(--spacing-2xl);
   }
 
+  .heroCtas {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+
   .heroVisual {
     order: -1;
   }
@@ -506,6 +521,10 @@
   .heroFeatures {
     width: 100%;
     max-width: 400px;
+  }
+
+  .heroCtas {
+    width: 100%;
   }
 
   .featureItem {
