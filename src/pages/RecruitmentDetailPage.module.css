@@ -244,6 +244,12 @@
   box-shadow: var(--shadow-sm);
 }
 
+.salonVisual {
+  margin: var(--spacing-md) 0;
+  display: flex;
+  justify-content: center;
+}
+
 .salonInfoList {
   display: flex;
   flex-direction: column;
@@ -321,6 +327,38 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
+}
+
+.salonDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.salonDetailRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid rgba(114, 111, 150, 0.12);
+}
+
+.salonDetailRow:last-child {
+  border-bottom: none;
+}
+
+.salonDetailLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.salonDetailValue {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  word-break: break-word;
 }
 
 /* 募集情報カード */

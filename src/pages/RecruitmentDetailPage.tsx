@@ -1,6 +1,6 @@
 // src/pages/RecruitmentDetailPage.tsx
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { useRecruitments } from '@/recruitment';
 import { useReservations } from '@/hooks/useReservations';
@@ -373,29 +373,27 @@ export const RecruitmentDetailPage = () => {
               </span>
               サロン情報
             </h3>
-            <div className={styles.conditionsList}>
-              <div className={styles.conditionItem}>
-                <span className={styles.conditionLabel}>サロン名</span>
-                <span className={styles.conditionValue}>{recruitment.salon.salon_name}</span>
+            <div className={styles.salonDetails}>
+              <div className={styles.salonDetailRow}>
+                <span className={styles.salonDetailLabel}>サロン名</span>
+                <span className={styles.salonDetailValue}>{recruitment.salon.salon_name}</span>
               </div>
               {recruitment.salon.address && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>住所</span>
-                  <span className={styles.conditionValue}>
-                    {recruitment.salon.address}
-                  </span>
+                <div className={styles.salonDetailRow}>
+                  <span className={styles.salonDetailLabel}>住所</span>
+                  <span className={styles.salonDetailValue}>{recruitment.salon.address}</span>
                 </div>
               )}
               {recruitment.salon.phone_number && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>電話</span>
-                  <span className={styles.conditionValue}>{recruitment.salon.phone_number}</span>
+                <div className={styles.salonDetailRow}>
+                  <span className={styles.salonDetailLabel}>電話</span>
+                  <span className={styles.salonDetailValue}>{recruitment.salon.phone_number}</span>
                 </div>
               )}
               {recruitment.salon.website_url && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>WEBサイト</span>
-                  <span className={styles.conditionValue}>
+                <div className={styles.salonDetailRow}>
+                  <span className={styles.salonDetailLabel}>WEBサイト</span>
+                  <span className={styles.salonDetailValue}>
                     <a
                       href={recruitment.salon.website_url}
                       target="_blank"
