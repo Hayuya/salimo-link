@@ -189,7 +189,8 @@
 .scheduleDescription {
   margin: 0;
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-normal);
 }
 
