@@ -17,6 +17,11 @@ export const useRecruitments = () => {
   const fetchRecruitments = useCallback(async () => {
     setLoading(true);
     try {
+      const { error: normalizeError } = await supabase.rpc('normalize_all_recruitments');
+      if (normalizeError) {
+        console.error('normalize_all_recruitments error:', normalizeError);
+      }
+
       const { data, error } = await supabase
         .from('recruitments')
         .select(`
@@ -51,6 +56,13 @@ export const useRecruitments = () => {
 
   const fetchRecruitmentById = useCallback(async (id: string): Promise<RecruitmentWithDetails | null> => {
     try {
+      const { error: normalizeError } = await supabase.rpc('normalize_recruitment_schedule', {
+        p_recruitment_id: id,
+      });
+      if (normalizeError) {
+        console.error('normalize_recruitment_schedule error:', normalizeError);
+      }
+
       const { data, error } = await supabase
         .from('recruitments')
         .select(`
@@ -69,6 +81,11 @@ export const useRecruitments = () => {
 
   const fetchRecruitmentsBySalonId = useCallback(async (salonId: string): Promise<Recruitment[]> => {
     try {
+      const { error: normalizeError } = await supabase.rpc('normalize_all_recruitments');
+      if (normalizeError) {
+        console.error('normalize_all_recruitments error:', normalizeError);
+      }
+
       const { data, error } = await supabase
         .from('recruitments')
         .select('*')
@@ -94,6 +111,16 @@ export const useRecruitments = () => {
         .single();
 
       if (error) throw error;
+
+      if (newRecruitment?.id) {
+        const { error: normalizeError } = await supabase.rpc('normalize_recruitment_schedule', {
+          p_recruitment_id: newRecruitment.id,
+        });
+        if (normalizeError) {
+          console.error('normalize_recruitment_schedule error:', normalizeError);
+        }
+      }
+
       return newRecruitment;
     } catch (err: any) {
       throw err;
@@ -110,6 +137,14 @@ export const useRecruitments = () => {
         .single();
 
       if (error) throw error;
+
+      const { error: normalizeError } = await supabase.rpc('normalize_recruitment_schedule', {
+        p_recruitment_id: id,
+      });
+      if (normalizeError) {
+        console.error('normalize_recruitment_schedule error:', normalizeError);
+      }
+
       return updatedRecruitment;
     } catch (err: any) {
       throw err;

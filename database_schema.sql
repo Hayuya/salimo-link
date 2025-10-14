@@ -104,6 +104,74 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION normalize_recruitment_schedule(p_recruitment_id UUID)
+RETURNS VOID AS $$
+DECLARE
+  v_available_dates JSONB := '[]'::jsonb;
+  v_flexible_text TEXT;
+  v_updated_dates JSONB := '[]'::jsonb;
+  v_date_obj JSONB;
+  v_has_future_open BOOLEAN := FALSE;
+  v_should_be_active BOOLEAN := FALSE;
+BEGIN
+  SELECT available_dates, flexible_schedule_text
+  INTO v_available_dates, v_flexible_text
+  FROM recruitments
+  WHERE id = p_recruitment_id;
+
+  IF NOT FOUND THEN
+    RETURN;
+  END IF;
+
+  FOR v_date_obj IN SELECT * FROM jsonb_array_elements(COALESCE(v_available_dates, '[]'::jsonb))
+  LOOP
+    IF (v_date_obj->>'datetime')::timestamptz <= NOW() THEN
+      v_updated_dates := v_updated_dates || jsonb_build_object(
+        'datetime', v_date_obj->>'datetime',
+        'is_booked', TRUE
+      );
+    ELSE
+      v_updated_dates := v_updated_dates || jsonb_build_object(
+        'datetime', v_date_obj->>'datetime',
+        'is_booked', COALESCE((v_date_obj->>'is_booked')::boolean, FALSE)
+      );
+      IF COALESCE((v_date_obj->>'is_booked')::boolean, FALSE) = FALSE THEN
+        v_has_future_open := TRUE;
+      END IF;
+    END IF;
+  END LOOP;
+
+  v_should_be_active := v_has_future_open OR (v_flexible_text IS NOT NULL AND btrim(v_flexible_text) <> '');
+
+  UPDATE recruitments
+  SET available_dates = v_updated_dates,
+      status = CASE
+        WHEN v_should_be_active THEN 'active'
+        ELSE 'closed'
+      END
+  WHERE id = p_recruitment_id
+    AND (
+      available_dates IS DISTINCT FROM v_updated_dates
+      OR status <> CASE WHEN v_should_be_active THEN 'active' ELSE 'closed' END
+    );
+
+  PERFORM refresh_recruitment_booking_state(p_recruitment_id);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+CREATE OR REPLACE FUNCTION normalize_all_recruitments()
+RETURNS VOID AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  FOR rec IN
+    SELECT id FROM recruitments
+  LOOP
+    PERFORM normalize_recruitment_schedule(rec.id);
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
 CREATE OR REPLACE FUNCTION trg_update_recruitment_booking_state()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -298,6 +366,8 @@ DECLARE
   v_updated_dates JSONB := '[]'::jsonb;
   v_date_obj JSONB;
 BEGIN
+  PERFORM normalize_recruitment_schedule(p_recruitment_id);
+
   -- Get current available_dates and chat setting
   SELECT available_dates, flexible_schedule_text
   INTO v_available_dates, v_flexible_text
@@ -354,9 +424,10 @@ BEGIN
 
   -- Update recruitment's available_dates and close the recruitment
   UPDATE recruitments
-  SET available_dates = v_updated_dates,
-      status = 'closed'
+  SET available_dates = v_updated_dates
   WHERE id = p_recruitment_id;
+
+  PERFORM normalize_recruitment_schedule(p_recruitment_id);
   
   -- Create reservation
   INSERT INTO reservations (
@@ -394,11 +465,8 @@ DECLARE
   v_available_dates JSONB;
   v_updated_dates JSONB := '[]'::jsonb;
   v_date_obj JSONB;
-  v_active_reservations INTEGER;
-  v_has_open_slot BOOLEAN := FALSE;
   v_is_chat_consultation BOOLEAN := FALSE;
   v_flexible_text TEXT;
-  v_has_flexible BOOLEAN := FALSE;
 BEGIN
   -- Get reservation details
   SELECT recruitment_id, reservation_datetime, is_chat_consultation
@@ -415,8 +483,6 @@ BEGIN
   INTO v_available_dates, v_flexible_text
   FROM recruitments
   WHERE id = v_recruitment_id;
-  
-  v_has_flexible := v_flexible_text IS NOT NULL AND btrim(v_flexible_text) <> '';
   
   IF v_is_chat_consultation THEN
     v_updated_dates := COALESCE(v_available_dates, '[]'::jsonb);
@@ -435,28 +501,12 @@ BEGIN
     END LOOP;
   END IF;
 
-  -- Check for remaining pending/confirmed reservations
-  SELECT COUNT(*) INTO v_active_reservations
-  FROM reservations
-  WHERE recruitment_id = v_recruitment_id
-    AND status IN ('pending', 'confirmed');
-
-  -- Determine if there is at least one open slot
-  SELECT EXISTS (
-    SELECT 1
-    FROM jsonb_array_elements(COALESCE(v_updated_dates, '[]'::jsonb)) elem
-    WHERE (elem->>'is_booked')::boolean = FALSE
-  ) INTO v_has_open_slot;
-  
   -- Update recruitment's available_dates and status
   UPDATE recruitments
-  SET available_dates = v_updated_dates,
-      status = CASE
-        WHEN v_active_reservations = 0 AND (v_has_open_slot OR v_has_flexible) THEN 'active'
-        WHEN v_active_reservations = 0 AND NOT (v_has_open_slot OR v_has_flexible) THEN 'closed'
-        ELSE 'closed'
-      END
+  SET available_dates = v_updated_dates
   WHERE id = v_recruitment_id;
+
+  PERFORM normalize_recruitment_schedule(v_recruitment_id);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
