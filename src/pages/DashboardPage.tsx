@@ -92,6 +92,21 @@ export const DashboardPage = () => {
     handleCancelReservation,
   } = useDashboard();
 
+  const createFormInitialData = useMemo(
+    () => cloneRecruitmentFormData(dashboardInitialRecruitmentState),
+    [showCreateModal],
+  );
+
+  const editingFormInitialData = useMemo(() => {
+    if (!editingRecruitment) return null;
+    return recruitmentToFormData(editingRecruitment);
+  }, [editingRecruitment]);
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingRecruitment(null);
+  };
+
   if (loading) return <Spinner fullScreen />;
   if (!user) return null;
 
@@ -108,20 +123,6 @@ export const DashboardPage = () => {
       default:
         return { text: status, className: '' };
     }
-  };
-  const createFormInitialData = useMemo(
-    () => cloneRecruitmentFormData(dashboardInitialRecruitmentState),
-    [showCreateModal],
-  );
-
-  const editingFormInitialData = useMemo(() => {
-    if (!editingRecruitment) return null;
-    return recruitmentToFormData(editingRecruitment);
-  }, [editingRecruitment]);
-
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-    setEditingRecruitment(null);
   };
 
   return (
