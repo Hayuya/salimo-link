@@ -441,18 +441,32 @@ export const RecruitmentDetailPage = () => {
               <div className={styles.expiredNotice}>
                 <p className={styles.expiredNoticeTitle}>予約期限を過ぎています</p>
                 <p className={styles.expiredNoticeText}>
-                  各予約枠は予約日時の48時間前で締切となります。サロンに直接お電話いただくか、チャット機能でご相談ください。
+                  各予約枠は予約日時の48時間前で締切となります。掲載日時は「相談可」となりますので、サロンへ直接ご連絡の上、空き状況をご相談ください。
                 </p>
-                {recruitment.salon.phone_number && (
+                {(recruitment.salon.phone_number || recruitment.salon.email) && (
+                  <div className={styles.expiredNoticeContacts}>
+                    {recruitment.salon.phone_number && (
+                      <p className={styles.expiredNoticeContact}>
+                        電話: {recruitment.salon.phone_number}
+                      </p>
+                    )}
+                    {recruitment.salon.email && (
+                      <p className={styles.expiredNoticeContact}>
+                        メール: {recruitment.salon.email}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {!recruitment.salon.phone_number && !recruitment.salon.email && (
                   <p className={styles.expiredNoticeContact}>
-                    サロン直通: {recruitment.salon.phone_number}
+                    サロン情報欄から提示の連絡手段でご相談ください。
                   </p>
                 )}
                 <div className={styles.expiredDatesList}>
                   {expiredDates.map(date => (
                     <div key={date.datetime} className={styles.expiredDateItem}>
                       <span>{formatDateTime(date.datetime)}</span>
-                      <span className={styles.expiredDateLabel}>締切済</span>
+                      <span className={styles.expiredDateLabel}>相談可</span>
                     </div>
                   ))}
                 </div>
