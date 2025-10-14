@@ -51,7 +51,7 @@ export const Header = () => {
         <Link to="/" className={styles.logo}>
           <h1 className={styles.logoTitle}>
             SaloMo Link
-            <span className={styles.betaBadge}>β版</span>
+            <span className={styles.betaBadge}>ベータ版</span>
           </h1>
         </Link>
 
