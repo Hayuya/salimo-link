@@ -22,6 +22,16 @@ export const RecruitmentManagementSection = ({
   const getAvailableSlotCount = (recruitment: Recruitment) =>
     recruitment.available_dates.filter(date => !date.is_booked).length;
 
+  const formatPayment = (recruitment: Recruitment) => {
+    if (recruitment.payment_type === 'free') {
+      return '無料';
+    }
+    if (!recruitment.payment_amount) {
+      return '料金未設定';
+    }
+    return `¥${new Intl.NumberFormat('ja-JP').format(recruitment.payment_amount)}`;
+  };
+
   return (
     <section className={styles.wrapper}>
       <div className={styles.header}>
@@ -65,6 +75,7 @@ export const RecruitmentManagementSection = ({
                   空き枠: <strong>{availableSlots}</strong>件
                   {hasFlexible && <span> / 調整メモあり</span>}
                 </p>
+                <p className={styles.meta}>料金: <strong>{formatPayment(recruitment)}</strong></p>
                 <div className={styles.scheduleBlock}>
                   <p className={styles.scheduleTitle}>募集中の日時</p>
                   {visibleUpcomingDates.length > 0 ? (

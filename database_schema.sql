@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS recruitments (
   status TEXT NOT NULL DEFAULT 'active',
   photo_shoot_requirement TEXT NOT NULL DEFAULT 'none',
   model_experience_requirement TEXT NOT NULL DEFAULT 'any',
+  payment_type TEXT NOT NULL DEFAULT 'free',
+  payment_amount INTEGER,
   has_reward BOOLEAN NOT NULL DEFAULT false,
   reward_details TEXT,
   available_dates JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -62,7 +64,9 @@ CREATE TABLE IF NOT EXISTS recruitments (
   CONSTRAINT recruitments_gender_check CHECK (gender_requirement IN ('male', 'female', 'any')),
   CONSTRAINT recruitments_hair_length_check CHECK (hair_length_requirement IN ('short', 'bob', 'medium', 'long', 'any')),
   CONSTRAINT recruitments_photo_shoot_check CHECK (photo_shoot_requirement IN ('required', 'optional', 'none')),
-  CONSTRAINT recruitments_experience_check CHECK (model_experience_requirement IN ('any', 'experienced', 'beginner'))
+  CONSTRAINT recruitments_experience_check CHECK (model_experience_requirement IN ('any', 'experienced', 'beginner')),
+  CONSTRAINT recruitments_payment_type_check CHECK (payment_type IN ('free', 'paid')),
+  CONSTRAINT recruitments_payment_amount_check CHECK (payment_amount IS NULL OR payment_amount >= 0)
 );
 
 -- ==========================================

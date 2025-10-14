@@ -30,6 +30,8 @@ const initialRecruitmentState: RecruitmentFormData = {
   status: 'active' as const,
   photo_shoot_requirement: 'none' as PhotoShootRequirement,
   model_experience_requirement: 'any' as ModelExperienceRequirement,
+  payment_type: 'free',
+  payment_amount: null,
   has_reward: false,
   reward_details: '',
   available_dates: [],

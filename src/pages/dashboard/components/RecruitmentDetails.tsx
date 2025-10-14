@@ -13,6 +13,16 @@ type RecruitmentDetailsProps = {
 };
 
 export const RecruitmentDetails = ({ recruitment }: RecruitmentDetailsProps) => {
+  const formatPayment = () => {
+    if (recruitment.payment_type === 'free') {
+      return '無料';
+    }
+    if (!recruitment.payment_amount) {
+      return '料金未設定';
+    }
+    return `¥${new Intl.NumberFormat('ja-JP').format(recruitment.payment_amount)}`;
+  };
+
   return (
     <div className={styles.wrapper}>
       {recruitment.description && (
@@ -60,20 +70,24 @@ export const RecruitmentDetails = ({ recruitment }: RecruitmentDetailsProps) => 
             {PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}
           </span>
         </div>
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>料金</span>
+          <span className={styles.detailValue}>{formatPayment()}</span>
+        </div>
         {recruitment.treatment_duration && (
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>施術時間</span>
             <span className={styles.detailValue}>{recruitment.treatment_duration}</span>
           </div>
         )}
-        {recruitment.has_reward && (
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>謝礼</span>
-            <span className={styles.detailValue}>
-              {recruitment.reward_details || 'あり'}
-            </span>
-          </div>
-        )}
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>謝礼</span>
+          <span className={styles.detailValue}>
+            {recruitment.has_reward
+              ? recruitment.reward_details || 'あり'
+              : 'なし'}
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -32,6 +32,11 @@ const recruitmentToFormData = (recruitment: Recruitment): RecruitmentFormData =>
     status: recruitment.status,
     photo_shoot_requirement: recruitment.photo_shoot_requirement,
     model_experience_requirement: recruitment.model_experience_requirement,
+    payment_type: recruitment.payment_type,
+    payment_amount:
+      recruitment.payment_type === 'paid'
+        ? recruitment.payment_amount ?? null
+        : null,
     has_reward: Boolean(recruitment.has_reward),
     reward_details: recruitment.reward_details || '',
     available_dates: recruitment.available_dates ? recruitment.available_dates.map(date => ({ ...date })) : [],

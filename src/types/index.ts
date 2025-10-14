@@ -93,6 +93,7 @@ export type MenuType =
   | 'other';
 export type PhotoShootRequirement = 'required' | 'optional' | 'none';
 export type ModelExperienceRequirement = 'any' | 'experienced' | 'beginner';
+export type PaymentType = 'free' | 'paid';
 
 // ==========================================
 // Available Date Type (JSONB内の構造)
@@ -117,6 +118,8 @@ export interface Recruitment {
   status: RecruitmentStatus;
   photo_shoot_requirement: PhotoShootRequirement;
   model_experience_requirement: ModelExperienceRequirement;
+  payment_type: PaymentType;
+  payment_amount?: number | null;
   has_reward: boolean;
   reward_details?: string;
   
@@ -144,6 +147,8 @@ export interface RecruitmentInsert {
   status: RecruitmentStatus;
   photo_shoot_requirement: PhotoShootRequirement;
   model_experience_requirement: ModelExperienceRequirement;
+  payment_type: PaymentType;
+  payment_amount?: number | null;
   has_reward: boolean;
   reward_details?: string;
   
@@ -163,6 +168,8 @@ export interface RecruitmentUpdate {
   status?: RecruitmentStatus;
   photo_shoot_requirement?: PhotoShootRequirement;
   model_experience_requirement?: ModelExperienceRequirement;
+  payment_type?: PaymentType;
+  payment_amount?: number | null;
   has_reward?: boolean;
   reward_details?: string;
   available_dates?: AvailableDate[];

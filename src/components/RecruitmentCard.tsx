@@ -29,12 +29,18 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
   const hasFlexibleSchedule = !!recruitment.flexible_schedule_text?.trim();
 
   const slotDisplay = hasBookableSlots
-    ? `受付 ${bookableSlotsCount} 件`
+    ? `${bookableSlotsCount}件`
     : hasConsultableSlots
       ? '相談可'
       : hasFlexibleSchedule
         ? '調整可能'
         : 'なし';
+
+  const paymentDisplay = recruitment.payment_type === 'free'
+    ? '無料'
+    : recruitment.payment_amount
+    ? `¥${new Intl.NumberFormat('ja-JP').format(recruitment.payment_amount)}`
+    : '料金未設定';
 
   return (
     <Link to={`/recruitment/${recruitment.id}`} className={styles.link}>
@@ -82,6 +88,10 @@ export const RecruitmentCard = ({ recruitment }: RecruitmentCardProps) => {
           <div className={styles.slotInfo}>
             <span className={styles.slotLabel}>空き枠:</span>
             <span className={styles.slotCount}>{slotDisplay}</span>
+            <span className={styles.slotPrice}>
+              料金:
+              <span className={styles.slotPriceValue}>{paymentDisplay}</span>
+            </span>
           </div>
 
           {hasBookableSlots ? (

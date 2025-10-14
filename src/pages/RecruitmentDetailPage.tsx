@@ -42,6 +42,23 @@ export const RecruitmentDetailPage = () => {
   );
   const supportsFlexibleSchedule = flexibleScheduleText.length > 0;
   const RESERVATION_CUTOFF_HOURS = 48;
+  const paymentLabel = useMemo(() => {
+    if (!recruitment) return '無料';
+    if (recruitment.payment_type === 'free') {
+      return '無料';
+    }
+    if (!recruitment.payment_amount) {
+      return '料金未設定';
+    }
+    return `¥${new Intl.NumberFormat('ja-JP').format(recruitment.payment_amount)}`;
+  }, [recruitment]);
+
+  const rewardLabel = useMemo(() => {
+    if (!recruitment) return 'なし';
+    return recruitment.has_reward
+      ? recruitment.reward_details?.trim() || 'あり'
+      : 'なし';
+  }, [recruitment]);
   const reservationDisabledReason = useMemo(() => {
     if (checkingBlockingReservation) {
       return '予約状況を確認しています。少し待ってから再度お試しください。';
@@ -328,20 +345,20 @@ export const RecruitmentDetailPage = () => {
                 <span className={styles.conditionLabel}>撮影</span>
                 <span className={styles.conditionValue}>{PHOTO_SHOOT_LABELS[recruitment.photo_shoot_requirement]}</span>
               </div>
+              <div className={styles.conditionItem}>
+                <span className={styles.conditionLabel}>料金</span>
+                <span className={styles.conditionValue}>{paymentLabel}</span>
+              </div>
               {recruitment.treatment_duration && (
                 <div className={styles.conditionItem}>
                   <span className={styles.conditionLabel}>施術時間</span>
                   <span className={styles.conditionValue}>{recruitment.treatment_duration}</span>
                 </div>
               )}
-              {recruitment.has_reward && (
-                <div className={styles.conditionItem}>
-                  <span className={styles.conditionLabel}>謝礼</span>
-                  <span className={styles.conditionValue}>
-                    {recruitment.reward_details || 'あり'}
-                  </span>
-                </div>
-              )}
+              <div className={styles.conditionItem}>
+                <span className={styles.conditionLabel}>謝礼</span>
+                <span className={styles.conditionValue}>{rewardLabel}</span>
+              </div>
             </div>
           </div>
 
