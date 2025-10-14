@@ -1,5 +1,5 @@
-import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, FormEvent, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import { Input } from './Input';
 import { Button } from './Button';
@@ -8,7 +8,11 @@ import { isValidEmail, isSchoolEmail, isValidPassword, isValidPhoneNumber } from
 import styles from './SignupForm.module.css';
 
 export const SignupForm = () => {
-  const [userType, setUserType] = useState<UserType>('student');
+  const location = useLocation();
+  const [userType, setUserType] = useState<UserType>(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('role') === 'salon' ? 'salon' : 'student';
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,6 +33,12 @@ export const SignupForm = () => {
   
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const roleParam = params.get('role');
+    setUserType(roleParam === 'salon' ? 'salon' : 'student');
+  }, [location.search]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
