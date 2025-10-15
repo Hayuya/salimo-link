@@ -115,10 +115,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.warn('プロファイルが見つかりません。自動作成を試みます...');
       
       // auth.usersからメタデータを取得
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser();
+
       if (authError) {
         console.error('Auth user fetch error:', authError);
+
+        if ((authError as { status?: number }).status === 403) {
+          console.warn('保持しているセッションのユーザーが存在しません。サインアウトします。');
+          const { error: signOutError } = await supabase.auth.signOut();
+          if (signOutError) {
+            console.error('サインアウト処理に失敗しました:', signOutError);
+          }
+          alert('アカウント情報が見つかりません。再度ログインしてください。');
+          throw new Error('SESSION_USER_MISSING');
+        }
+
         throw new Error('ユーザー情報の取得に失敗しました');
       }
 
@@ -197,7 +211,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     } catch (error) {
       console.error('プロファイル読み込みエラー:', error);
-      alert('プロファイルの読み込み中にエラーが発生しました。詳細はコンソールを確認してください。');
+      if ((error as Error)?.message !== 'SESSION_USER_MISSING') {
+        alert('プロファイルの読み込み中にエラーが発生しました。詳細はコンソールを確認してください。');
+      }
       setUser(null);
       setLoading(false);
     }
