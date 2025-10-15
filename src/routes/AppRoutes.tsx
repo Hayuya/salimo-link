@@ -12,6 +12,8 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { RecruitmentDetailPage } from '@/pages/RecruitmentDetailPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminRoute } from './AdminRoute';
+import { AdminPage } from '@/pages/AdminPage';
 
 export const AppRoutes = () => {
   return (
@@ -29,6 +31,14 @@ export const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/recruitment/:id" element={<RecruitmentDetailPage />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
+          }
+        />
 
         {/* 保護されたルート（ログイン必須） */}
         <Route

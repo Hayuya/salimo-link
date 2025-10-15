@@ -31,6 +31,13 @@ export const Footer = () => {
         </div>
         <div className={styles.copyright}>
           <p>© {new Date().getFullYear()} SaloMo Link. All rights reserved.</p>
+          <Link
+            to="/admin"
+            className={styles.adminLink}
+            aria-label="管理者ページ"
+          >
+            system
+          </Link>
         </div>
       </div>
     </footer>

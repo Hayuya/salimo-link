@@ -83,6 +83,20 @@
   margin: 0;
 }
 
+.adminLink {
+  display: inline-block;
+  margin-top: var(--spacing-2xs);
+  font-size: var(--font-size-2xs);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.18);
+  transition: color var(--transition-fast);
+}
+
+.adminLink:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 @media (max-width: 768px) {
   .mainContent {
     flex-direction: column;
