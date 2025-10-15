@@ -242,7 +242,7 @@ export const AdminPage = () => {
     await fetchRows();
   };
 
-  const renderCellValue = (value: unknown) => {
+  const renderCellValue = (column: string, value: unknown) => {
     if (value === null || value === undefined) {
       return <span className={styles.nullValue}>null</span>;
     }
@@ -261,6 +261,23 @@ export const AdminPage = () => {
           {value ? 'true' : 'false'}
         </span>
       );
+    }
+
+    if (typeof value === 'string') {
+      const lowerColumn = column.toLowerCase();
+      const looksLikeId =
+        lowerColumn.endsWith('id') ||
+        /^[0-9a-f-]{16,}$/i.test(value);
+
+      if (looksLikeId) {
+        return (
+          <span className={styles.codeCell} title={value}>
+            {value}
+          </span>
+        );
+      }
+
+      return <span className={styles.textCell}>{value}</span>;
     }
 
     return <span className={styles.textCell}>{String(value)}</span>;
@@ -354,7 +371,7 @@ export const AdminPage = () => {
                         </td>
                         {columnNames.map((col) => (
                           <td key={`${rowKey}-${col}`} className={styles.dataCell}>
-                            {renderCellValue(row[col])}
+                            {renderCellValue(col, row[col])}
                           </td>
                         ))}
                       </tr>

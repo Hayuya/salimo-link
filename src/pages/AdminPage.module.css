@@ -253,6 +253,22 @@
   word-break: break-word;
 }
 
+.codeCell {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'SFMono-Regular', Consolas, 'Roboto Mono', 'Courier New', monospace;
+  font-size: var(--font-size-xs);
+  background: rgba(124, 93, 247, 0.1);
+  color: rgba(37, 21, 83, 0.85);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(124, 93, 247, 0.18);
+  padding: var(--spacing-3xs) var(--spacing-xs);
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .nullValue {
   color: rgba(37, 21, 83, 0.42);
   font-style: italic;
